@@ -11,11 +11,11 @@
 
 - type: entityShape
   id: RookCross
-  shape: !type:RookEntityShape
+  shape: !type:CrossEntityShape
 
 - type: entityShape
   id: BishopCross
-  shape: !type:BishopEntityShape
+  shape: !type:DiagonalCrossEntityShape
 
 - type: entityShape
   id: QueenCross

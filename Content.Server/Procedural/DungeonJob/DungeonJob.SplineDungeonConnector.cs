@@ -3,7 +3,9 @@ using System.Threading.Tasks;
 using Content.Server.NPC.Pathfinding;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.PostGeneration;
+using Content.Shared.Tag;
 using Robust.Shared.Map;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
 namespace Content.Server.Procedural.DungeonJob;
@@ -129,7 +131,7 @@ public sealed partial class DungeonJob
         }
 
         var dungy = new Dungeon();
-        var dungyRoom = new DungeonRoom(allTiles, Vector2.Zero, Box2i.Empty, new HashSet<Vector2i>());
+        var dungyRoom = new DungeonRoom(allTiles, Vector2.Zero, Box2i.Empty, new HashSet<Vector2i>(), new List<ProtoId<TagPrototype>>());
         dungy.AddRoom(dungyRoom);
 
         return dungy;

@@ -1,0 +1,33 @@
+- type: dungeonConfig
+  id: RandomRoomTest
+  layers:
+  - !type:RandomRoomDunGen
+    roomCount: 15
+    roomSize: !type:RoomSizeSelector
+      width: 3,9
+      height: 3,9
+    areaSize: 50,50
+    tile: Plating
+
+  - !type:CorridorDunGen
+    width: 3
+    tile: FloorSteel
+
+  - !type:BoundaryWallDunGen
+    wall: WallSolid
+    cornerWall: WallReinforced
+    tile: Plating
+
+- type: dungeonConfig
+  id: ShapeRoomTest
+  layers:
+  - !type:ShapeRoomDunGen
+    areaSize: 50,50
+    tile: Plating
+    minRoomWidth: 5,7
+    minRoomHeight: 5,7
+
+  - !type:BoundaryWallDunGen
+    wall: WallSolid
+    cornerWall: WallReinforced
+    tile: Plating

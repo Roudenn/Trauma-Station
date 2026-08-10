@@ -8,6 +8,7 @@ using Content.Shared.Actions;
 using Content.Shared.Actions.Events;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
+using Content.Shared.EntityShapes.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Weapons.Melee.Events;
@@ -22,7 +23,8 @@ public sealed partial class AngerSystem : EntitySystem
     [Dependency] private MobPhasesSystem _phases = default!;
     [Dependency] private SharedActionsSystem _actions = default!;
 
-    private EntityQuery<AngerPlayerScalingComponent> _scalingQuery;
+    [Dependency] private EntityQuery<ShapeSpawnerCounterComponent> _counterQuery = default!;
+    [Dependency] private EntityQuery<AngerPlayerScalingComponent> _scalingQuery = default!;
 
     public override void Initialize()
     {
@@ -38,7 +40,7 @@ public sealed partial class AngerSystem : EntitySystem
         SubscribeLocalEvent<AdjustAngerOnHitComponent, AttackedEvent>(OnAttacked);
         SubscribeLocalEvent<AngerDelayActionComponent, ActionPerformedEvent>(OnAngerActionUsed);
 
-        _scalingQuery = GetEntityQuery<AngerPlayerScalingComponent>();
+        SubscribeLocalEvent<AngerShapeSpawnerComponent, SpawnedByActionEvent>(OnActionSpawned);
     }
 
     public void AdjustAggression(Entity<AngerComponent?> ent, float value)
@@ -198,6 +200,30 @@ public sealed partial class AngerSystem : EntitySystem
 
         _actions.SetUseDelay(ent.Owner, delay);
         _actions.StartUseDelay(ent.Owner);
+    }
+
+    private void OnActionSpawned(Entity<AngerShapeSpawnerComponent> ent, ref SpawnedByActionEvent args)
+    {
+        if (!_counterQuery.TryComp(ent, out var counterComp))
+            return;
+
+        var anger = ent.Comp;
+
+        if (anger.MaxCounterRange != null)
+        {
+            counterComp.MaxCounter = GetAngerScale(args.User,
+                anger.MaxCounterRange.Value.X,
+                anger.MaxCounterRange.Value.Y,
+                anger.InverseCounter);
+        }
+
+        if (anger.SpawnPeriodRange != null)
+        {
+            counterComp.SpawnPeriod = GetAngerScale(args.User,
+                TimeSpan.FromSeconds(anger.SpawnPeriodRange.Value.X),
+                TimeSpan.FromSeconds(anger.SpawnPeriodRange.Value.Y),
+                anger.InverseCounter);
+        }
     }
 
     #endregion

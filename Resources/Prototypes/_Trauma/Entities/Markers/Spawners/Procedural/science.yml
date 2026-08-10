@@ -1,0 +1,11 @@
+- type: entity
+  parent: MarkerBase
+  id: FeatureArtifactAnalyzer
+  name: artifact analyzer chamber feature
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+  - type: FeatureSpawner
+    feature: !type:NestedFeature
+      id: ScienceArtifactAnalyzer

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Lavaland.Shared.EntityShapes.Shapes;
+using Content.Shared.EntityShapes.Shapes;
 
 namespace Content.Lavaland.Shared.Megafauna.Components;
 

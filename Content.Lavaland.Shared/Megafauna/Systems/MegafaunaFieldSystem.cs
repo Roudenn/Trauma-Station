@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
-using Content.Lavaland.Shared.EntityShapes;
 using Content.Lavaland.Shared.Megafauna.Components;
 using Content.Lavaland.Shared.Megafauna.Events;
+using Content.Shared.EntityShapes;
 using Robust.Shared.Threading;
 
 // ReSharper disable EnforceForeachStatementBraces

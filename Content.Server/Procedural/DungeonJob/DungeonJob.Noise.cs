@@ -3,7 +3,9 @@ using System.Threading.Tasks;
 using Content.Shared.Maps;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.DungeonGenerators;
+using Content.Shared.Tag;
 using Robust.Shared.Map;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
 
@@ -139,7 +141,7 @@ public sealed partial class DungeonJob
             }
 
             center /= roomTiles.Count;
-            rooms.Add(new DungeonRoom(roomTiles, center, roomArea, new HashSet<Vector2i>()));
+            rooms.Add(new DungeonRoom(roomTiles, center, roomArea, new HashSet<Vector2i>(), new List<ProtoId<TagPrototype>>()));
             await SuspendIfOutOfTime();
             ValidateResume();
         }

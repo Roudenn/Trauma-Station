@@ -313,6 +313,17 @@ public sealed partial class DungeonJob : Job<List<Dungeon>>
             case WormCorridorDunGen worm:
                 await PostGen(worm, dungeons[^1], reservedTiles, random);
                 break;
+            // <Trauma>
+            case FeatureDunGen feature:
+                await PostGen(feature, dungeons[^1], reservedTiles, random);
+                break;
+            case ShapeRoomDunGen shapeRoom:
+                dungeons.Add(await GenerateShapeDunGen(position, shapeRoom, reservedTiles, random));
+                break;
+            case RandomRoomDunGen randomRoom:
+                dungeons.Add(await GenerateRandomDunGen(position, randomRoom, reservedTiles, random));
+                break;
+            // </Trauma>
             default:
                 throw new NotImplementedException();
         }

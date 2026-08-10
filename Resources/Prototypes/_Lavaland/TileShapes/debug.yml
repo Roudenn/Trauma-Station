@@ -60,22 +60,22 @@
 
 - type: entityShape
   id: DebugCrossRook1
-  shape: !type:RookEntityShape
+  shape: !type:CrossEntityShape
     size: 1
 
 - type: entityShape
   id: DebugCrossBishop1
-  shape: !type:RookEntityShape
+  shape: !type:CrossEntityShape
     size: 1
 
 - type: entityShape
   id: DebugCrossRook5
-  shape: !type:RookEntityShape
+  shape: !type:CrossEntityShape
     size: 5
 
 - type: entityShape
   id: DebugCrossBishop5
-  shape: !type:RookEntityShape
+  shape: !type:CrossEntityShape
     size: 5
 
 # Options
