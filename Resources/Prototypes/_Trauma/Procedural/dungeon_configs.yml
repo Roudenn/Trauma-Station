@@ -22,10 +22,10 @@
   id: ShapeRoomTest
   layers:
   - !type:ShapeRoomDunGen
-    areaSize: 50,50
+    areaSize: 200,200
     tile: Plating
-    minRoomWidth: 5,7
-    minRoomHeight: 5,7
+    minRoomWidth: 5
+    minRoomHeight: 5
 
   - !type:BoundaryWallDunGen
     wall: WallSolid

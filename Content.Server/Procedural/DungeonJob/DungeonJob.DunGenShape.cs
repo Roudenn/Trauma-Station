@@ -18,10 +18,11 @@ public sealed partial class DungeonJob
 
         var startBox = (Box2i) Box2.CenteredAround(position, shapeRoom.AreaSize).Rounded(0);
         var minSize = new Vector2i(shapeRoom.MinRoomWidth.Get(random), shapeRoom.MinRoomHeight.Get(random));
+        var variation = shapeRoom.Variation.Get(random);
 
         var tiles = new List<(Vector2i, Tile)>(startBox.Width * startBox.Height);
 
-        var roomBoxes = SplitRecursiveBox(shapeRoom, startBox, minSize, random).ToList();
+        var roomBoxes = SplitRecursiveBox(shapeRoom, startBox, minSize, variation, random).ToList();
         foreach (var roomBox in roomBoxes)
         {
             var roomTiles = new HashSet<Vector2i>(roomBox.Width * roomBox.Height);
@@ -65,15 +66,15 @@ public sealed partial class DungeonJob
         return dungeon;
     }
 
-    private static IEnumerable<Box2i> SplitRecursiveBox(ShapeRoomDunGen shapeRoom, Box2i box, Vector2i minSize, IRobustRandom random)
+    private static IEnumerable<Box2i> SplitRecursiveBox(ShapeRoomDunGen shapeRoom, Box2i box, Vector2i minSize, float variation, IRobustRandom random)
     {
         DebugTools.Assert(box.IsValid());
 
         bool isHorizontalSplit;
 
-        if ((float) box.Width / box.Height > 1f + shapeRoom.Variation)
+        if ((float) box.Width / box.Height > 1f + variation)
             isHorizontalSplit = false;
-        else if ((float) box.Height / box.Width > 1f + shapeRoom.Variation)
+        else if ((float) box.Height / box.Width > 1f + variation)
             isHorizontalSplit = true;
         else
             isHorizontalSplit = random.Prob(0.5f);
@@ -92,7 +93,7 @@ public sealed partial class DungeonJob
                 yield return bottom;
             else
             {
-                foreach (var recursiveBox in SplitRecursiveBox(shapeRoom, bottom, minSize, random))
+                foreach (var recursiveBox in SplitRecursiveBox(shapeRoom, bottom, minSize, variation, random))
                 {
                     yield return recursiveBox;
                 }
@@ -102,7 +103,7 @@ public sealed partial class DungeonJob
                 yield return top;
             else
             {
-                foreach (var recursiveBox in SplitRecursiveBox(shapeRoom, top, minSize, random))
+                foreach (var recursiveBox in SplitRecursiveBox(shapeRoom, top, minSize, variation, random))
                 {
                     yield return recursiveBox;
                 }
@@ -122,7 +123,7 @@ public sealed partial class DungeonJob
                 yield return left;
             else
             {
-                foreach (var recursiveBox in SplitRecursiveBox(shapeRoom, left, minSize, random))
+                foreach (var recursiveBox in SplitRecursiveBox(shapeRoom, left, minSize, variation, random))
                 {
                     yield return recursiveBox;
                 }
@@ -132,7 +133,7 @@ public sealed partial class DungeonJob
                 yield return right;
             else
             {
-                foreach (var recursiveBox in SplitRecursiveBox(shapeRoom, right, minSize, random))
+                foreach (var recursiveBox in SplitRecursiveBox(shapeRoom, right, minSize, variation, random))
                 {
                     yield return recursiveBox;
                 }

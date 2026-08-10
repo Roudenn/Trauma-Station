@@ -1,5 +1,7 @@
-using Content.Shared.EntityTable.ValueSelector;
+using System.Numerics;
 using Content.Shared.Maps;
+using Content.Shared.ValueSelectors.Floats;
+using Content.Shared.ValueSelectors.Numbers;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Procedural.DungeonGenerators;
@@ -37,7 +39,7 @@ public sealed partial class ShapeRoomDunGen : IDunGenLayer
     /// The lower this value is, the more rooms will try to look like accurate boxes.
     /// </summary>
     [DataField]
-    public float Variation = 0.25f;
+    public FloatSelector Variation = new RangeFloatSelector(new Vector2(0.2f, 0.4f));
 
     [DataField(required: true)]
     public ProtoId<ContentTileDefinition> Tile;
