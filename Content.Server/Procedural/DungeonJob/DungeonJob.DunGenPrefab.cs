@@ -341,6 +341,9 @@ public sealed partial class DungeonJob
                     continue;
                 }
 
+                if (room.Entrances.Contains(entrancePos))
+                    continue;
+
                 if (reservedTiles.Contains(entrancePos))
                     continue;
 

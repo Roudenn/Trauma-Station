@@ -15,6 +15,9 @@ public sealed class FeatureTypeSerializer :
         IDependencyCollection dependencies,
         ISerializationContext? context = null)
     {
+        if (node.Has(NestedFeature.IdDataFieldTag))
+            return serializationManager.ValidateNode<NestedFeature>(node, context);
+
         if (node.Has(EntFeature.EntDataFieldTag))
             return serializationManager.ValidateNode<EntFeature>(node, context);
 
@@ -34,17 +37,18 @@ public sealed class FeatureTypeSerializer :
         ISerializationContext? context = null,
         ISerializationManager.InstantiationDelegate<Feature>? instanceProvider = null)
     {
-        var type = typeof(Feature);
+        if (node.Has(NestedFeature.IdDataFieldTag))
+            return serializationManager.Read<NestedFeature>(node, context, notNullableOverride: true);
 
         if (node.Has(EntFeature.EntDataFieldTag))
-            type = typeof(EntFeature);
+            return serializationManager.Read<EntFeature>(node, context, notNullableOverride: true);
 
         if (node.Has(TileFeature.TileDataFieldTag))
-            type = typeof(TileFeature);
+            return serializationManager.Read<TileFeature>(node, context, notNullableOverride: true);
 
         if (node.Has(DecalFeature.DecalDataFieldTag))
-            type = typeof(DecalFeature);
+            return serializationManager.Read<DecalFeature>(node, context, notNullableOverride: true);
 
-        return (Feature) serializationManager.Read(type, node, context)!;
+        return serializationManager.Read<Feature>(node, context, notNullableOverride: true);
     }
 }

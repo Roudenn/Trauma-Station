@@ -6,7 +6,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Procedural.DungeonLayers;
 
 /// <summary>
-/// Generates a single <see cref="Feature"/> in each room of the current dungeon.
+/// Generates a single <see cref="Features.Feature"/> in each room of the current dungeon.
 /// </summary>
 public sealed partial class FeatureDunGen : IDunGenLayer
 {

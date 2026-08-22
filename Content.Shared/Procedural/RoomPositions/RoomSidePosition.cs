@@ -10,8 +10,11 @@ namespace Content.Shared.Procedural.RoomPositions;
 /// </summary>
 public sealed partial class RoomSidePosition : RoomPosition
 {
-    [DataField(required: true)]
-    public RoomSides Side;
+    [DataField]
+    public RoomSides? Side;
+
+    [DataField]
+    public RoomSides[]? AvailableSides;
 
     protected override Vector2 GetPositionImpl(
         IEntityManager entMan,
@@ -19,7 +22,9 @@ public sealed partial class RoomSidePosition : RoomPosition
         IRobustRandom rand,
         DungeonRoom room)
     {
-        switch (Side)
+        var side = Side ?? (AvailableSides != null ? rand.Pick(AvailableSides) : RoomSides.None);
+
+        switch (side)
         {
             case RoomSides.Center:
                 return room.Center;

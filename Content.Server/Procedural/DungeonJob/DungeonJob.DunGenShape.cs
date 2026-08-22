@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.DungeonGenerators;
 using Content.Shared.Tag;
+using Robust.Shared.Collections;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
@@ -21,6 +22,8 @@ public sealed partial class DungeonJob
         var variation = shapeRoom.Variation.Get(random);
 
         var tiles = new List<(Vector2i, Tile)>(startBox.Width * startBox.Height);
+
+        var corners = new HashSet<Vector2i>();
 
         var roomBoxes = SplitRecursiveBox(shapeRoom, startBox, minSize, variation, random).ToList();
         foreach (var roomBox in roomBoxes)
@@ -56,7 +59,19 @@ public sealed partial class DungeonJob
                 }
             }
 
+            corners.Add(roomBox.BottomLeft + new Vector2i(-1, -1));
+            corners.Add(roomBox.BottomRight + new Vector2i(1, -1));
+            corners.Add(roomBox.TopLeft + new Vector2i(-1, 1));
+            corners.Add(roomBox.TopRight + new Vector2i(1, 1));
+
             dungeon.AddRoom(new DungeonRoom(roomTiles, roomBox.Center, roomBox, exteriorTiles, new List<ProtoId<TagPrototype>>()));
+        }
+
+        var pickedEntrances = new HashSet<Vector2i>(dungeon.Rooms.Count * 2);
+
+        foreach (var room in dungeon.Rooms)
+        {
+            ShapePickEntrances(room, random, corners, pickedEntrances, startBox);
         }
 
         _maps.SetTiles(_gridUid, _grid, tiles);
@@ -138,6 +153,78 @@ public sealed partial class DungeonJob
                     yield return recursiveBox;
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Picks multiple entrances for a dungeon room.
+    /// </summary>
+    private static void ShapePickEntrances(DungeonRoom room, IRobustRandom random, HashSet<Vector2i> corners, HashSet<Vector2i> pickedEntrances, Box2i? shapeBounds = null)
+    {
+        for (int i = 1; i < 5; i++)
+        {
+            var j = 0;
+            Vector2i? found = null;
+            while (j < 30)
+            {
+                if (AttemptPick(i, out var candidate))
+                {
+                    found = candidate;
+                    break;
+                }
+
+                j++;
+            }
+
+            if (found != null)
+                room.Entrances.Add(found.Value);
+        }
+
+        return;
+
+        bool AttemptPick(int index, out Vector2i candidate)
+        {
+            switch (index)
+            {
+                case 1:
+                    candidate = random.Pick(new ValueList<Vector2i>(room.Exterior.Where(p => p.Y == room.Bounds.Top)));
+                    break;
+                case 2:
+                    candidate = random.Pick(new ValueList<Vector2i>(room.Exterior.Where(p => p.Y == room.Bounds.Bottom)));
+                    break;
+                case 3:
+                    candidate = random.Pick(new ValueList<Vector2i>(room.Exterior.Where(p => p.X == room.Bounds.Left)));
+                    break;
+                case 4:
+                    candidate = random.Pick(new ValueList<Vector2i>(room.Exterior.Where(p => p.X == room.Bounds.Right)));
+                    break;
+                default:
+                    candidate = random.Pick(room.Exterior);
+                    return false;
+            }
+
+            // Check for corners
+            if (corners.Contains(candidate))
+                return false;
+
+            // Check for other entrances (and 1 tile in all directions)
+            if (pickedEntrances.Contains(candidate)
+                || pickedEntrances.Contains(candidate + new Vector2i(0, 1))
+                || pickedEntrances.Contains(candidate + new Vector2i(1, 0))
+                || pickedEntrances.Contains(candidate + new Vector2i(0, -1))
+                || pickedEntrances.Contains(candidate + new Vector2i(-1, 0)))
+                return false;
+
+            // Check for the edge of the map
+            if (shapeBounds != null
+                && (shapeBounds.Value.Left - 1 == candidate.X
+                    || shapeBounds.Value.Right == candidate.X
+                    || shapeBounds.Value.Top == candidate.Y
+                    || shapeBounds.Value.Bottom - 1 == candidate.Y))
+                return false;
+
+            pickedEntrances.Add(candidate);
+            return true;
         }
     }
 }

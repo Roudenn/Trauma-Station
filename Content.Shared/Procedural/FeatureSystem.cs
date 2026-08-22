@@ -1,9 +1,12 @@
 ﻿using System.Linq;
 using Content.Shared.Decals;
 using Content.Shared.EntityShapes;
+using Content.Shared.Maps;
+using Content.Shared.Physics;
 using Content.Shared.Procedural.Components;
 using Content.Shared.Procedural.Features;
 using Content.Shared.Random.Helpers;
+using Robust.Shared.Collections;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
@@ -173,10 +176,84 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
     public void VisitGroupFeature(GroupFeature feature, Args args)
     {
+        PickFeatureGroup(this, feature.Children, feature.Prob, feature.AlignTile, args);
+    }
+
+    public void VisitLineFeature(LineFeature feature, Args args)
+    {
         if (!args.Rand.Prob(feature.Prob))
             return;
 
-        var validWeightedChildren = feature.Children
+        var turf = args.EntMan.System<TurfSystem>();
+        var center = turf.GetTileRef(args.CenterCoordinates);
+        if (center == null || turf.IsTileBlocked(center.Value, CollisionGroup.Impassable))
+            return;
+
+        var horizPos = new ValueList<EntityCoordinates>(feature.MaxSpawns + 1);
+        horizPos.Add(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices));
+        var leftEnd = false;
+        var rightEnd = false;
+        for (int i = 1; !leftEnd && !rightEnd; i++)
+        {
+            var left = turf.GetTileRef(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices + new Vector2i(-i, 0)));
+            var right = turf.GetTileRef(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices + new Vector2i(i, 0)));
+
+            if (left == null || turf.IsTileBlocked(left.Value, CollisionGroup.Impassable))
+                leftEnd = true;
+            else
+                horizPos.Add(new EntityCoordinates(left.Value.GridUid, left.Value.GridIndices));
+
+            if (right == null || turf.IsTileBlocked(right.Value, CollisionGroup.Impassable))
+                rightEnd = true;
+            else
+                horizPos.Add(new EntityCoordinates(right.Value.GridUid, right.Value.GridIndices));
+
+            if (horizPos.Count >= feature.MaxSpawns)
+                break;
+        }
+
+        var vertPos = new ValueList<EntityCoordinates>(feature.MaxSpawns + 1);
+        vertPos.Add(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices));
+        var topEnd = false;
+        var bottomEnd = false;
+        for (int i = 1; !topEnd && !bottomEnd; i++)
+        {
+            var bottom = turf.GetTileRef(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices + new Vector2i(0, -i)));
+            var top = turf.GetTileRef(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices + new Vector2i(0, i)));
+
+            if (bottom == null || turf.IsTileBlocked(bottom.Value, CollisionGroup.Impassable))
+                bottomEnd = true;
+            else
+                vertPos.Add(new EntityCoordinates(bottom.Value.GridUid, bottom.Value.GridIndices));
+
+            if (top == null || turf.IsTileBlocked(top.Value, CollisionGroup.Impassable))
+                topEnd = true;
+            else
+                vertPos.Add(new EntityCoordinates(top.Value.GridUid, top.Value.GridIndices));
+
+            if (vertPos.Count >= feature.MaxSpawns)
+                break;
+        }
+
+        SpawnFeatures(vertPos.Count > horizPos.Count ? vertPos : horizPos);
+        return;
+
+        void SpawnFeatures(ValueList<EntityCoordinates> positions)
+        {
+            foreach (var pos in positions)
+            {
+                var newArgs = args with { CenterCoordinates = pos };
+                PickFeatureGroup(this, feature.Children, feature.Prob, feature.AlignTile, newArgs);
+            }
+        }
+    }
+
+    private static void PickFeatureGroup(SpawnFeatureVisitor visitor, List<Feature> features, float prob, bool alignTile, Args args)
+    {
+        if (!args.Rand.Prob(prob))
+            return;
+
+        var validWeightedChildren = features
             .Where(child => child.Weight >= float.Epsilon)
             .ToDictionary(child => child, child => child.Weight);
 
@@ -184,8 +261,8 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
             return;
 
         var child = SharedRandomExtensions.Pick(validWeightedChildren, args.Rand);
-        if (feature.AlignTile)
+        if (alignTile)
             child.AlignTile = true;
-        child.Accept(this, args);
+        child.Accept(visitor, args);
     }
 }

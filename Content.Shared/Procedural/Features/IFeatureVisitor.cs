@@ -63,4 +63,10 @@ public interface IFeatureVisitor<in TArgs>
     /// </summary>
     [PublicAPI]
     void VisitNoneFeature(NoneFeature feature, TArgs args);
+
+    /// <summary>
+    /// Visit a <see cref="LineFeature"/>.
+    /// </summary>
+    [PublicAPI]
+    void VisitLineFeature(LineFeature feature, TArgs args);
 }

@@ -42,10 +42,10 @@ public sealed partial class DungeonJob
                     _maps.GridTileToLocal(_gridUid, _grid, entrance),
                     _entTable.GetSpawns(contents, random));
 
-                await SuspendDungeon();
+                /*await SuspendDungeon();
 
                 if (!ValidateResume())
-                    return;
+                    return;*/
             }
         }
     }

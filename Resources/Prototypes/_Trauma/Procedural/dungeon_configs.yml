@@ -19,7 +19,7 @@
     tile: Plating
 
 - type: dungeonConfig
-  id: ShapeRoomTest
+  id: ShapeRoomTestBig
   layers:
   - !type:ShapeRoomDunGen
     areaSize: 200,200
@@ -27,7 +27,49 @@
     minRoomWidth: 5
     minRoomHeight: 5
 
+  - !type:RoomEntranceDunGen
+    tile: FloorSteel
+    contents: BaseAirlock
+
   - !type:BoundaryWallDunGen
     wall: WallSolid
     cornerWall: WallReinforced
     tile: Plating
+
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceClosetLootRow
+    position: !type:RoomSidePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+
+- type: dungeonConfig
+  id: ShapeRoomTestSmall
+  layers:
+  - !type:ShapeRoomDunGen
+    areaSize: 15,15
+    tile: Plating
+    minRoomWidth: 5
+    minRoomHeight: 5
+
+  - !type:RoomEntranceDunGen
+    tile: FloorSteel
+    contents: BaseAirlock
+
+  - !type:BoundaryWallDunGen
+    wall: WallSolid
+    cornerWall: WallReinforced
+    tile: Plating
+
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceClosetLootRow
+    position: !type:RoomSidePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right

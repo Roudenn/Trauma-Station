@@ -1,0 +1,23 @@
+- type: feature
+  id: MaintenanceClosetLootRow
+  feature: !type:LineFeature
+    children:
+    - ent: RandomMaintsCloset
+      weight: 3
+    - ent: NitrogenCanister
+      weight: 0.5
+    - ent: OxygenCanister
+      weight: 0.5
+    - ent: AirCanister
+      weight: 0.5
+    - id: MaintenanceToolRack
+      weight: 1
+    - ent: PottedPlantRandom
+      weight: 1
+
+- type: feature
+  id: MaintenanceToolRack
+  feature: !type:AllFeature
+    children:
+    - ent: Rack
+    - ent: MaintenanceToolSpawner

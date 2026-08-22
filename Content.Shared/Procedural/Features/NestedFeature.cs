@@ -8,6 +8,8 @@ namespace Content.Shared.Procedural.Features;
 /// </summary>
 public sealed partial class NestedFeature : Feature
 {
+    public const string IdDataFieldTag = "id";
+
     [DataField(required: true)]
     public ProtoId<FeaturePrototype> Id;
 

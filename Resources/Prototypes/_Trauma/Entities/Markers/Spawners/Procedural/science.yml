@@ -7,5 +7,17 @@
     layers:
     - state: green
   - type: FeatureSpawner
-    feature: !type:NestedFeature
+    feature:
       id: ScienceArtifactAnalyzer
+
+- type: entity
+  parent: MarkerBase
+  id: FeatureMaintenanceClosetLootRow
+  name: maintenance loot row feature
+  components:
+  - type: Sprite
+    layers:
+    - state: green
+  - type: FeatureSpawner
+    feature: !type:NestedFeature
+      id: MaintenanceClosetLootRow
