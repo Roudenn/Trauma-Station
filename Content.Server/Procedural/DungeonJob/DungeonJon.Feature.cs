@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.DungeonLayers;
-using Content.Shared.Procedural.Features;
 using Robust.Shared.Map;
 using Robust.Shared.Random;
 
@@ -19,7 +18,6 @@ public sealed partial class DungeonJob
         IRobustRandom random)
     {
         var featureSystem = _entManager.System<FeatureSystem>();
-        var context = new FeatureContext();
 
         foreach (var room in dungeon.Rooms)
         {
@@ -27,7 +25,7 @@ public sealed partial class DungeonJob
                 continue;
 
             var pos = gen.Position.GetPosition(_entManager, _prototype, random, room);
-            featureSystem.SpawnFeature(gen.Feature, new EntityCoordinates(_gridUid, pos), random, context);
+            featureSystem.SpawnFeature(gen.Feature, new EntityCoordinates(_gridUid, pos), random, dungeon.FeatureContext);
         }
     }
 }

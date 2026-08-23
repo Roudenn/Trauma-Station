@@ -7,7 +7,7 @@
 public sealed partial class LineFeature : Feature
 {
     [DataField(required: true)]
-    public List<Feature> Children = new();
+    public Feature Feature;
 
     /// <summary>
     /// Maximum amount of allowed spawns of this feature.

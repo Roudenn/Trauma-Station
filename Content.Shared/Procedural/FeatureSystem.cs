@@ -71,9 +71,18 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
         EntityCoordinates CenterCoordinates
     );
 
+    private static bool Check(
+        Feature feature,
+        Args args
+    )
+    {
+        return feature.CheckConditions(args.CenterCoordinates, args.EntMan, args.ProtoMan, args.Context)
+               && args.Rand.Prob(feature.Prob);
+    }
+
     public void VisitAllFeature(AllFeature feature, Args args)
     {
-        if (!args.Rand.Prob(feature.Prob))
+        if (!Check(feature, args))
             return;
 
         foreach (var child in feature.Children)
@@ -87,7 +96,7 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
     public void VisitEntFeature(EntFeature feature, Args args)
     {
-        if (!args.Rand.Prob(feature.Prob))
+        if (!Check(feature, args))
             return;
 
         var pos = args.CenterCoordinates
@@ -107,7 +116,7 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
     public void VisitTileFeature(TileFeature feature, Args args)
     {
-        if (!args.Rand.Prob(feature.Prob)
+        if (!Check(feature, args)
             || !args.EntMan.TryGetComponent(args.CenterCoordinates.EntityId, out MapGridComponent? gridComp))
             return;
 
@@ -127,7 +136,7 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
     public void VisitDecalFeature(DecalFeature feature, Args args)
     {
-        if (!args.Rand.Prob(feature.Prob))
+        if (!Check(feature, args))
             return;
 
         var decalSystem = args.EntMan.System<SharedDecalSystem>();
@@ -152,7 +161,7 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
     public void VisitNestedFeature(NestedFeature feature, Args args)
     {
-        if (!args.Rand.Prob(feature.Prob))
+        if (!Check(feature, args))
             return;
 
         args.ProtoMan.Index(feature.Id).Feature.Accept(this, args);
@@ -160,7 +169,7 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
     public void VisitShapeFeature(ShapeFeature feature, Args args)
     {
-        if (!args.Rand.Prob(feature.Prob))
+        if (!Check(feature, args))
             return;
 
         var entShape = args.EntMan.System<EntityShapeSystem>();
@@ -176,17 +185,38 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
     public void VisitGroupFeature(GroupFeature feature, Args args)
     {
-        PickFeatureGroup(this, feature.Children, feature.Prob, feature.AlignTile, args);
+        if (!Check(feature, args))
+            return;
+
+        var validWeightedChildren = feature.Children
+            .Where(child => child.Weight >= float.Epsilon)
+            .ToDictionary(child => child, child => child.Weight);
+
+        if (validWeightedChildren.Count == 0)
+            return;
+
+        var child = SharedRandomExtensions.Pick(validWeightedChildren, args.Rand);
+
+        if (feature.AlignTile)
+            child.AlignTile = true;
+
+        if (feature.ConditionInheritance)
+        {
+            child.ConditionInheritance = true;
+            child.Conditions.UnionWith(feature.Conditions);
+        }
+
+        child.Accept(this, args);
     }
 
     public void VisitLineFeature(LineFeature feature, Args args)
     {
-        if (!args.Rand.Prob(feature.Prob))
+        if (!Check(feature, args))
             return;
 
         var turf = args.EntMan.System<TurfSystem>();
         var center = turf.GetTileRef(args.CenterCoordinates);
-        if (center == null || turf.IsTileBlocked(center.Value, CollisionGroup.Impassable))
+        if (center == null || turf.IsTileBlocked(center.Value, CollisionGroup.MobMask))
             return;
 
         var horizPos = new ValueList<EntityCoordinates>(feature.MaxSpawns + 1);
@@ -198,12 +228,12 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
             var left = turf.GetTileRef(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices + new Vector2i(-i, 0)));
             var right = turf.GetTileRef(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices + new Vector2i(i, 0)));
 
-            if (left == null || turf.IsTileBlocked(left.Value, CollisionGroup.Impassable))
+            if (left == null || turf.IsTileBlocked(left.Value, CollisionGroup.MobMask))
                 leftEnd = true;
             else
                 horizPos.Add(new EntityCoordinates(left.Value.GridUid, left.Value.GridIndices));
 
-            if (right == null || turf.IsTileBlocked(right.Value, CollisionGroup.Impassable))
+            if (right == null || turf.IsTileBlocked(right.Value, CollisionGroup.MobMask))
                 rightEnd = true;
             else
                 horizPos.Add(new EntityCoordinates(right.Value.GridUid, right.Value.GridIndices));
@@ -221,12 +251,12 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
             var bottom = turf.GetTileRef(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices + new Vector2i(0, -i)));
             var top = turf.GetTileRef(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices + new Vector2i(0, i)));
 
-            if (bottom == null || turf.IsTileBlocked(bottom.Value, CollisionGroup.Impassable))
+            if (bottom == null || turf.IsTileBlocked(bottom.Value, CollisionGroup.MobMask))
                 bottomEnd = true;
             else
                 vertPos.Add(new EntityCoordinates(bottom.Value.GridUid, bottom.Value.GridIndices));
 
-            if (top == null || turf.IsTileBlocked(top.Value, CollisionGroup.Impassable))
+            if (top == null || turf.IsTileBlocked(top.Value, CollisionGroup.MobMask))
                 topEnd = true;
             else
                 vertPos.Add(new EntityCoordinates(top.Value.GridUid, top.Value.GridIndices));
@@ -243,26 +273,17 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
             foreach (var pos in positions)
             {
                 var newArgs = args with { CenterCoordinates = pos };
-                PickFeatureGroup(this, feature.Children, feature.Prob, feature.AlignTile, newArgs);
+                if (feature.AlignTile)
+                    feature.Feature.AlignTile = true;
+
+                if (feature.ConditionInheritance)
+                {
+                    feature.Feature.ConditionInheritance = true;
+                    feature.Feature.Conditions.UnionWith(feature.Conditions);
+                }
+
+                feature.Feature.Accept(this, newArgs);
             }
         }
-    }
-
-    private static void PickFeatureGroup(SpawnFeatureVisitor visitor, List<Feature> features, float prob, bool alignTile, Args args)
-    {
-        if (!args.Rand.Prob(prob))
-            return;
-
-        var validWeightedChildren = features
-            .Where(child => child.Weight >= float.Epsilon)
-            .ToDictionary(child => child, child => child.Weight);
-
-        if (validWeightedChildren.Count == 0)
-            return;
-
-        var child = SharedRandomExtensions.Pick(validWeightedChildren, args.Rand);
-        if (alignTile)
-            child.AlignTile = true;
-        child.Accept(visitor, args);
     }
 }

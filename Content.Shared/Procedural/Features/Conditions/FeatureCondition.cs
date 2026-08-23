@@ -28,4 +28,19 @@ public abstract partial class FeatureCondition
     }
 
     protected abstract bool EvaluateImplementation(Feature root, EntityCoordinates position, IEntityManager entMan, IPrototypeManager proto, FeatureContext ctx);
+
+    public override bool Equals(object? obj)
+    {
+        return obj?.GetType() == GetType()
+               && obj is FeatureCondition condition
+               && Invert == condition.Invert
+               && Equals(condition);
+    }
+
+    public override int GetHashCode()
+    {
+        return Invert.GetHashCode();
+    }
+
+    protected abstract bool Equals(FeatureCondition other);
 }

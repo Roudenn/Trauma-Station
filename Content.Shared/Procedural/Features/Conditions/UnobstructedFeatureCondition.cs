@@ -20,34 +20,38 @@ public sealed partial class UnobstructedFeatureCondition : FeatureCondition
         IPrototypeManager proto,
         FeatureContext ctx)
     {
+        var intPos = position.ToVector2i(entMan, entMan.System<SharedTransformSystem>());
+
+        if (ctx.Obstructed.Contains(intPos))
+            return false;
+
         var flags = (FeatureType) Type;
         foreach (var type in Enum.GetValues<FeatureType>())
         {
             if (!flags.HasFlag(type))
                 continue;
 
-            var intPos = position.ToVector2i(entMan, entMan.System<SharedTransformSystem>());
             switch (type)
             {
                 case FeatureType.Entity:
                     foreach (var entry in ctx.EntFeatures)
                     {
                         if (entry.Obstructed && entry.GridIndices == intPos)
-                            return true;
+                            return false;
                     }
                     break;
                 case FeatureType.Tile:
                     foreach (var entry in ctx.TileFeatures)
                     {
                         if (entry.Obstructed && entry.GridIndices == intPos)
-                            return true;
+                            return false;
                     }
                     break;
                 case FeatureType.Decal:
                     foreach (var entry in ctx.DecalFeatures)
                     {
                         if (entry.Obstructed && entry.GridIndices == intPos)
-                            return true;
+                            return false;
                     }
                     break;
                 default:
@@ -55,7 +59,12 @@ public sealed partial class UnobstructedFeatureCondition : FeatureCondition
             }
         }
 
-        return false;
+        return true;
+    }
+
+    protected override bool Equals(FeatureCondition other)
+    {
+        return other is UnobstructedFeatureCondition condition && Type == condition.Type;
     }
 }
 

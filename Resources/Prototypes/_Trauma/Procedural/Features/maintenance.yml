@@ -1,19 +1,45 @@
 - type: feature
   id: MaintenanceClosetLootRow
   feature: !type:LineFeature
-    children:
-    - ent: RandomMaintsCloset
-      weight: 3
-    - ent: NitrogenCanister
-      weight: 0.5
-    - ent: OxygenCanister
-      weight: 0.5
-    - ent: AirCanister
-      weight: 0.5
-    - id: MaintenanceToolRack
-      weight: 1
-    - ent: PottedPlantRandom
-      weight: 1
+    conditionInheritance: true
+    conditionsApplySelf: false
+    conditions:
+    - !type:UnobstructedFeatureCondition
+      type:
+      - Entity
+    feature: !type:GroupFeature
+      children:
+      # Loot
+      - ent: RandomMaintsCloset
+        weight: 2
+      - id: MaintenanceToolRack
+        weight: 1
+      - id: MaintenanceToolTable
+        weight: 1
+      # Canisters
+      - ent: NitrogenCanister
+        weight: 0.5
+      - ent: OxygenCanister
+        weight: 0.5
+      - ent: AirCanister
+        weight: 0.5
+      - ent: CarbonDioxideCanister
+        weight: 0.1
+      - ent: NitrousOxideCanister
+        weight: 0.05
+      - ent: AmmoniaCanister
+        weight: 0.05
+      - ent: PlasmaCanister
+        weight: 0.01
+      - ent: TritiumCanister
+        weight: 0.005
+      - ent: FrezonCanister
+        weight: 0.005
+      # Decorations
+      - ent: PottedPlantRandom
+        weight: 1
+      - ent: Chair # TODO this somehow needs random/conditional rotation
+        weight: 0.75
 
 - type: feature
   id: MaintenanceToolRack
@@ -21,3 +47,14 @@
     children:
     - ent: Rack
     - ent: MaintenanceToolSpawner
+    - ent: MaintenanceWeaponSpawner
+    - ent: MaintenanceFluffSpawner
+
+- type: feature
+  id: MaintenanceToolTable
+  feature: !type:AllFeature
+    children:
+    - ent: Table
+    - ent: MaintenanceToolSpawner
+    - ent: MaintenanceWeaponSpawner
+    - ent: MaintenanceFluffSpawner

@@ -71,7 +71,7 @@ public sealed partial class DungeonJob
 
         foreach (var room in dungeon.Rooms)
         {
-            ShapePickEntrances(room, random, corners, pickedEntrances, startBox);
+            ShapePickEntrances(dungeon, room, random, corners, pickedEntrances, startBox);
         }
 
         _maps.SetTiles(_gridUid, _grid, tiles);
@@ -159,7 +159,7 @@ public sealed partial class DungeonJob
     /// <summary>
     /// Picks multiple entrances for a dungeon room.
     /// </summary>
-    private static void ShapePickEntrances(DungeonRoom room, IRobustRandom random, HashSet<Vector2i> corners, HashSet<Vector2i> pickedEntrances, Box2i? shapeBounds = null)
+    private static void ShapePickEntrances(Dungeon dungeon, DungeonRoom room, IRobustRandom random, HashSet<Vector2i> corners, HashSet<Vector2i> pickedEntrances, Box2i? shapeBounds = null)
     {
         for (int i = 1; i < 5; i++)
         {
@@ -176,8 +176,16 @@ public sealed partial class DungeonJob
                 j++;
             }
 
-            if (found != null)
-                room.Entrances.Add(found.Value);
+            if (found == null)
+                continue;
+
+            room.Entrances.Add(found.Value);
+
+            dungeon.FeatureContext.Obstructed.Add(found.Value);
+            dungeon.FeatureContext.Obstructed.Add(found.Value + new Vector2i(1, 0));
+            dungeon.FeatureContext.Obstructed.Add(found.Value + new Vector2i(0, 1));
+            dungeon.FeatureContext.Obstructed.Add(found.Value + new Vector2i(-1, 0));
+            dungeon.FeatureContext.Obstructed.Add(found.Value + new Vector2i(0, -1));
         }
 
         return;

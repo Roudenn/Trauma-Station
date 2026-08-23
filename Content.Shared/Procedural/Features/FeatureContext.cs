@@ -6,12 +6,16 @@ namespace Content.Shared.Procedural.Features;
 
 public sealed class FeatureContext
 {
-    public List<EntFeatureEntry> EntFeatures = new();
+    public readonly HashSet<Vector2i> Obstructed = new();
 
-    public List<TileFeatureEntry> TileFeatures = new();
+    public readonly List<EntFeatureEntry> EntFeatures = new();
 
-    public List<DecalFeatureEntry> DecalFeatures = new();
+    public readonly List<TileFeatureEntry> TileFeatures = new();
+
+    public readonly List<DecalFeatureEntry> DecalFeatures = new();
 }
+
+public record struct FeatureEntry(Vector2i GridIndices, bool Obstructed = false);
 
 public record struct EntFeatureEntry(EntityUid Ent, Vector2i GridIndices, bool Obstructed = false);
 
