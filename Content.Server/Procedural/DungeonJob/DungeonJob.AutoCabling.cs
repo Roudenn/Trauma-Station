@@ -31,7 +31,10 @@ public sealed partial class DungeonJob
             while (anchored.MoveNext(out var anc))
             {
                 if (!nodeQuery.TryGetComponent(anc, out var nodeContainer) ||
-                   !nodeContainer.Nodes.ContainsKey("power"))
+                    // <Trauma>
+                   !nodeContainer.Nodes.TryGetValue(gen.NodeId, out var node) ||
+                   node.NodeGroupID != gen.NodeGroup)
+                    // </Trauma>
                 {
                     continue;
                 }
@@ -140,7 +143,10 @@ public sealed partial class DungeonJob
             while (anchored.MoveNext(out var anc))
             {
                 if (!nodeQuery.TryGetComponent(anc, out var nodeContainer) ||
-                    !nodeContainer.Nodes.ContainsKey("power"))
+                    // <Trauma>
+                    !nodeContainer.Nodes.TryGetValue(gen.NodeId, out var node) ||
+                    node.NodeGroupID != gen.NodeGroup)
+                    // </Trauma>
                 {
                     continue;
                 }

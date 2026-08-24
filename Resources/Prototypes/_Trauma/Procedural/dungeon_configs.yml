@@ -27,15 +27,36 @@
     minRoomWidth: 5
     minRoomHeight: 5
 
+  # Room roles
+  - !type:RoomRoleDunGen
+    minSize: 3,3
+    maxSize: 6,6
+    prob: 0.5
+    weightsId: RoomMaintenanceSmall
+
+  #- !type:RoomRoleDunGen
+  #  minSize: 5,5
+  #  prob: 0.5
+  #  weightsId: RoomMaintenanceMedium
+
+  - !type:RoomRoleDunGen
+    weightsId: RoomMaintenanceDefault # Fallback for all unassigned rooms
+
+  - !type:WallMountDunGen
+    contents: MaintenanceWalls
+    tile: Plating
+
+  # Walls and airlocks
   - !type:RoomEntranceDunGen
     tile: FloorSteel
-    contents: BaseAirlock
+    contents: MaintenanceAirlock
 
   - !type:BoundaryWallDunGen
     wall: WallSolid
     cornerWall: WallReinforced
     tile: Plating
 
+  # Features
   - !type:FeatureDunGen
     feature:
       id: MaintenanceClosetLootRow
@@ -45,25 +66,94 @@
       - Bottom
       - Left
       - Right
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenance
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceGenerator
+
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceApc
+    position: !type:RoomSidePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceGenerator
+    position: !type:RoomSidePosition
+      availableSides:
+      - Center
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceGenerator
+
+  # Tiles
+  - !type:FeatureFillDunGen
+    feature:
+      id: MaintenanceFloor
+
+  # Other
+
+  - !type:AutoCablingDunGen
+    entity: CableApcExtension
+
+  - !type:AutoCablingDunGen
+    entity: CableMV
+    nodeGroup: MVPower
+
+  - !type:AutoCablingDunGen
+    entity: CableHV
+    nodeGroup: HVPower
+
+  - !type:FeatureFillDunGen
+    feature:
+      id: MaintenanceCatwalk
 
 - type: dungeonConfig
   id: ShapeRoomTestSmall
   layers:
   - !type:ShapeRoomDunGen
-    areaSize: 15,15
+    areaSize: 20,20
     tile: Plating
     minRoomWidth: 5
     minRoomHeight: 5
 
+  # Room roles
+  - !type:RoomRoleDunGen
+    minSize: 3,3
+    maxSize: 6,6
+    prob: 0.5
+    weightsId: RoomMaintenanceSmall
+
+  #- !type:RoomRoleDunGen
+  #  minSize: 5,5
+  #  prob: 0.5
+  #  weightsId: RoomMaintenanceMedium
+
+  - !type:RoomRoleDunGen
+    weightsId: RoomMaintenanceDefault # Fallback for all unassigned rooms
+
+  - !type:WallMountDunGen
+    contents: MaintenanceWalls
+    tile: Plating
+
+  # Walls and airlocks
   - !type:RoomEntranceDunGen
     tile: FloorSteel
-    contents: BaseAirlock
+    contents: MaintenanceAirlock
 
   - !type:BoundaryWallDunGen
     wall: WallSolid
     cornerWall: WallReinforced
     tile: Plating
 
+  # Features
   - !type:FeatureDunGen
     feature:
       id: MaintenanceClosetLootRow
@@ -73,3 +163,96 @@
       - Bottom
       - Left
       - Right
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenance
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceGenerator
+
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceApc
+    position: !type:RoomSidePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceGenerator
+    position: !type:RoomSidePosition
+      availableSides:
+      - Center
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceGenerator
+
+  # Tiles
+  - !type:FeatureFillDunGen
+    feature:
+      id: MaintenanceFloor
+
+  # Other
+
+  - !type:AutoCablingDunGen
+    entity: CableApcExtension
+
+  - !type:AutoCablingDunGen
+    entity: CableMV
+    nodeGroup: MVPower
+
+  - !type:AutoCablingDunGen
+    entity: CableHV
+    nodeGroup: HVPower
+
+  - !type:FeatureFillDunGen
+    feature:
+      id: MaintenanceCatwalk
+
+
+- type: entityTable
+  id: MaintenanceAirlock
+  table: !type:AllSelector
+    children:
+    - id: AirlockMaint
+    - id: Firelock
+
+- type: entityTable
+  id: MaintenanceWalls
+  table: !type:GroupSelector
+    children:
+    - id: RandomPosterAny
+    - id: ExtinguisherCabinetFilled
+      prob: 0.1
+    - id: RandomPainting
+      prob: 0.01
+
+- type: weightedRandom
+  id: RoomMaintenanceSmall
+  weights:
+    #RoomMaintenanceArcade: 2
+    #RoomMaintenanceAtmos: 1
+    #RoomMaintenanceBotany: 2
+    #RoomMaintenanceChem: 1
+    #RoomMaintenanceDorm: 2
+    #RoomMaintenanceEngineering: 1
+    #RoomMaintenanceKitchen: 1
+    #RoomMaintenanceSurgery: 1
+    #RoomMaintenanceMedical: 1
+    #RoomMaintenancePrison: 1
+    RoomMaintenanceGenerator: 6
+
+- type: weightedRandom
+  id: RoomMaintenanceMedium
+  weights:
+    RoomMaintenanceLibrary: 2
+    RoomMaintenanceScience: 1
+    RoomMaintenanceBar: 1
+
+- type: weightedRandom
+  id: RoomMaintenanceDefault
+  weights:
+    RoomMaintenance: 1

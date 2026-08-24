@@ -64,7 +64,7 @@ public sealed partial class DungeonJob
             corners.Add(roomBox.TopLeft + new Vector2i(-1, 1));
             corners.Add(roomBox.TopRight + new Vector2i(1, 1));
 
-            dungeon.AddRoom(new DungeonRoom(roomTiles, roomBox.Center, roomBox, exteriorTiles, new List<ProtoId<TagPrototype>>()));
+            dungeon.AddRoom(new DungeonRoom(roomTiles, roomBox.Center, roomBox, exteriorTiles));
         }
 
         var pickedEntrances = new HashSet<Vector2i>(dungeon.Rooms.Count * 2);

@@ -2,9 +2,7 @@
 using System.Threading.Tasks;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.DungeonGenerators;
-using Content.Shared.Tag;
 using Robust.Shared.Map;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
 namespace Content.Server.Procedural.DungeonJob;
@@ -127,7 +125,7 @@ public sealed partial class DungeonJob
 
             center /= roomTiles.Count;
 
-            dungeon.AddRoom(new DungeonRoom(roomTiles, center, mapBounds!.Value, exterior, new List<ProtoId<TagPrototype>>()));
+            dungeon.AddRoom(new DungeonRoom(roomTiles, center, mapBounds!.Value, exterior));
 
             await SuspendDungeon();
 

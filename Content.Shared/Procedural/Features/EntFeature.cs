@@ -12,9 +12,6 @@ public sealed partial class EntFeature : Feature
     [DataField]
     public EntProtoId Ent;
 
-    [DataField]
-    public Angle Rotation;
-
     public override void Accept<TContext>(IFeatureVisitor<TContext> visitor, TContext args) =>
         visitor.VisitEntFeature(this, args);
 }

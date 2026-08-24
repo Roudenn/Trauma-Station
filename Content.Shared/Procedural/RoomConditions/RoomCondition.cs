@@ -1,5 +1,4 @@
-﻿using Content.Shared.Procedural.DungeonLayers;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Procedural.RoomConditions;
@@ -13,13 +12,13 @@ public abstract partial class RoomCondition
     [DataField]
     public bool Invert;
 
-    public bool Evaluate(FeatureDunGen root, DungeonRoom room, IEntityManager entMan, IPrototypeManager proto)
+    public bool Evaluate(DungeonRoom room, IEntityManager entMan, IPrototypeManager proto)
     {
-        var res = EvaluateImplementation(root, room, entMan, proto);
+        var res = EvaluateImplementation(room, entMan, proto);
 
         // XOR eval to invert the result.
         return res ^ Invert;
     }
 
-    protected abstract bool EvaluateImplementation(FeatureDunGen root, DungeonRoom room, IEntityManager entMan, IPrototypeManager proto);
+    protected abstract bool EvaluateImplementation(DungeonRoom room, IEntityManager entMan, IPrototypeManager proto);
 }

@@ -69,4 +69,10 @@ public interface IFeatureVisitor<in TArgs>
     /// </summary>
     [PublicAPI]
     void VisitLineFeature(LineFeature feature, TArgs args);
+
+    /// <summary>
+    /// Visit a <see cref="WallMountFeature"/>.
+    /// </summary>
+    [PublicAPI]
+    void VisitWallMountFeature(WallMountFeature feature, TArgs args);
 }

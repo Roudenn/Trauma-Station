@@ -1,6 +1,4 @@
-﻿using Content.Shared.Procedural.DungeonLayers;
-using Content.Shared.Tag;
-using Robust.Shared.Prototypes;
+﻿using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Procedural.RoomConditions;
 
@@ -13,9 +11,9 @@ public sealed partial class RoomRoleCondition : RoomCondition
     /// A role tag to check on a room.
     /// </summary>
     [DataField]
-    public ProtoId<TagPrototype> Role;
+    public string Role;
 
-    protected override bool EvaluateImplementation(FeatureDunGen root, DungeonRoom room, IEntityManager entMan, IPrototypeManager proto)
+    protected override bool EvaluateImplementation(DungeonRoom room, IEntityManager entMan, IPrototypeManager proto)
     {
         return room.Roles.Contains(Role);
     }

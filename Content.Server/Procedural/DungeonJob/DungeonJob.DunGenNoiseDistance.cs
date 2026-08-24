@@ -4,9 +4,7 @@ using Content.Shared.Maps;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.Distance;
 using Content.Shared.Procedural.DungeonGenerators;
-using Content.Shared.Tag;
 using Robust.Shared.Map;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
 namespace Content.Server.Procedural.DungeonJob;
@@ -88,7 +86,7 @@ public sealed partial class DungeonJob
             await SuspendDungeon();
         }
 
-        var room = new DungeonRoom(roomTiles, area.Center, area, new HashSet<Vector2i>(), new List<ProtoId<TagPrototype>>());
+        var room = new DungeonRoom(roomTiles, area.Center, area, new HashSet<Vector2i>());
 
         _maps.SetTiles(_gridUid, _grid, tiles);
         var dungeon = new Dungeon(new List<DungeonRoom>()

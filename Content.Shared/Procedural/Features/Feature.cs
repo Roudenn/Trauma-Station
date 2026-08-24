@@ -36,6 +36,13 @@ public abstract partial class Feature
     public FeaturePosition Offset = new ConstantFeaturePosition(Vector2.Zero);
 
     /// <summary>
+    /// Local rotation of this feature. Doesn't apply to tiles.
+    /// If null, gets inherited from the parent.
+    /// </summary>
+    [DataField]
+    public Angle? Rotation;
+
+    /// <summary>
     /// Conditions that are checked before spawning this feature.
     /// </summary>
     [DataField]

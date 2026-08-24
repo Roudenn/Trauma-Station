@@ -35,6 +35,11 @@
         weight: 0.005
       - ent: FrezonCanister
         weight: 0.005
+      # Tanks
+      - ent: WeldingFuelTankFull
+        weight: 1
+      - ent: WaterTankFull
+        weight: 1
       # Decorations
       - ent: PottedPlantRandom
         weight: 1
@@ -58,3 +63,62 @@
     - ent: MaintenanceToolSpawner
     - ent: MaintenanceWeaponSpawner
     - ent: MaintenanceFluffSpawner
+
+- type: feature
+  id: MaintenanceFloor
+  feature: !type:AllFeature
+    children:
+    - !type:GroupFeature
+      children:
+      - tile: Plating
+        weight: 2
+      - tile: FloorSteel
+        weight: 1
+      - tile: FloorTechMaint
+        weight: 1
+      - tile: FloorTechMaintDark
+        weight: 1
+
+# Generator rooms
+
+- type: feature
+  id: MaintenanceApc
+  feature: !type:AllFeature
+    children:
+    - !type:WallMountFeature
+      feature: !type:AllFeature
+        children:
+        - ent: APCBasic
+        - ent: CableMV
+        - ent: CableApcExtension
+
+- type: feature
+  id: MaintenanceGenerator
+  feature: !type:AllFeature
+    children:
+    - !type:AllFeature
+      conditions:
+      - !type:UnobstructedFeatureCondition
+      children:
+      - ent: GeneratorRTG
+      - ent: CableHV
+    - !type:WallMountFeature
+      feature: !type:AllFeature
+        children:
+        - ent: SubstationWallBasic
+        - ent: CableMV
+        - ent: CableHV
+
+# Spawns a catwalk on plating tiles with exposed cables in order to hide them
+- type: feature
+  id: MaintenanceCatwalk
+  feature: !type:EntFeature
+    ent: Catwalk
+    conditions:
+    - !type:TileFeatureCondition
+      tiles:
+      - Plating
+    - !type:EntityFeatureCondition
+      whitelist:
+        components:
+        - NodeContainer

@@ -317,6 +317,12 @@ public sealed partial class DungeonJob : Job<List<Dungeon>>
             case FeatureDunGen feature:
                 await PostGen(feature, dungeons[^1], reservedTiles, random);
                 break;
+            case FeatureFillDunGen featureFill:
+                await PostGen(featureFill, dungeons[^1], reservedTiles, random);
+                break;
+            case RoomRoleDunGen sizeRole:
+                await PostGen(sizeRole, dungeons[^1], reservedTiles, random);
+                break;
             case ShapeRoomDunGen shapeRoom:
                 dungeons.Add(await GenerateShapeDunGen(position, shapeRoom, reservedTiles, random));
                 break;

@@ -1,20 +1,16 @@
 ﻿using Content.Shared.Procedural.Features;
 using Content.Shared.Procedural.RoomConditions;
-using Content.Shared.Procedural.RoomPositions;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Procedural.DungeonLayers;
 
 /// <summary>
-/// Generates a single <see cref="Features.Feature"/> in each room of the current dungeon.
+/// Generates a <see cref="Features.Feature"/> on every tile of every room of the dungeon.
 /// </summary>
-public sealed partial class FeatureDunGen : IDunGenLayer
+public sealed partial class FeatureFillDunGen : IDunGenLayer
 {
     [DataField(required: true)]
     public Feature Feature;
-
-    [DataField(required: true)]
-    public RoomPosition Position;
 
     [DataField]
     public List<RoomCondition> Conditions = new();

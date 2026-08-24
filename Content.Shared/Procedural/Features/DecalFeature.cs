@@ -17,9 +17,6 @@ public sealed partial class DecalFeature : Feature
     public Color Color;
 
     [DataField]
-    public Angle Angle;
-
-    [DataField]
     public bool Clearable;
 
     public override void Accept<TContext>(IFeatureVisitor<TContext> visitor, TContext args) =>

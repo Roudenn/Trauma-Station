@@ -105,7 +105,7 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
         var ent = args.EntMan.PredictedSpawnAtPosition(feature.Ent, pos);
         var transformSys = args.EntMan.System<SharedTransformSystem>();
-        transformSys.SetLocalRotation(ent, feature.Rotation);
+        transformSys.SetLocalRotation(ent, feature.Rotation ?? Angle.Zero);
 
         var entry = new EntFeatureEntry(
             ent,
@@ -149,7 +149,7 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
             pos,
             out _,
             feature.Color,
-            feature.Angle,
+            feature.Rotation,
             cleanable: feature.Clearable);
 
         var entry = new DecalFeatureEntry(
@@ -270,20 +270,70 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
         void SpawnFeatures(ValueList<EntityCoordinates> positions)
         {
+            if (feature.AlignTile)
+                feature.Feature.AlignTile = true;
+
+            if (feature.ConditionInheritance)
+            {
+                feature.Feature.ConditionInheritance = true;
+                feature.Feature.Conditions.UnionWith(feature.Conditions);
+            }
+
             foreach (var pos in positions)
             {
                 var newArgs = args with { CenterCoordinates = pos };
-                if (feature.AlignTile)
-                    feature.Feature.AlignTile = true;
-
-                if (feature.ConditionInheritance)
-                {
-                    feature.Feature.ConditionInheritance = true;
-                    feature.Feature.Conditions.UnionWith(feature.Conditions);
-                }
-
                 feature.Feature.Accept(this, newArgs);
             }
         }
+    }
+
+    private static readonly Direction[] CardinalDirections =
+    [
+        Direction.North,
+        Direction.East,
+        Direction.South,
+        Direction.West,
+    ];
+
+    public void VisitWallMountFeature(WallMountFeature feature, Args args)
+    {
+        if (!Check(feature, args))
+            return;
+
+        var grid = args.CenterCoordinates.EntityId;
+        if (!args.EntMan.TryGetComponent(grid, out MapGridComponent? gridComp))
+            return;
+
+        var anchor = args.EntMan.System<TurfSystem>();
+        var mapSystem = args.EntMan.System<SharedMapSystem>();
+        var center = args.CenterCoordinates.ToVector2i(args.EntMan, args.EntMan.System<SharedTransformSystem>());
+        var i = 0;
+        var isFound = false;
+        Vector2i? foundPos = null;
+        var direction = Direction.South;
+        while (!isFound && i <= feature.MaxDistance)
+        {
+            foreach (var dir in CardinalDirections)
+            {
+                var newPos = center + dir.ToIntVec() * i;
+                if (!anchor.IsTileBlocked(args.CenterCoordinates.EntityId, newPos, CollisionGroup.Impassable, gridComp))
+                    continue;
+
+                isFound = true;
+                foundPos = newPos;
+                direction = dir.GetOpposite();
+                break;
+            }
+
+            i++;
+        }
+
+        if (foundPos == null)
+            return;
+
+        feature.Feature.Rotation ??= direction.ToAngle() + (feature.Rotation ?? Angle.Zero);
+
+        var newArgs = args with { CenterCoordinates = mapSystem.GridTileToLocal(grid, gridComp, foundPos.Value) };
+        feature.Feature.Accept(this, newArgs);
     }
 }
