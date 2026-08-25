@@ -26,6 +26,7 @@
     tile: Plating
     minRoomWidth: 5
     minRoomHeight: 5
+    cutProb: 0.1 # Prefer more tunnels to large rooms
 
   # Room roles
   - !type:RoomRoleDunGen
@@ -123,6 +124,7 @@
     tile: Plating
     minRoomWidth: 5
     minRoomHeight: 5
+    cutProb: 0.1 # Prefer more tunnels to large rooms
 
   # Room roles
   - !type:RoomRoleDunGen

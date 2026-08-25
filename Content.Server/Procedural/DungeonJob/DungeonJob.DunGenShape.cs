@@ -2,10 +2,8 @@
 using System.Threading.Tasks;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.DungeonGenerators;
-using Content.Shared.Tag;
 using Robust.Shared.Collections;
 using Robust.Shared.Map;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
 
@@ -20,12 +18,13 @@ public sealed partial class DungeonJob
         var startBox = (Box2i) Box2.CenteredAround(position, shapeRoom.AreaSize).Rounded(0);
         var minSize = new Vector2i(shapeRoom.MinRoomWidth.Get(random), shapeRoom.MinRoomHeight.Get(random));
         var variation = shapeRoom.Variation.Get(random);
+        var curProb = shapeRoom.CutProb.Get(random);
 
         var tiles = new List<(Vector2i, Tile)>(startBox.Width * startBox.Height);
 
         var corners = new HashSet<Vector2i>();
 
-        var roomBoxes = SplitRecursiveBox(shapeRoom, startBox, minSize, variation, random).ToList();
+        var roomBoxes = SplitBox(startBox, minSize, variation, curProb, random).ToList();
         foreach (var roomBox in roomBoxes)
         {
             var roomTiles = new HashSet<Vector2i>(roomBox.Width * roomBox.Height);
@@ -81,78 +80,86 @@ public sealed partial class DungeonJob
         return dungeon;
     }
 
-    private static IEnumerable<Box2i> SplitRecursiveBox(ShapeRoomDunGen shapeRoom, Box2i box, Vector2i minSize, float variation, IRobustRandom random)
+    /// <summary>
+    /// Iteratively splits a <see cref="Box2i"/> into pieces separated by 1-tile thick walls until it comes close to the minSize dimensions.
+    /// </summary>
+    /// <param name="startBox">The original box to split.</param>
+    /// <param name="minSize">Minimal size of a room</param>
+    /// <param name="variation">
+    /// The percentage amount by which to compare the aspect ratio of a splitting box to force a direction of a split.
+    /// Higher value forces the rooms to look more stretched.
+    /// </param>
+    /// <param name="cutProb">
+    /// The probability to skip the last cut before making a box that is smaller than the minimal size.
+    /// Higher values means more bigger rooms surrounded by smaller ones.
+    /// </param>
+    /// <param name="random">The random to use.</param>
+    /// <returns>All boxes that were split from the original box.</returns>
+    private static IEnumerable<Box2i> SplitBox(
+        Box2i startBox,
+        Vector2i minSize,
+        float variation,
+        float cutProb,
+        IRobustRandom random)
     {
-        DebugTools.Assert(box.IsValid());
+        DebugTools.Assert(startBox.IsValid());
 
-        bool isHorizontalSplit;
+        var pendingBoxes = new Stack<Box2i>();
+        pendingBoxes.Push(startBox);
 
-        if ((float) box.Width / box.Height > 1f + variation)
-            isHorizontalSplit = false;
-        else if ((float) box.Height / box.Width > 1f + variation)
-            isHorizontalSplit = true;
-        else
-            isHorizontalSplit = random.Prob(0.5f);
-
-        if (isHorizontalSplit)
+        while (pendingBoxes.Count > 0)
         {
-            var forbiddenBoxHeight = box.Height / 2;
+            var box = pendingBoxes.Pop();
+            bool isHorizontalSplit;
 
-            // This height is excluded from both boxes and gets replaced by a wall
-            var cutHeight = random.Next(box.Bottom + forbiddenBoxHeight, box.Top - forbiddenBoxHeight);
+            if ((float) box.Width / box.Height > 1f + variation)
+                isHorizontalSplit = false;
+            else if ((float) box.Height / box.Width > 1f + variation)
+                isHorizontalSplit = true;
+            else
+                isHorizontalSplit = random.Prob(0.5f);
 
-            var bottom = new Box2i(box.BottomLeft, new Vector2i(box.Right, cutHeight - 1));
-            var top = new Box2i(new Vector2i(box.Left, cutHeight), box.TopRight);
+            Box2i box1, box2;
 
-            if (bottom.Width < minSize.X || bottom.Height < minSize.Y)
-                yield return bottom;
+            if (isHorizontalSplit)
+            {
+                var forbiddenBoxHeight = box.Height / 2;
+
+                // This height is excluded from both boxes and gets replaced by a wall
+                var cutHeight = random.Next(box.Bottom + forbiddenBoxHeight, box.Top - forbiddenBoxHeight);
+
+                box1 = new Box2i(box.BottomLeft, new Vector2i(box.Right, cutHeight - 1));
+                box2 = new Box2i(new Vector2i(box.Left, cutHeight), box.TopRight);
+            }
             else
             {
-                foreach (var recursiveBox in SplitRecursiveBox(shapeRoom, bottom, minSize, variation, random))
-                {
-                    yield return recursiveBox;
-                }
+                var forbiddenBoxWidth = box.Width / 2;
+
+                // This width is excluded from both boxes and gets replaced by a wall
+                var cutWidth = random.Next(box.Left + forbiddenBoxWidth, box.Right - forbiddenBoxWidth);
+
+                box1 = new Box2i(box.BottomLeft, new Vector2i(cutWidth - 1, box.Top));
+                box2 = new Box2i(new Vector2i(cutWidth, box.Bottom), box.TopRight);
             }
 
-            if (top.Width < minSize.X || top.Height < minSize.Y)
-                yield return top;
-            else
+            bool isBox1Small = box1.Width < minSize.X || box1.Height < minSize.Y;
+            bool isBox2Small = box2.Width < minSize.X || box2.Height < minSize.Y;
+
+            if ((isBox1Small || isBox2Small) && random.Prob(cutProb))
             {
-                foreach (var recursiveBox in SplitRecursiveBox(shapeRoom, top, minSize, variation, random))
-                {
-                    yield return recursiveBox;
-                }
+                yield return box;
+                continue;
             }
-        }
-        else
-        {
-            var forbiddenBoxWidth = box.Width / 2;
 
-            // This height is excluded from both boxes and gets replaced by a wall
-            var cutWidth = random.Next(box.Left + forbiddenBoxWidth, box.Right - forbiddenBoxWidth);
-
-            var left = new Box2i(box.BottomLeft, new Vector2i(cutWidth - 1, box.Top));
-            var right = new Box2i(new Vector2i(cutWidth, box.Bottom), box.TopRight);
-
-            if (left.Width < minSize.X || left.Height < minSize.Y)
-                yield return left;
+            if (isBox1Small)
+                yield return box1;
             else
-            {
-                foreach (var recursiveBox in SplitRecursiveBox(shapeRoom, left, minSize, variation, random))
-                {
-                    yield return recursiveBox;
-                }
-            }
+                pendingBoxes.Push(box1);
 
-            if (right.Width < minSize.X || right.Height < minSize.Y)
-                yield return right;
+            if (isBox2Small)
+                yield return box2;
             else
-            {
-                foreach (var recursiveBox in SplitRecursiveBox(shapeRoom, right, minSize, variation, random))
-                {
-                    yield return recursiveBox;
-                }
-            }
+                pendingBoxes.Push(box2);
         }
     }
 
