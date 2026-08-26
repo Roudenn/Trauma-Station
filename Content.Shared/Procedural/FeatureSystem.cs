@@ -48,10 +48,7 @@ public sealed partial class FeatureSystem : EntitySystem
 
         rand ??= _random;
         ctx ??= new FeatureContext();
-        table.Accept(
-            SpawnFeatureVisitor.Instance,
-            new SpawnFeatureVisitor.Args(EntityManager, ProtoMan, rand, ctx, centerCoords)
-        );
+        SpawnFeatureVisitor.Instance.Visit(table, new SpawnFeatureVisitor.Args(EntityManager, ProtoMan, rand, ctx, centerCoords));
     }
 }
 
@@ -87,28 +84,34 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
         return true;
     }
 
-    public void Visit(Feature selector, Args args)
+    public void Visit(Feature feature, Args args)
     {
         if (args.LastFeature != null)
         {
             if (args.LastFeature.AlignTile)
-                selector.AlignTile = true;
+                feature.AlignTile = true;
 
             if (args.LastFeature.ConditionInheritance)
             {
-                selector.ConditionInheritance = true;
-                selector.Conditions.UnionWith(args.LastFeature.Conditions);
+                feature.ConditionInheritance = true;
+                feature.Conditions.UnionWith(args.LastFeature.Conditions);
             }
+
+            feature.Rotation ??= args.LastFeature.Rotation;
         }
 
-        selector.Accept(this, args);
+        var amount = feature.Rolls.Get(args.Rand);
+        for (int i = 0; i < amount; i++)
+        {
+            if (!Check(feature, ref args))
+                return;
+
+            feature.Accept(this, args);
+        }
     }
 
     public void VisitAllFeature(AllFeature feature, Args args)
     {
-        if (!Check(feature, ref args))
-            return;
-
         foreach (var child in feature.Children)
         {
             Visit(child, args);
@@ -117,9 +120,6 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
     public void VisitEntFeature(EntFeature feature, Args args)
     {
-        if (!Check(feature, ref args))
-            return;
-
         var pos = args.CenterCoordinates
             .Offset(feature.Offset.GetPosition(args.Rand))
             .AlignWithClosestGridTile(entityManager: args.EntMan);
@@ -137,8 +137,7 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
     public void VisitTileFeature(TileFeature feature, Args args)
     {
-        if (!Check(feature, ref args)
-            || !args.EntMan.TryGetComponent(args.CenterCoordinates.EntityId, out MapGridComponent? gridComp))
+        if (!args.EntMan.TryGetComponent(args.CenterCoordinates.EntityId, out MapGridComponent? gridComp))
             return;
 
         var mapSystem = args.EntMan.System<SharedMapSystem>();
@@ -157,9 +156,6 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
     public void VisitDecalFeature(DecalFeature feature, Args args)
     {
-        if (!Check(feature, ref args))
-            return;
-
         var decalSystem = args.EntMan.System<SharedDecalSystem>();
         var pos = args.CenterCoordinates
             .Offset(feature.Offset.GetPosition(args.Rand))
@@ -182,17 +178,11 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
     public void VisitNestedFeature(NestedFeature feature, Args args)
     {
-        if (!Check(feature, ref args))
-            return;
-
         Visit(args.ProtoMan.Index(feature.Id).Feature, args);
     }
 
     public void VisitShapeFeature(ShapeFeature feature, Args args)
     {
-        if (!Check(feature, ref args))
-            return;
-
         var entShape = args.EntMan.System<EntityShapeSystem>();
         foreach (var pos in entShape.GetShape(feature.Shape, null, args.Rand))
         {
@@ -206,9 +196,6 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
     public void VisitGroupFeature(GroupFeature feature, Args args)
     {
-        if (!Check(feature, ref args))
-            return;
-
         var validWeightedChildren = feature.Children
             .Where(child => child.Weight >= float.Epsilon)
             .ToDictionary(child => child, child => child.Weight);
@@ -223,9 +210,6 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
     public void VisitLineFeature(LineFeature feature, Args args)
     {
-        if (!Check(feature, ref args))
-            return;
-
         var turf = args.EntMan.System<TurfSystem>();
         var center = turf.GetTileRef(args.CenterCoordinates);
         if (center == null || turf.IsTileBlocked(center.Value, CollisionGroup.MobMask))
@@ -300,9 +284,6 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
     public void VisitWallMountFeature(WallMountFeature feature, Args args)
     {
-        if (!Check(feature, ref args))
-            return;
-
         var grid = args.CenterCoordinates.EntityId;
         if (!args.EntMan.TryGetComponent(grid, out MapGridComponent? gridComp))
             return;
@@ -334,9 +315,12 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
         if (foundPos == null)
             return;
 
-        feature.Feature.Rotation ??= direction.ToAngle() + (feature.Rotation ?? Angle.Zero);
+        feature.Rotation ??= direction.ToAngle() + (feature.Rotation ?? Angle.Zero);
+        var coords = mapSystem.GridTileToLocal(grid, gridComp, foundPos.Value);
+        if (feature.WallOffset)
+            coords = coords.Offset(direction.ToVec());
 
-        var newArgs = args with { CenterCoordinates = mapSystem.GridTileToLocal(grid, gridComp, foundPos.Value) };
+        var newArgs = args with { CenterCoordinates = coords };
         Visit(feature.Feature, newArgs);
     }
 }

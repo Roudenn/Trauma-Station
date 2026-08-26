@@ -36,11 +36,11 @@ public sealed partial class DungeonJob
 
                 var gridPos = _maps.GridTileToLocal(_gridUid, _grid, tile);
                 featureSystem.SpawnFeature(gen.Feature, gridPos, random, dungeon.FeatureContext);
-
-                await SuspendDungeon();
-                if (!ValidateResume())
-                    break;
             }
+
+            await SuspendDungeon();
+            if (!ValidateResume())
+                break;
         }
     }
 }

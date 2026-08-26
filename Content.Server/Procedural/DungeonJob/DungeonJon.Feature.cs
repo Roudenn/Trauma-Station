@@ -26,6 +26,11 @@ public sealed partial class DungeonJob
 
             var pos = gen.Position.GetPosition(_entManager, _prototype, random, room);
             featureSystem.SpawnFeature(gen.Feature, new EntityCoordinates(_gridUid, pos), random, dungeon.FeatureContext);
+
+            await SuspendDungeon();
+
+            if (!ValidateResume())
+                return;
         }
     }
 }

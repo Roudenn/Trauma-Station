@@ -15,6 +15,13 @@ public sealed partial class WallMountFeature : Feature
     [DataField]
     public int MaxDistance = 16;
 
+    /// <summary>
+    /// If true, will offset the entity by 1 tile towards the center.
+    /// Useful for wallmounts that aren't actually wallmount, like lights or cameras.
+    /// </summary>
+    [DataField]
+    public bool WallOffset;
+
     public override void Accept<TContext>(IFeatureVisitor<TContext> visitor, TContext args) =>
         visitor.VisitWallMountFeature(this, args);
 }

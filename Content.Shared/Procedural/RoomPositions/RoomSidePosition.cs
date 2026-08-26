@@ -33,13 +33,13 @@ public sealed partial class RoomSidePosition : RoomPosition
             case RoomSides.Right:
                 return room.Center with { X = room.Bounds.Right };
             case RoomSides.Top:
-                return room.Center with { Y = room.Bounds.Top };
+                return room.Center with { Y = room.Bounds.Top - 1 };
             case RoomSides.Bottom:
-                return room.Center with { Y = room.Bounds.Bottom };
+                return room.Center with { Y = room.Bounds.Bottom - 1 };
             case RoomSides.TopLeft:
                 return room.Bounds.TopLeft;
             case RoomSides.TopRight:
-                return room.Bounds.TopRight;
+                return room.Bounds.TopRight - Vector2.One;
             case RoomSides.BottomLeft:
                 return room.Bounds.BottomLeft;
             case RoomSides.BottomRight:

@@ -22,7 +22,7 @@
   id: ShapeRoomTestBig
   layers:
   - !type:ShapeRoomDunGen
-    areaSize: 200,200
+    areaSize: 150,150
     tile: Plating
     minRoomWidth: 5
     minRoomHeight: 5
@@ -35,10 +35,10 @@
     prob: 0.5
     weightsId: RoomMaintenanceSmall
 
-  #- !type:RoomRoleDunGen
-  #  minSize: 5,5
-  #  prob: 0.5
-  #  weightsId: RoomMaintenanceMedium
+  - !type:RoomRoleDunGen
+    minSize: 6,6
+    prob: 0.5
+    weightsId: RoomMaintenanceMedium
 
   - !type:RoomRoleDunGen
     weightsId: RoomMaintenanceDefault # Fallback for all unassigned rooms
@@ -58,6 +58,12 @@
     tile: Plating
 
   # Features
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceLight
+      obstruct: false
+    position: !type:RoomRandomPosition
+
   - !type:FeatureDunGen
     feature:
       id: MaintenanceClosetLootRow
@@ -94,10 +100,131 @@
     - !type:RoomRoleCondition
       role: RoomMaintenanceGenerator
 
+  - !type:FeatureDunGen
+    feature:
+      id: OfficeDecoration
+    position: !type:RoomSidePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+      - TopLeft
+      - TopRight
+      - BottomLeft
+      - BottomRight
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceLibrary
+
+  - !type:FeatureDunGen
+    feature:
+      id: BookshelvesLine
+    position: !type:RoomRandomPosition
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceLibrary
+
+  - !type:FeatureDunGen
+    feature:
+      id: ReadingTable
+    position: !type:RoomRandomPosition
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceLibrary
+
+  - !type:EntityTableDunGen
+    minCount: 125
+    maxCount: 180
+    perDungeon: true
+    ignoreReserved: true
+    table:
+      id: Girder
+
+  - !type:EntityTableDunGen
+    minCount: 100
+    maxCount: 150
+    perDungeon: true
+    ignoreReserved: true
+    table:
+      id: ReinforcedGirder
+
+  - !type:EntityTableDunGen
+    minCount: 80
+    maxCount: 120
+    perDungeon: true
+    ignoreReserved: true
+    table:
+      id: ReinforcedWindow
+
+  - !type:EntityTableDunGen
+    minCount: 150
+    maxCount: 250
+    perDungeon: true
+    ignoreReserved: true
+    table:
+      id: Window
+
+  # Loot
+
+  - !type:EntityTableDunGen
+    minCount: 750
+    maxCount: 1500
+    perDungeon: true
+    ignoreReserved: true
+    table: !type:NestedSelector
+      tableId: GenericTrashItems
+
+  - !type:EntityTableDunGen
+    minCount: 500
+    maxCount: 1000
+    perDungeon: true
+    ignoreReserved: true
+    table: !type:NestedSelector
+      tableId: SalvageScrapSpawnerCommon
+
+  - !type:EntityTableDunGen
+    minCount: 200
+    maxCount: 300
+    perDungeon: true
+    ignoreReserved: true
+    table: !type:NestedSelector
+      tableId: SalvageScrapSpawnerValuable
+
+  - !type:EntityTableDunGen
+    minCount: 250
+    maxCount: 400
+    perDungeon: true
+    ignoreReserved: true
+    table: !type:NestedSelector
+      tableId: SalvageTreasureSpawnerCommon
+
+  - !type:EntityTableDunGen
+    minCount: 100
+    maxCount: 200
+    perDungeon: true
+    ignoreReserved: true
+    table: !type:NestedSelector
+      tableId: SalvageTreasureSpawnerValuable
+
   # Tiles
   - !type:FeatureFillDunGen
     feature:
       id: MaintenanceFloor
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenance
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceGenerator
+
+  - !type:FeatureFillDunGen
+    feature:
+      id: MaintenanceLibraryFloor
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceLibrary
 
   # Other
 
@@ -116,6 +243,7 @@
     feature:
       id: MaintenanceCatwalk
 
+
 - type: dungeonConfig
   id: ShapeRoomTestSmall
   layers:
@@ -133,10 +261,10 @@
     prob: 0.5
     weightsId: RoomMaintenanceSmall
 
-  #- !type:RoomRoleDunGen
-  #  minSize: 5,5
-  #  prob: 0.5
-  #  weightsId: RoomMaintenanceMedium
+  - !type:RoomRoleDunGen
+    minSize: 6,6
+    prob: 0.5
+    weightsId: RoomMaintenanceMedium
 
   - !type:RoomRoleDunGen
     weightsId: RoomMaintenanceDefault # Fallback for all unassigned rooms
@@ -196,6 +324,20 @@
   - !type:FeatureFillDunGen
     feature:
       id: MaintenanceFloor
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenance
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceGenerator
+
+  - !type:FeatureFillDunGen
+    feature:
+      id: MaintenanceLibraryFloor
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceLibrary
 
   # Other
 
@@ -251,8 +393,8 @@
   id: RoomMaintenanceMedium
   weights:
     RoomMaintenanceLibrary: 2
-    RoomMaintenanceScience: 1
-    RoomMaintenanceBar: 1
+    #RoomMaintenanceScience: 1
+    #RoomMaintenanceBar: 1
 
 - type: weightedRandom
   id: RoomMaintenanceDefault

@@ -14,7 +14,7 @@ public interface IFeatureVisitor<in TArgs>
     /// Alias of <see cref="Feature.Accept{TContext}(IFeatureVisitor{TContext}, TContext)"/>.
     /// </summary>
     [PublicAPI]
-    void Visit(Feature selector, TArgs args) => selector.Accept(this, args);
+    void Visit(Feature feature, TArgs args) => feature.Accept(this, args);
 
     /// <summary>
     /// Visit an <see cref="AllSelector"/>.

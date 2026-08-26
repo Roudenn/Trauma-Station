@@ -122,3 +122,93 @@
       whitelist:
         components:
         - NodeContainer
+
+## Library
+
+- type: feature
+  id: BookshelvesLine
+  feature: !type:LineFeature
+    maxSpawns: 6
+    feature:
+      ent: BookshelfFilled
+      prob: 0.8 # Statistically will have at least 1 opening
+      conditions:
+      - !type:UnobstructedFeatureCondition
+
+- type: feature
+  id: ReadingTable
+  feature: !type:AllFeature
+    conditionInheritance: true
+    conditionsApplySelf: false
+    conditions:
+    - !type:UnobstructedFeatureCondition
+    children:
+    - ent: TableWood
+    - ent: TableWood
+      offset: -1,0
+    - ent: TableWood
+      offset: 1,0
+    - !type:GroupFeature
+      children:
+      - ent: ChairWood
+        offset: 0,1
+      - ent: ChairWood
+        offset: 0,-1
+    - ent: Paper
+      offset: !type:RangeFeaturePosition
+        minPos: -0.3,-0.3
+        maxPos: 0.3,0.3
+    - ent: Pen
+      offset: !type:RangeFeaturePosition
+        minPos: -0.3,-0.3
+        maxPos: 0.3,0.3
+    - ent: BookRandomStory
+      offset: !type:RangeFeaturePosition
+        minPos: -1.3,-0.3
+        maxPos: -0.3,0.3
+
+- type: feature
+  id: MaintenanceLibraryFloor
+  feature: !type:AllFeature
+    children:
+    - !type:GroupFeature
+      children:
+      - tile: FloorWoodTile
+        weight: 2
+      - tile: FloorBrokenWood
+        weight: 1
+      - tile: Plating
+        weight: 1
+      - tile: FloorTechMaintDark
+        weight: 1
+      - tile: FloorWoodLarge
+        weight: 1
+
+- type: feature
+  id: OfficeDecoration
+  feature: !type:GroupFeature
+    children:
+    - ent: PottedPlantRandom
+      weight: 2
+    - ent: WaterCooler
+      weight: 1
+    - ent: LockerFreezerBase
+      weight: 0.3
+    - !type:AllFeature
+      weight: 1
+      children:
+      - ent: TableWood
+      - ent: PaperBin5
+
+- type: feature
+  id: MaintenanceLight
+  feature: !type:WallMountFeature
+    wallOffset: true
+    feature: !type:GroupFeature
+      children:
+      - ent: PoweredDimSmallLight
+        weight: 2
+      - ent: PoweredWarmSmallLight
+        weight: 1
+      - ent: PoweredSmallLight
+        weight: 1
