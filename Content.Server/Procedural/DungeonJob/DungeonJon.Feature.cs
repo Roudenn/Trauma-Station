@@ -21,11 +21,15 @@ public sealed partial class DungeonJob
 
         foreach (var room in dungeon.Rooms)
         {
-            if (!gen.CheckConditions(_entManager, _prototype, room))
-                continue;
+            var rolls = gen.Rolls.Get(random);
+            for (int i = 0; i < rolls; i++)
+            {
+                if (!gen.CheckConditions(_entManager, _prototype, room))
+                    continue;
 
-            var pos = gen.Position.GetPosition(_entManager, _prototype, random, room);
-            featureSystem.SpawnFeature(gen.Feature, new EntityCoordinates(_gridUid, pos), random, dungeon.FeatureContext);
+                var pos = gen.Position.GetPosition(_entManager, _prototype, random, room);
+                featureSystem.SpawnFeature(gen.Feature, new EntityCoordinates(_gridUid, pos), random, dungeon.FeatureContext);
+            }
 
             await SuspendDungeon();
 

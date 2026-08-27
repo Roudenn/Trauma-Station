@@ -32,6 +32,10 @@ public sealed partial class DungeonJob
                 continue;
 
             room.Roles.Add(_prototype.Index(gen.WeightsId).Pick(random));
+
+            await SuspendDungeon();
+            if (!ValidateResume())
+                break;
         }
     }
 }

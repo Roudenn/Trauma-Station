@@ -21,6 +21,9 @@ public sealed class FeatureTypeSerializer :
         if (node.Has(EntFeature.EntDataFieldTag))
             return serializationManager.ValidateNode<EntFeature>(node, context);
 
+        if (node.Has(EntityTableFeature.TableDataFieldTag))
+            return serializationManager.ValidateNode<EntityTableFeature>(node, context);
+
         if (node.Has(TileFeature.TileDataFieldTag))
             return serializationManager.ValidateNode<TileFeature>(node, context);
 
@@ -42,6 +45,9 @@ public sealed class FeatureTypeSerializer :
 
         if (node.Has(EntFeature.EntDataFieldTag))
             return serializationManager.Read<EntFeature>(node, context, notNullableOverride: true);
+
+        if (node.Has(EntityTableFeature.TableDataFieldTag))
+            return serializationManager.Read<EntityTableFeature>(node, context, notNullableOverride: true);
 
         if (node.Has(TileFeature.TileDataFieldTag))
             return serializationManager.Read<TileFeature>(node, context, notNullableOverride: true);

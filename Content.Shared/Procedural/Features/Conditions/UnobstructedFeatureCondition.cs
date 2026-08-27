@@ -11,7 +11,7 @@ public sealed partial class UnobstructedFeatureCondition : FeatureCondition
     /// Feature type flags to check.
     /// </summary>
     [DataField(customTypeSerializer: typeof(FlagSerializer<FeatureTypeClass>))]
-    public int Type;
+    public int Type = 1;
 
     protected override bool EvaluateImplementation(
         Feature root,

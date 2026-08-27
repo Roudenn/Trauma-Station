@@ -1,0 +1,42 @@
+- type: feature
+  id: MaintenanceDormBed
+  feature: !type:AllFeature
+    children:
+    - ent: Bed
+    - ent: BedsheetSpawner
+    - ent: TableWood
+      offset: 1,0
+
+- type: feature
+  id: MaintenanceDormFloor
+  feature: !type:AllFeature
+    children:
+    - !type:GroupFeature
+      children:
+      - tile: FloorWoodTile
+        weight: 5
+      - tile: FloorBrokenWood
+        weight: 1
+
+# Used only in dorms for false sense of safety
+- type: feature
+  id: MaintenanceDormLight
+  feature: !type:WallMountFeature
+    wallOffset: true
+    feature:
+      ent: AlwaysPoweredWallLight
+
+- type: feature
+  id: MaintenanceDormClosets
+  feature: !type:LineFeature
+    maxSpawns: 4
+    feature:
+      ent: WardrobeMixedFilled
+
+- type: feature
+  id: MaintenanceDormCarpet
+  feature: !type:ShapeFeature
+    feature:
+      ent: CarpetBlack
+    shape: !type:BoxEntityShape
+      size: 2

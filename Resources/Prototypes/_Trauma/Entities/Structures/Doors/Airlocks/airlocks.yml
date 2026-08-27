@@ -13,3 +13,12 @@
   id: AirlockRoboticsGlass
   suffix: Robotics
   # TODO: non-chem sprites
+
+- type: entity
+  parent: AirlockAlwaysPowered
+  id: AirlockMaintAlwaysPowered
+  name: maintenance access
+  suffix: Maintenance, Always Powered
+  components:
+  - type: Sprite
+    sprite: Structures/Doors/Airlocks/Standard/maint.rsi

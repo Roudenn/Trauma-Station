@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Content.Shared.Decals;
 using Content.Shared.EntityShapes;
+using Content.Shared.EntityTable;
 using Content.Shared.Maps;
 using Content.Shared.Physics;
 using Content.Shared.Procedural.Components;
@@ -120,11 +121,25 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
     public void VisitEntFeature(EntFeature feature, Args args)
     {
+        SpawnEnt(feature.Ent, feature, args);
+    }
+
+    public void VisitTableFeature(EntityTableFeature feature, Args args)
+    {
+        var tableSystem = args.EntMan.System<EntityTableSystem>();
+        foreach (var protoId in tableSystem.GetSpawns(args.ProtoMan.Index(feature.Table)))
+        {
+            SpawnEnt(protoId, feature, args);
+        }
+    }
+
+    private static void SpawnEnt(EntProtoId entId, Feature feature, Args args)
+    {
         var pos = args.CenterCoordinates
             .Offset(feature.Offset.GetPosition(args.Rand))
             .AlignWithClosestGridTile(entityManager: args.EntMan);
 
-        var ent = args.EntMan.PredictedSpawnAtPosition(feature.Ent, pos);
+        var ent = args.EntMan.PredictedSpawnAtPosition(entId, pos);
         var transformSys = args.EntMan.System<SharedTransformSystem>();
         transformSys.SetLocalRotation(ent, feature.Rotation ?? Angle.Zero);
 

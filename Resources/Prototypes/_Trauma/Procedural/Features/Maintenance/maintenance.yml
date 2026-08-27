@@ -1,0 +1,114 @@
+- type: feature
+  id: MaintenanceClosetLootRow
+  feature: !type:LineFeature
+    conditionInheritance: true
+    conditionsApplySelf: false
+    conditions:
+    - !type:UnobstructedFeatureCondition
+      type:
+      - Entity
+    feature: !type:GroupFeature
+      children:
+      # Loot
+      - !type:GroupFeature
+        weight: 2.5
+        children:
+        - ent: ClosetMaintenanceFilledMore
+          weight: 0.75
+        - ent: ClosetMaintenanceFilledRandom
+          weight: 0.215
+        - ent: LockerMimic
+          weight: 0.025 # 2.5% chance for the bite of 87
+        - ent: ClosetBluespaceUnstable
+          weight: 0.01 # 1% chance for a fast-travel method
+      - ent: LockerElectricalSupplies
+        weight: 0.3
+      - ent: LockerWeldingSupplies
+        weight: 0.3
+      - ent: ClosetEmergencyFilledRandom
+        weight: 1
+      - ent: ClosetFireFilled
+        weight: 0.8
+      - id: MaintenanceToolRack
+        weight: 1
+      - id: MaintenanceToolTable
+        weight: 1
+      # Canisters
+      - ent: NitrogenCanister
+        weight: 0.5
+      - ent: OxygenCanister
+        weight: 0.5
+      - ent: AirCanister
+        weight: 0.5
+      - ent: CarbonDioxideCanister
+        weight: 0.1
+      # Tanks
+      - ent: WeldingFuelTankFull
+        weight: 1
+      - ent: WaterTankFull
+        weight: 1
+      # Decorations
+      - ent: PottedPlantRandom
+        weight: 1
+      - ent: Chair # TODO this somehow needs random/conditional rotation
+        weight: 0.75
+
+- type: feature
+  id: MaintenanceToolRack
+  feature: !type:AllFeature
+    children:
+    - ent: Rack
+    - ent: MaintenanceToolSpawner
+    - ent: MaintenanceWeaponSpawner
+    - ent: MaintenanceFluffSpawner
+
+- type: feature
+  id: MaintenanceToolTable
+  feature: !type:AllFeature
+    children:
+    - ent: Table
+    - ent: MaintenanceToolSpawner
+    - ent: MaintenanceWeaponSpawner
+    - ent: MaintenanceFluffSpawner
+
+- type: feature
+  id: MaintenanceFloor
+  feature: !type:AllFeature
+    children:
+    - !type:GroupFeature
+      children:
+      - tile: Plating
+        weight: 2
+      - tile: FloorSteel
+        weight: 1
+      - tile: FloorTechMaint
+        weight: 1
+      - tile: FloorTechMaintDark
+        weight: 1
+
+# Spawns a catwalk on plating tiles with exposed cables in order to hide them
+- type: feature
+  id: MaintenanceCatwalk
+  feature: !type:EntFeature
+    ent: Catwalk
+    conditions:
+    - !type:TileFeatureCondition
+      tiles:
+      - Plating
+    - !type:EntityFeatureCondition
+      whitelist:
+        components:
+        - NodeContainer
+
+- type: feature
+  id: MaintenanceLight
+  feature: !type:WallMountFeature
+    wallOffset: true
+    feature: !type:GroupFeature
+      children:
+      - ent: DimSmallLight
+        weight: 1
+      - ent: WarmSmallLight
+        weight: 2
+      - ent: SmallLight
+        weight: 0.1

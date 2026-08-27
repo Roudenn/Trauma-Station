@@ -50,4 +50,10 @@ public sealed partial class ShapeRoomDunGen : IDunGenLayer
 
     [DataField(required: true)]
     public ProtoId<ContentTileDefinition> Tile;
+
+    /// <summary>
+    /// Outer wall to surround the resulting shape with.
+    /// </summary>
+    [DataField]
+    public EntProtoId? OuterWall;
 }

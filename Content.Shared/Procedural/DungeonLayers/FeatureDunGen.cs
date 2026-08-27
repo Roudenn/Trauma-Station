@@ -1,6 +1,7 @@
 ﻿using Content.Shared.Procedural.Features;
 using Content.Shared.Procedural.RoomConditions;
 using Content.Shared.Procedural.RoomPositions;
+using Content.Shared.ValueSelectors.Numbers;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Procedural.DungeonLayers;
@@ -25,6 +26,9 @@ public sealed partial class FeatureDunGen : IDunGenLayer
     /// </summary>
     [DataField]
     public bool RequireAll = true;
+
+    [DataField]
+    public NumberSelector Rolls = new ConstantNumberSelector(1);
 
     /// <summary>
     /// Check if the condition for this selector are met.

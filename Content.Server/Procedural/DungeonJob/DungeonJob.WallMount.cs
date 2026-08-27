@@ -21,6 +21,10 @@ public sealed partial class DungeonJob
 
         foreach (var neighbor in allExterior)
         {
+            await SuspendDungeon();
+            if (!ValidateResume())
+                return;
+
             // Occupado
             if (dungeon.RoomTiles.Contains(neighbor) || checkedTiles.Contains(neighbor) || !_anchorable.TileFree((_gridUid, _grid), neighbor, DungeonSystem.CollisionLayer, DungeonSystem.CollisionMask))
                 continue;
@@ -36,10 +40,6 @@ public sealed partial class DungeonJob
             var protoNames = _entTable.GetSpawns(contents, random);
 
             _entManager.SpawnEntitiesAttachedTo(gridPos, protoNames);
-
-            await SuspendDungeon();
-            if (!ValidateResume())
-                return;
         }
     }
 }

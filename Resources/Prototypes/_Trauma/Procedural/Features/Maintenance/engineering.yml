@@ -1,0 +1,96 @@
+- type: feature
+  id: MaintenanceEngineeringLootRow
+  feature: !type:LineFeature
+    conditionInheritance: true
+    conditionsApplySelf: false
+    conditions:
+    - !type:UnobstructedFeatureCondition
+    feature: !type:GroupFeature
+      children:
+      # Lockers
+      - ent: ClosetToolFilled
+        weight: 2
+      - ent: LockerElectricalSuppliesFilled
+        weight: 2
+      - ent: LockerWeldingSuppliesFilled
+        weight: 2
+      - ent: LockerEngineerFilled
+        weight: 0.05
+      - ent: LockerEvacRepairFilled
+        weight: 0.025
+      - ent: LockerAtmosphericsFilled
+        weight: 0.025
+      # Material crates
+      - ent: CrateMaterialSteel
+        weight: 1
+      - ent: CrateMaterialGlass
+        weight: 1
+      - ent: CrateMaterialPlastic
+        weight: 1
+      - ent: CrateEngineeringCableBulk
+        weight: 1
+      - ent: CrateMaterialPlasteel
+        weight: 0.5
+      - ent: CrateMaterialWood
+        weight: 0.5
+      - ent: CrateMaterialCloth
+        weight: 0.5
+      # Canisters
+      - ent: PlasmaCanister
+        weight: 0.4
+      - ent: NitrousOxideCanister
+        weight: 0.3
+      - ent: AmmoniaCanister
+        weight: 0.2
+      - ent: FrezonCanister
+        weight: 0.01
+      - ent: TritiumCanister
+        weight: 0.005
+      # Tanks
+      - ent: WeldingFuelTankFull
+        weight: 0.5
+      - ent: WeldingFuelTankHighCapacity
+        weight: 0.05
+
+- type: feature
+  id: MaintenanceEngineeringFloor
+  feature: !type:AllFeature
+    children:
+    - !type:GroupFeature
+      children:
+      - tile: FloorSteel
+        weight: 5
+      - tile: Plating
+        weight: 1
+      - tile: FloorTechMaint
+        weight: 1
+      - tile: FloorTechMaintDark
+        weight: 1
+
+- type: feature
+  id: MaintenanceGenerator
+  feature: !type:AllFeature
+    children:
+    - !type:AllFeature
+      conditions:
+      - !type:UnobstructedFeatureCondition
+      children:
+      - ent: GeneratorBasic
+      - ent: CableHV
+    - !type:WallMountFeature
+      offset: 1,1
+      feature: !type:AllFeature
+        children:
+        - ent: APCBasic
+        - ent: CableMV
+          obstruct: false
+        - ent: CableApcExtension
+          obstruct: false
+    - !type:WallMountFeature
+      feature: !type:AllFeature
+        children:
+        - ent: SubstationWallBasic
+        - ent: CableMV
+          obstruct: false
+        - ent: CableHV
+          obstruct: false

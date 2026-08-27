@@ -1,5 +1,4 @@
 ﻿using Content.Shared.Random;
-using Content.Shared.Tag;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Procedural.DungeonLayers;

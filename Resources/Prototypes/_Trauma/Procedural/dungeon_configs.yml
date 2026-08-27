@@ -1,24 +1,4 @@
 - type: dungeonConfig
-  id: RandomRoomTest
-  layers:
-  - !type:RandomRoomDunGen
-    roomCount: 15
-    roomSize: !type:RoomSizeSelector
-      width: 3,9
-      height: 3,9
-    areaSize: 50,50
-    tile: Plating
-
-  - !type:CorridorDunGen
-    width: 3
-    tile: FloorSteel
-
-  - !type:BoundaryWallDunGen
-    wall: WallSolid
-    cornerWall: WallReinforced
-    tile: Plating
-
-- type: dungeonConfig
   id: ShapeRoomTestBig
   layers:
   - !type:ShapeRoomDunGen
@@ -27,6 +7,7 @@
     minRoomWidth: 5
     minRoomHeight: 5
     cutProb: 0.1 # Prefer more tunnels to large rooms
+    outerWall: WallPlastitaniumIndestructible # there is no escape from the brig maintenance
 
   # Room roles
   - !type:RoomRoleDunGen
@@ -62,11 +43,13 @@
     feature:
       id: MaintenanceLight
       obstruct: false
+      prob: 0.8
     position: !type:RoomRandomPosition
 
   - !type:FeatureDunGen
     feature:
       id: MaintenanceClosetLootRow
+    rolls: 1, 2
     position: !type:RoomSidePosition
       availableSides:
       - Top
@@ -82,16 +65,6 @@
 
   - !type:FeatureDunGen
     feature:
-      id: MaintenanceApc
-    position: !type:RoomSidePosition
-      availableSides:
-      - Top
-      - Bottom
-      - Left
-      - Right
-
-  - !type:FeatureDunGen
-    feature:
       id: MaintenanceGenerator
     position: !type:RoomSidePosition
       availableSides:
@@ -102,7 +75,37 @@
 
   - !type:FeatureDunGen
     feature:
+      id: MaintenanceEngineeringLootRow
+    rolls: 1, 2
+    position: !type:RoomSidePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+      - Center # infinite loot theorem
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceEngineering
+
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceDormClosets
+    position: !type:RoomSidePosition
+      availableSides:
+      - TopRight
+      - BottomRight
+      - Right
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceDorm
+
+  - !type:FeatureDunGen
+    feature:
       id: OfficeDecoration
+    rolls: 1, 4
     position: !type:RoomSidePosition
       availableSides:
       - Top
@@ -113,13 +116,40 @@
       - TopRight
       - BottomLeft
       - BottomRight
+    requireAll: false
     conditions:
     - !type:RoomRoleCondition
       role: RoomMaintenanceLibrary
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceDorm
+
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceDormBed
+    position: !type:RoomSidePosition
+      availableSides:
+      - Center
+      - TopLeft
+      - Left
+      - BottomLeft
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceDorm
+
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceDormLight
+    position: !type:RoomSidePosition
+      availableSides:
+      - Center
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceDorm
 
   - !type:FeatureDunGen
     feature:
       id: BookshelvesLine
+    rolls: 1, 2
     position: !type:RoomRandomPosition
     conditions:
     - !type:RoomRoleCondition
@@ -220,149 +250,64 @@
 
   - !type:FeatureFillDunGen
     feature:
+      id: MaintenanceEngineeringFloor
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceEngineering
+
+  - !type:FeatureFillDunGen
+    feature:
       id: MaintenanceLibraryFloor
     requireAll: false
     conditions:
     - !type:RoomRoleCondition
       role: RoomMaintenanceLibrary
 
-  # Other
-
-  - !type:AutoCablingDunGen
-    entity: CableApcExtension
-
-  - !type:AutoCablingDunGen
-    entity: CableMV
-    nodeGroup: MVPower
-
-  - !type:AutoCablingDunGen
-    entity: CableHV
-    nodeGroup: HVPower
-
   - !type:FeatureFillDunGen
     feature:
-      id: MaintenanceCatwalk
-
-
-- type: dungeonConfig
-  id: ShapeRoomTestSmall
-  layers:
-  - !type:ShapeRoomDunGen
-    areaSize: 20,20
-    tile: Plating
-    minRoomWidth: 5
-    minRoomHeight: 5
-    cutProb: 0.1 # Prefer more tunnels to large rooms
-
-  # Room roles
-  - !type:RoomRoleDunGen
-    minSize: 3,3
-    maxSize: 6,6
-    prob: 0.5
-    weightsId: RoomMaintenanceSmall
-
-  - !type:RoomRoleDunGen
-    minSize: 6,6
-    prob: 0.5
-    weightsId: RoomMaintenanceMedium
-
-  - !type:RoomRoleDunGen
-    weightsId: RoomMaintenanceDefault # Fallback for all unassigned rooms
-
-  - !type:WallMountDunGen
-    contents: MaintenanceWalls
-    tile: Plating
-
-  # Walls and airlocks
-  - !type:RoomEntranceDunGen
-    tile: FloorSteel
-    contents: MaintenanceAirlock
-
-  - !type:BoundaryWallDunGen
-    wall: WallSolid
-    cornerWall: WallReinforced
-    tile: Plating
-
-  # Features
-  - !type:FeatureDunGen
-    feature:
-      id: MaintenanceClosetLootRow
-    position: !type:RoomSidePosition
-      availableSides:
-      - Top
-      - Bottom
-      - Left
-      - Right
+      id: MaintenanceDormFloor
     requireAll: false
     conditions:
     - !type:RoomRoleCondition
-      role: RoomMaintenance
-    - !type:RoomRoleCondition
-      role: RoomMaintenanceGenerator
+      role: RoomMaintenanceDorm
 
   - !type:FeatureDunGen
     feature:
-      id: MaintenanceApc
-    position: !type:RoomSidePosition
-      availableSides:
-      - Top
-      - Bottom
-      - Left
-      - Right
-
-  - !type:FeatureDunGen
-    feature:
-      id: MaintenanceGenerator
+      id: MaintenanceDormCarpet
     position: !type:RoomSidePosition
       availableSides:
       - Center
-    conditions:
-    - !type:RoomRoleCondition
-      role: RoomMaintenanceGenerator
-
-  # Tiles
-  - !type:FeatureFillDunGen
-    feature:
-      id: MaintenanceFloor
     requireAll: false
     conditions:
     - !type:RoomRoleCondition
-      role: RoomMaintenance
-    - !type:RoomRoleCondition
-      role: RoomMaintenanceGenerator
-
-  - !type:FeatureFillDunGen
-    feature:
-      id: MaintenanceLibraryFloor
-    requireAll: false
-    conditions:
-    - !type:RoomRoleCondition
-      role: RoomMaintenanceLibrary
+      role: RoomMaintenanceDorm
 
   # Other
 
   - !type:AutoCablingDunGen
     entity: CableApcExtension
 
-  - !type:AutoCablingDunGen
-    entity: CableMV
-    nodeGroup: MVPower
+  # TODO auto cabling is very bad for performance because of how node groups work
+  #- !type:AutoCablingDunGen
+  #  entity: CableMV
+  #  nodeGroup: MVPower
 
-  - !type:AutoCablingDunGen
-    entity: CableHV
-    nodeGroup: HVPower
+  #- !type:AutoCablingDunGen
+  #  entity: CableHV
+  #  nodeGroup: HVPower
 
-  - !type:FeatureFillDunGen
-    feature:
-      id: MaintenanceCatwalk
-
+  #- !type:FeatureFillDunGen
+  #  feature:
+  #    id: MaintenanceCatwalk
 
 - type: entityTable
   id: MaintenanceAirlock
   table: !type:AllSelector
     children:
-    - id: AirlockMaint
+    - id: AirlockMaintAlwaysPowered
     - id: Firelock
+      prob: 0.5
 
 - type: entityTable
   id: MaintenanceWalls
@@ -381,13 +326,13 @@
     #RoomMaintenanceAtmos: 1
     #RoomMaintenanceBotany: 2
     #RoomMaintenanceChem: 1
-    #RoomMaintenanceDorm: 2
-    #RoomMaintenanceEngineering: 1
+    RoomMaintenanceDorm: 1
+    RoomMaintenanceEngineering: 2
     #RoomMaintenanceKitchen: 1
     #RoomMaintenanceSurgery: 1
     #RoomMaintenanceMedical: 1
     #RoomMaintenancePrison: 1
-    RoomMaintenanceGenerator: 6
+    RoomMaintenanceGenerator: 2
 
 - type: weightedRandom
   id: RoomMaintenanceMedium

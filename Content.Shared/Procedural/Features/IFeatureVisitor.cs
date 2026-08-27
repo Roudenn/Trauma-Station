@@ -35,6 +35,12 @@ public interface IFeatureVisitor<in TArgs>
     void VisitEntFeature(EntFeature feature, TArgs args);
 
     /// <summary>
+    /// Visit an <see cref="EntityTableFeature"/>.
+    /// </summary>
+    [PublicAPI]
+    void VisitTableFeature(EntityTableFeature feature, TArgs args);
+
+    /// <summary>
     /// Visit an <see cref="TileFeature"/>.
     /// </summary>
     [PublicAPI]

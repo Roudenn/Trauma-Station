@@ -64,6 +64,10 @@ public sealed partial class DungeonJob
             corners.Add(roomBox.TopRight + new Vector2i(1, 1));
 
             dungeon.AddRoom(new DungeonRoom(roomTiles, roomBox.Center, roomBox, exteriorTiles));
+
+            await SuspendDungeon();
+            if (!ValidateResume())
+                return Dungeon.Empty;
         }
 
         var pickedEntrances = new HashSet<Vector2i>(dungeon.Rooms.Count * 2);
@@ -76,6 +80,38 @@ public sealed partial class DungeonJob
         _maps.SetTiles(_gridUid, _grid, tiles);
 
         dungeon.Rebuild();
+
+        // Spawn an outer wall
+        if (shapeRoom.OuterWall == null)
+            return dungeon;
+
+        var outerBox = startBox.Enlarged(2);
+        var outerWalls = new List<(Vector2i, Tile)>((outerBox.Height + outerBox.Width) * 2);
+        for (int x = -(outerBox.Width / 2) + 1; x < outerBox.Width / 2 - 1; x++) // Start and end 1 tile short to prevent overlapping
+        {
+            outerWalls.Add((new Vector2i(x, outerBox.Bottom), new Tile(_prototype.Index(shapeRoom.Tile).TileId)));
+            outerWalls.Add((new Vector2i(x, outerBox.Top - 1), new Tile(_prototype.Index(shapeRoom.Tile).TileId)));
+        }
+        for (int y = -(outerBox.Height / 2); y < outerBox.Height / 2; y++)
+        {
+            outerWalls.Add((new Vector2i(outerBox.Left, y), new Tile(_prototype.Index(shapeRoom.Tile).TileId)));
+            outerWalls.Add((new Vector2i(outerBox.Right - 1, y), new Tile(_prototype.Index(shapeRoom.Tile).TileId)));
+        }
+
+        _maps.SetTiles(_gridUid, _grid, outerWalls);
+
+        await SuspendDungeon();
+        if (!ValidateResume())
+            return dungeon;
+
+        foreach (var (pos, _) in outerWalls)
+        {
+            _entManager.SpawnAtPosition(shapeRoom.OuterWall.Value, _maps.ToCoordinates(_gridUid, pos, _grid));
+
+            await SuspendDungeon();
+            if (!ValidateResume())
+                return dungeon;
+        }
 
         return dungeon;
     }
