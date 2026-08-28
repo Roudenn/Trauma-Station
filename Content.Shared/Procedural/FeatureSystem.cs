@@ -67,7 +67,8 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
         IRobustRandom Rand,
         FeatureContext Context,
         EntityCoordinates CenterCoordinates,
-        Feature? LastFeature = null
+        Feature? LastFeature = null,
+        Angle? OverrideRotation = null
     );
 
     private static bool Check(
@@ -100,6 +101,9 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
             feature.Rotation ??= args.LastFeature.Rotation;
         }
+
+        if (args.OverrideRotation != null)
+            feature.Rotation = args.OverrideRotation.Value;
 
         var amount = feature.Rolls.Get(args.Rand);
         for (int i = 0; i < amount; i++)
@@ -330,12 +334,12 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
         if (foundPos == null)
             return;
 
-        feature.Rotation ??= direction.ToAngle() + (feature.Rotation ?? Angle.Zero);
+        feature.Rotation = direction.ToAngle() + (feature.Rotation ?? Angle.Zero);
         var coords = mapSystem.GridTileToLocal(grid, gridComp, foundPos.Value);
         if (feature.WallOffset)
             coords = coords.Offset(direction.ToVec());
 
-        var newArgs = args with { CenterCoordinates = coords };
+        var newArgs = args with { CenterCoordinates = coords, OverrideRotation = feature.Rotation };
         Visit(feature.Feature, newArgs);
     }
 }
