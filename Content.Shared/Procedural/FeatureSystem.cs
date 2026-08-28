@@ -261,20 +261,26 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
         vertPos.Add(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices));
         var topEnd = false;
         var bottomEnd = false;
-        for (int i = 1; !topEnd && !bottomEnd; i++)
+        for (int i = 1; !topEnd || !bottomEnd; i++)
         {
-            var bottom = turf.GetTileRef(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices + new Vector2i(0, -i)));
-            var top = turf.GetTileRef(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices + new Vector2i(0, i)));
+            if (!bottomEnd)
+            {
+                var bottom = turf.GetTileRef(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices + new Vector2i(0, -i)));
+                if (bottom == null || turf.IsTileBlocked(bottom.Value, CollisionGroup.MobMask))
+                    bottomEnd = true;
+                else
+                    vertPos.Add(new EntityCoordinates(bottom.Value.GridUid, bottom.Value.GridIndices));
+            }
 
-            if (bottom == null || turf.IsTileBlocked(bottom.Value, CollisionGroup.MobMask))
-                bottomEnd = true;
-            else
-                vertPos.Add(new EntityCoordinates(bottom.Value.GridUid, bottom.Value.GridIndices));
-
-            if (top == null || turf.IsTileBlocked(top.Value, CollisionGroup.MobMask))
-                topEnd = true;
-            else
-                vertPos.Add(new EntityCoordinates(top.Value.GridUid, top.Value.GridIndices));
+            if (!topEnd)
+            {
+                var top = turf.GetTileRef(new EntityCoordinates(center.Value.GridUid,
+                    center.Value.GridIndices + new Vector2i(0, i)));
+                if (top == null || turf.IsTileBlocked(top.Value, CollisionGroup.MobMask))
+                    topEnd = true;
+                else
+                    vertPos.Add(new EntityCoordinates(top.Value.GridUid, top.Value.GridIndices));
+            }
 
             if (vertPos.Count >= feature.MaxSpawns)
                 break;
