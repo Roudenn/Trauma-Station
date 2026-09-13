@@ -1,0 +1,43 @@
+- type: dungeonLayers
+  id: MaintroomsRoles
+  layers:
+  - !type:RoomRoleDunGen
+    minSize: 3,3
+    maxSize: 6,6
+    prob: 0.5
+    weightsId: RoomMaintenanceSmall
+  - !type:RoomRoleDunGen
+    minSize: 6,6
+    prob: 0.5
+    weightsId: RoomMaintenanceMedium
+  - !type:RoomRoleDunGen
+    weightsId: RoomMaintenanceDefault # Fallback for all unassigned rooms
+
+- type: weightedRandom
+  id: RoomMaintenanceSmall
+  weights:
+    RoomMaintenanceArcade: 1
+    RoomMaintenanceAtmos: 1
+    RoomMaintenanceBotany: 1
+    RoomMaintenanceDorm: 1
+    RoomMaintenanceOutpost: 0.2
+    RoomMaintenanceEngineering: 1
+    RoomMaintenanceKitchen: 1
+    RoomMaintenanceMedical: 1
+    RoomMaintenancePrison: 1
+    RoomMaintenanceSecurity: 1
+    RoomMaintenanceGenerator: 2
+
+- type: weightedRandom
+  id: RoomMaintenanceMedium
+  weights:
+    RoomMaintenanceLibrary: 2
+    RoomMaintenanceOffice: 2
+    RoomMaintenanceScience: 1
+    RoomMaintenanceBar: 1
+    RoomMaintenanceFirelockAnomaly: 0.1
+
+- type: weightedRandom
+  id: RoomMaintenanceDefault
+  weights:
+    RoomMaintenance: 1

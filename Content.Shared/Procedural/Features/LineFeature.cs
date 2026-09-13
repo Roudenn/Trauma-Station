@@ -1,4 +1,6 @@
-﻿namespace Content.Shared.Procedural.Features;
+﻿using Content.Shared.ValueSelectors.Numbers;
+
+namespace Content.Shared.Procedural.Features;
 
 /// <summary>
 /// Feature that spawns one of the children features in
@@ -13,7 +15,7 @@ public sealed partial class LineFeature : Feature
     /// Maximum amount of allowed spawns of this feature.
     /// </summary>
     [DataField]
-    public int MaxSpawns = 15;
+    public NumberSelector MaxSpawns = new ConstantNumberSelector(15);
 
     public override void Accept<TArgs>(IFeatureVisitor<TArgs> visitor, TArgs args)
         => visitor.VisitLineFeature(this, args);

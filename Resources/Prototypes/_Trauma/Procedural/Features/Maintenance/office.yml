@@ -41,23 +41,6 @@
         maxPos: -0.3,0.3
 
 - type: feature
-  id: MaintenanceLibraryFloor
-  feature: !type:AllFeature
-    children:
-    - !type:GroupFeature
-      children:
-      - tile: FloorWoodTile
-        weight: 2
-      - tile: FloorBrokenWood
-        weight: 1
-      - tile: Plating
-        weight: 1
-      - tile: FloorTechMaintDark
-        weight: 1
-      - tile: FloorWoodLarge
-        weight: 1
-
-- type: feature
   id: OfficeDecoration
   feature: !type:GroupFeature
     children:
@@ -72,3 +55,39 @@
       children:
       - ent: TableWood
       - ent: PaperBin5
+
+- type: feature
+  id: TableLine
+  feature: !type:LineFeature
+    maxSpawns: 8
+    feature: !type:AllFeature
+      children:
+      - ent: Table
+      - !type:GroupFeature
+        children:
+        - ent: Pen
+          weight: 3
+        - ent: Paper
+          weight: 3
+        - ent: PaperOffice
+          weight: 3
+        - ent: PaperBin5
+        - ent: BookRandomStory
+        - ent: PaperCaptainsThoughts
+          weight: 0.05
+        - ent: CyberPen
+          weight: 0.05
+      conditions:
+      - !type:UnobstructedFeatureCondition
+
+- type: feature
+  id: ComputerLine
+  feature: !type:LineFeature
+    maxSpawns: 4
+    feature: !type:GroupFeature
+      children:
+      - ent: ComputerBroken
+      - ent: ComputerFrame
+      - ent: BaseComputer
+      conditions:
+      - !type:UnobstructedFeatureCondition

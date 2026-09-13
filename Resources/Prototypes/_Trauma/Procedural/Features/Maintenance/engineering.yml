@@ -53,39 +53,15 @@
         weight: 0.05
 
 - type: feature
-  id: MaintenanceEngineeringFloor
-  feature: !type:AllFeature
-    children:
-    - !type:GroupFeature
-      children:
-      - tile: FloorSteel
-        weight: 5
-      - tile: Plating
-        weight: 1
-      - tile: FloorTechMaint
-        weight: 1
-      - tile: FloorTechMaintDark
-        weight: 1
-
-- type: feature
   id: MaintenanceGenerator
   feature: !type:AllFeature
     children:
-    - !type:AllFeature
-      conditions:
-      - !type:UnobstructedFeatureCondition
-      children:
-      - ent: GeneratorBasic
-      - ent: CableHV
     - !type:WallMountFeature
-      offset: 1,1
+      wallOffset: true
       feature: !type:AllFeature
         children:
-        - ent: APCBasic
-        - ent: CableMV
-          obstruct: false
-        - ent: CableApcExtension
-          obstruct: false
+        - ent: GeneratorBasic
+        - ent: CableHV
     - !type:WallMountFeature
       feature: !type:AllFeature
         children:

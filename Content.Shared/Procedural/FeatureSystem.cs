@@ -234,7 +234,8 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
         if (center == null || turf.IsTileBlocked(center.Value, CollisionGroup.MobMask))
             return;
 
-        var horizPos = new ValueList<EntityCoordinates>(feature.MaxSpawns + 1);
+        var maxSpawns = feature.MaxSpawns.Get(args.Rand);
+        var horizPos = new ValueList<EntityCoordinates>(maxSpawns + 1);
         horizPos.Add(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices));
         var leftEnd = false;
         var rightEnd = false;
@@ -253,11 +254,11 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
             else
                 horizPos.Add(new EntityCoordinates(right.Value.GridUid, right.Value.GridIndices));
 
-            if (horizPos.Count >= feature.MaxSpawns)
+            if (horizPos.Count >= maxSpawns)
                 break;
         }
 
-        var vertPos = new ValueList<EntityCoordinates>(feature.MaxSpawns + 1);
+        var vertPos = new ValueList<EntityCoordinates>(maxSpawns + 1);
         vertPos.Add(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices));
         var topEnd = false;
         var bottomEnd = false;
@@ -282,7 +283,7 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
                     vertPos.Add(new EntityCoordinates(top.Value.GridUid, top.Value.GridIndices));
             }
 
-            if (vertPos.Count >= feature.MaxSpawns)
+            if (vertPos.Count >= maxSpawns)
                 break;
         }
 

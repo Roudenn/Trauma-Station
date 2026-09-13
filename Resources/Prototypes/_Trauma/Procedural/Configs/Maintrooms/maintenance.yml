@@ -1,0 +1,35 @@
+- type: dungeonLayers
+  id: MaintroomsMaintenance
+  layers:
+  # Lights are shared for all rooms
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceLight
+      obstruct: false
+      prob: 0.8
+    position: !type:RoomRandomPosition
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceClosetLootRow
+    rolls: 1, 2
+    position: !type:RoomSidePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenance
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceGenerator
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceGenerator
+    position: !type:RoomSidePosition
+      availableSides:
+      - Center
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceGenerator

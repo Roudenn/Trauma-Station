@@ -1,0 +1,94 @@
+# Default maintenance tiling
+- type: feature
+  id: MaintenanceFloor
+  feature: !type:AllFeature
+    children:
+    - !type:GroupFeature
+      children:
+      - tile: Plating
+        weight: 2
+      - tile: FloorSteel
+        weight: 1
+      - tile: FloorTechMaint
+        weight: 1
+      - tile: FloorTechMaintDark
+        weight: 1
+    - id: MaintenanceCatwalk # TODO remove this when Maintrooms have cables
+      prob: 0.1
+
+# Spawns a catwalk on plating tiles with exposed cables in order to hide them
+# Currently unused since Maintrooms don't have cables yet
+- type: feature
+  id: MaintenanceCatwalk
+  feature: !type:EntFeature
+    ent: Catwalk
+    conditions:
+    - !type:TileFeatureCondition
+      tiles:
+      - Plating
+    - !type:EntityFeatureCondition
+      whitelist:
+        components:
+        - NodeContainer
+
+# Science, Engineering & Prison rooms
+- type: feature
+  id: MaintenanceBlackFloor
+  feature: !type:AllFeature
+    children:
+    - !type:GroupFeature
+      children:
+      - tile: FloorDark
+        weight: 2
+      - tile: FloorDarkMono
+        weight: 1
+      - tile: Plating
+        weight: 1
+      - tile: FloorTechMaintDark
+        weight: 1
+
+# Kitchen & Medical
+- type: feature
+  id: MaintenanceWhiteFloor
+  feature: !type:AllFeature
+    children:
+    - !type:GroupFeature
+      children:
+      - tile: FloorWhite
+        weight: 2
+      - tile: FloorWhiteMono
+        weight: 1
+      - tile: Plating
+        weight: 1
+      - tile: FloorTechMaintDark
+        weight: 1
+
+# Bar, Library
+- type: feature
+  id: MaintenanceWoodFloor
+  feature: !type:AllFeature
+    children:
+    - !type:GroupFeature
+      children:
+      - tile: FloorWoodTile
+        weight: 2
+      - tile: FloorBrokenWood
+        weight: 1
+      - tile: Plating
+        weight: 1
+      - tile: FloorTechMaintDark
+        weight: 1
+      - tile: FloorWoodLarge
+        weight: 1
+
+# Dorm-specific floor, looks better
+- type: feature
+  id: MaintenanceDormFloor
+  feature: !type:AllFeature
+    children:
+    - !type:GroupFeature
+      children:
+      - tile: FloorWoodTile
+        weight: 5
+      - tile: FloorBrokenWood
+        weight: 1

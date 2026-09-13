@@ -1,0 +1,61 @@
+- type: dungeonLayers
+  id: MaintroomsFloor
+  layers:
+  - !type:FeatureFillDunGen
+    feature:
+      id: MaintenanceFloor
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenance
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceGenerator
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceBotany
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceOutpost
+  - !type:FeatureFillDunGen
+    feature:
+      id: MaintenanceBlackFloor
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceEngineering
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceAtmos
+    - !type:RoomRoleCondition
+      role: RoomMaintenancePrison
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceScience
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceOffice
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceSurgery
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceKitchen
+  - !type:FeatureFillDunGen
+    feature:
+      id: MaintenanceWoodFloor
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceLibrary
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceBar
+  - !type:FeatureFillDunGen
+    feature:
+      id: MaintenanceDormFloor
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceDorm
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceDormCarpet
+    position: !type:RoomSidePosition
+      availableSides:
+      - Center
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceDorm

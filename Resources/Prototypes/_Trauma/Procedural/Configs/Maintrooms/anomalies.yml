@@ -1,0 +1,26 @@
+- type: dungeonLayers
+  id: MaintroomsAnomalies
+  layers:
+  - !type:NestedDunGen
+    proto: MaintroomsFirelockAnomaly
+
+- type: dungeonLayers
+  id: MaintroomsFirelockAnomaly # A lot of firelocks with a plasma chamber in the center.
+  layers:
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceAnomalyFireChamber
+    position: !type:RoomSidePosition
+      availableSides:
+      - Center
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceFirelockAnomaly
+  - !type:FeatureFillDunGen
+    feature:
+      ent: FirelockGlass
+      conditions:
+      - !type:UnobstructedFeatureCondition
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceFirelockAnomaly

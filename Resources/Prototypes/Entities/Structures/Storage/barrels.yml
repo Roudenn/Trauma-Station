@@ -72,8 +72,10 @@
   id: RandomChemicalBarrelRadioactive
   table: !type:GroupSelector
     children:
-    - id: BaseBarrelChemRadioactiveEmpty
-      weight: 2
+    # <Trauma>
+    #- id: BaseBarrelChemRadioactiveEmpty
+    #  weight: 2
+    # </Trauma>
     - id: BaseBarrelChemRadioactiveFilledRadium
     - id: BaseBarrelChemRadioactiveFilledUranium
 

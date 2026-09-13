@@ -1,0 +1,25 @@
+# Common science equipment, usually available at round start.
+- type: entityTable
+  id: ScienceEquipmentCommon
+  table: !type:GroupSelector
+    children:
+    - id: AnomalyScanner
+    - id: NodeScanner
+    - id: Igniter
+    - id: ClothingHandsGlovesLatex
+    - id: ClothingMaskSterile
+    - id: ClothingOuterCoatRnd
+    - id: RemoteSignaller
+
+# Rare science equipment, T1 and T2 technologies.
+- type: entityTable
+  id: ScienceEquipmentValuable
+  table: !type:GroupSelector
+    children:
+    - id: AnomalyScanner
+    - id: NodeScanner
+    - id: Igniter
+    - id: ClothingHandsGlovesLatex
+    - id: ClothingMaskSterile
+    - id: ClothingOuterCoatRnd
+    - id: RemoteSignaller

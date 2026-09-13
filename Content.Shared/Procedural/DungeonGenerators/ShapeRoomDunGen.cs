@@ -48,6 +48,12 @@ public sealed partial class ShapeRoomDunGen : IDunGenLayer
     [DataField]
     public FloatSelector Variation = new RangeFloatSelector(new Vector2(0.2f, 0.4f));
 
+    /// <summary>
+    /// Amount of entrances in every generated room.
+    /// </summary>
+    [DataField]
+    public NumberSelector EntranceCount = new ConstantNumberSelector(4);
+
     [DataField(required: true)]
     public ProtoId<ContentTileDefinition> Tile;
 

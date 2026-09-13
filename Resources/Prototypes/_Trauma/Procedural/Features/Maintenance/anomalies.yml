@@ -1,0 +1,21 @@
+- type: feature
+  id: MaintenanceAnomalyFireChamber
+  feature: !type:AllFeature
+    children:
+    - ent: AtmosFixInstantPlasmaFireMarker
+    - ent: WallReinforced
+      offset: 1,1
+    - ent: WallReinforced
+      offset: -1,1
+    - ent: WallReinforced
+      offset: 1,-1
+    - ent: WallReinforced
+      offset: -1,-1
+    - ent: ReinforcedPlasmaWindow
+      offset: 0,1
+    - ent: ReinforcedPlasmaWindow
+      offset: 0,-1
+    - ent: ReinforcedPlasmaWindow
+      offset: 1,0
+    - ent: ReinforcedPlasmaWindow
+      offset: -1,0

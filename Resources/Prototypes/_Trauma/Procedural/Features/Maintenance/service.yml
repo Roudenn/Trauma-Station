@@ -7,17 +7,6 @@
     - ent: TableWood
       offset: 1,0
 
-- type: feature
-  id: MaintenanceDormFloor
-  feature: !type:AllFeature
-    children:
-    - !type:GroupFeature
-      children:
-      - tile: FloorWoodTile
-        weight: 5
-      - tile: FloorBrokenWood
-        weight: 1
-
 # Used only in dorms for false sense of safety
 - type: feature
   id: MaintenanceDormLight

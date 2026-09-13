@@ -329,6 +329,13 @@ public sealed partial class DungeonJob : Job<List<Dungeon>>
             case RandomRoomDunGen randomRoom:
                 dungeons.Add(await GenerateRandomDunGen(position, randomRoom, reservedTiles, random));
                 break;
+            case NestedDunGen nestedDungeon:
+                var layers = _prototype.Index(nestedDungeon.Proto).Layers;
+                foreach (var nestedLayer in layers)
+                {
+                    await RunLayer(dungeons, position, nestedLayer, reservedTiles, seed, random);
+                }
+                break;
             // </Trauma>
             default:
                 throw new NotImplementedException();

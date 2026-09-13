@@ -1,0 +1,102 @@
+- type: feature
+  id: MaintenanceSurgeryOperatingTable
+  feature: !type:AllFeature
+    children:
+    - ent: OperatingTable
+    - ent: computerBodyScanner
+      offset: 1,0
+    - ent: CrateMedicalSurgery
+      offset: -1,0
+      prob: 0.3
+
+- type: feature
+  id: MaintenanceMedicalLockers
+  feature: !type:LineFeature
+    conditionInheritance: true
+    conditionsApplySelf: false
+    conditions:
+    - !type:UnobstructedFeatureCondition
+      type:
+      - Entity
+    feature: !type:GroupFeature
+      children:
+      - ent: LockerMedical # No loot for you mf!!!!!!!!!! (my friend)
+      - ent: LockerMedicalFilled
+        weight: 2
+      - ent: LockerChemistryFilled
+
+- type: feature
+  id: MaintenanceMedicalChemistry
+  feature: !type:AllFeature
+    conditionInheritance: true
+    conditionsApplySelf: false
+    conditions:
+    - !type:UnobstructedFeatureCondition
+      type:
+      - Entity
+    children:
+    - ent: ChemMaster
+    - ent: EnergyChemDispenser
+      offset: 0,1
+    - ent: Table
+      offset: 0,-1
+    - !type:GroupFeature
+      offset: 0,-1
+      children:
+      - ent: KitchenReagentGrinder
+      - ent: ChemistryHotplate
+      - ent: MachineElectrolysisUnit
+      - ent: MachineCentrifuge
+
+- type: feature
+  id: MaintenanceMedicalBeds
+  feature: !type:LineFeature
+    maxSpawns: 2,4
+    conditionInheritance: true
+    conditionsApplySelf: false
+    conditions:
+    - !type:UnobstructedFeatureCondition
+      type:
+      - Entity
+    feature: !type:AllFeature
+      children:
+      - ent: BedsheetMedical
+      - !type:GroupFeature
+        children:
+        - ent: Bed
+          weight: 2
+        - ent: MedicalBed
+        - ent: StasisBed
+
+- type: feature
+  id: MaintenanceMedicalLoot
+  feature: !type:LineFeature
+    maxSpawns: 3,5
+    conditionInheritance: true
+    conditionsApplySelf: false
+    conditions:
+    - !type:UnobstructedFeatureCondition
+      type:
+      - Entity
+    feature: !type:AllFeature
+      children:
+      - ent: TableReinforced
+      - !type:GroupFeature
+        prob: 0.33
+        children:
+        - ent: MedkitBurnFilled
+          weight: 1.5
+        - ent: MedkitBruteFilled
+          weight: 1.5
+        - ent: MedkitOxygenFilled
+        - ent: MedkitToxinFilled
+        - ent: MedkitRadiationFilled
+
+- type: feature
+  id: MaintenanceMedicalDrain
+  feature:
+    ent: FloorDrain
+    conditions:
+    - !type:UnobstructedFeatureCondition
+      type:
+      - Entity

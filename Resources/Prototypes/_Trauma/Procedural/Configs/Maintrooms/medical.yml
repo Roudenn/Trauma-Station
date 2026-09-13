@@ -1,0 +1,12 @@
+- type: dungeonLayers
+  id: MaintroomsMedical
+  layers:
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceSurgeryOperatingTable
+    position: !type:RoomSidePosition
+      availableSides:
+      - Center
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceSurgery

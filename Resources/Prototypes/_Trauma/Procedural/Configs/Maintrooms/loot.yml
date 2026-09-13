@@ -1,0 +1,57 @@
+- type: dungeonLayers
+  id: MaintroomsSalvageLoot
+  layers:
+  - !type:FeatureDunGen
+    position: !type:RoomRandomPosition
+    rolls: !type:BinomialNumberSelector
+      trials: 10
+    feature:
+      table: SalvageScrapSpawnerCommon
+  - !type:FeatureDunGen
+    position: !type:RoomRandomPosition
+    rolls: !type:BinomialNumberSelector
+      trials: 5
+    feature:
+      table: SalvageScrapSpawnerValuable
+
+- type: dungeonLayers
+  id: MaintroomsTrash
+  layers:
+  - !type:FeatureDunGen
+    position: !type:RoomRandomPosition
+    rolls: !type:BinomialNumberSelector
+      trials: 10
+    feature:
+      table: GenericTrashItems
+
+- type: dungeonLayers
+  id: MaintroomsStructures
+  layers:
+  - !type:FeatureDunGen
+    position: !type:RoomRandomPosition
+    rolls: !type:BinomialNumberSelector
+      trials: 4
+      chance: 0.33
+    feature:
+      ent: Girder
+  - !type:FeatureDunGen
+    position: !type:RoomRandomPosition
+    rolls: !type:BinomialNumberSelector
+      trials: 4
+      chance: 0.25
+    feature:
+      ent: ReinforcedGirder
+  - !type:FeatureDunGen
+    position: !type:RoomRandomPosition
+    rolls: !type:BinomialNumberSelector
+      trials: 4
+      chance: 0.33
+    feature:
+      ent: Window
+  - !type:FeatureDunGen
+    position: !type:RoomRandomPosition
+    rolls: !type:BinomialNumberSelector
+      trials: 4
+      chance: 0.25
+    feature:
+      ent: ReinforcedWindow

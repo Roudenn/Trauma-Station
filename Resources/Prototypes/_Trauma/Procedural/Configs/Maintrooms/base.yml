@@ -1,0 +1,82 @@
+# The core config of the Maintrooms which combines other nested configs.
+- type: dungeonConfig
+  id: MaintRoomsDefault
+  layers:
+  - !type:ShapeRoomDunGen
+    areaSize: 150,150
+    tile: Plating
+    minRoomWidth: 5
+    minRoomHeight: 5
+    cutProb: 0.1 # Prefer more tunnels to large rooms
+    outerWall: WallPlastitaniumIndestructible # there is no escape from the brig maintenance
+    entranceCount: 2, 4
+  # Assign roles to rooms based on their size
+  - !type:NestedDunGen
+    proto: MaintroomsRoles
+  # Walls, entrances and shared wallmounts
+  - !type:RoomEntranceDunGen
+    tile: FloorSteel
+    contents: MaintenanceAirlock
+  - !type:BoundaryWallDunGen
+    wall: WallSolid
+    cornerWall: WallReinforced
+    tile: Plating
+  - !type:WallMountDunGen
+    contents: MaintenanceWalls
+    tile: Plating
+  # Room contents, sorted by departments & their loot importance
+  - !type:NestedDunGen
+    proto: MaintroomsMaintenance # Default maintenance halls
+  - !type:NestedDunGen
+    proto: MaintroomsAnomalies # Extremely rare room anomalies with weird stuff
+  - !type:NestedDunGen
+    proto: MaintroomsEngineering # Engineering storage rooms
+  - !type:NestedDunGen
+    proto: MaintroomsMedical # Surgery, chemistry, and storage rooms
+  - !type:NestedDunGen
+    proto: MaintroomsScience # Artifact rooms and anomaly research rooms
+  - !type:NestedDunGen
+    proto: MaintroomsSecurity # Prison cells & control points
+  - !type:NestedDunGen
+    proto: MaintroomsCargo # Cargo storage rooms
+  - !type:NestedDunGen
+    proto: MaintroomsService # Bars, kitchens, botanies
+  - !type:NestedDunGen
+    proto: MaintroomsCivillian # Public places like libraries, dorms, etc.
+  # Additional loot added to some rooms
+  - !type:NestedDunGen
+    proto: MaintroomsSalvageLoot # Scrap and rare materials usually found on salvage wrecks
+  - !type:NestedDunGen
+    proto: MaintroomsTrash # Random trash that appears literally everywhere
+  - !type:NestedDunGen
+    proto: MaintroomsStructures # Random obstacles in the middle of maintenance rooms
+  # Tiles & decals for every role type (added at the very end to not mess up generation algorithms)
+  - !type:NestedDunGen
+    proto: MaintroomsFloor
+  # TODO auto cabling is very bad for performance because of how node groups work
+  #- !type:AutoCablingDunGen
+  #  entity: CableApcExtension
+  #- !type:AutoCablingDunGen
+  #  entity: CableMV
+  #  nodeGroup: MVPower
+  #- !type:AutoCablingDunGen
+  #  entity: CableHV
+  #  nodeGroup: HVPower
+
+- type: entityTable
+  id: MaintenanceAirlock
+  table: !type:AllSelector
+    children:
+    - id: AirlockMaintAlwaysPowered
+    - id: Firelock
+      prob: 0.5
+
+- type: entityTable
+  id: MaintenanceWalls
+  table: !type:GroupSelector
+    children:
+    - id: RandomPosterAny
+    - id: ExtinguisherCabinetFilled
+      prob: 0.1
+    - id: RandomPainting
+      prob: 0.01

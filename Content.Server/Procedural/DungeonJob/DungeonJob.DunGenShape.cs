@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Content.Shared.Procedural;
 using Content.Shared.Procedural.DungeonGenerators;
+using Content.Shared.ValueSelectors.Numbers;
 using Robust.Shared.Collections;
 using Robust.Shared.Map;
 using Robust.Shared.Random;
@@ -74,7 +75,7 @@ public sealed partial class DungeonJob
 
         foreach (var room in dungeon.Rooms)
         {
-            ShapePickEntrances(dungeon, room, random, corners, pickedEntrances, startBox);
+            ShapePickEntrances(dungeon, room, random, corners, pickedEntrances, shapeRoom.EntranceCount, startBox);
         }
 
         _maps.SetTiles(_gridUid, _grid, tiles);
@@ -202,15 +203,23 @@ public sealed partial class DungeonJob
     /// <summary>
     /// Picks multiple entrances for a dungeon room.
     /// </summary>
-    private static void ShapePickEntrances(Dungeon dungeon, DungeonRoom room, IRobustRandom random, HashSet<Vector2i> corners, HashSet<Vector2i> pickedEntrances, Box2i? shapeBounds = null)
+    private static void ShapePickEntrances(
+        Dungeon dungeon,
+        DungeonRoom room,
+        IRobustRandom random,
+        HashSet<Vector2i> corners,
+        HashSet<Vector2i> pickedEntrances,
+        NumberSelector count,
+        Box2i? shapeBounds = null)
     {
-        for (int i = 1; i < 5; i++)
+        for (int i = 0; i < count.Get(random); i++)
         {
+            var dir = random.Next(1, 4);
             var j = 0;
             Vector2i? found = null;
             while (j < 30)
             {
-                if (AttemptPick(i, out var candidate))
+                if (AttemptPick(dir, out var candidate))
                 {
                     found = candidate;
                     break;

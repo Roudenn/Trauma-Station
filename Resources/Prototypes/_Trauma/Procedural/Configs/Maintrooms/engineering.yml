@@ -1,0 +1,18 @@
+- type: dungeonLayers
+  id: MaintroomsEngineering
+  layers:
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceEngineeringLootRow
+    rolls: 1, 2
+    position: !type:RoomSidePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+      - Center # infinite loot theorem
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceEngineering

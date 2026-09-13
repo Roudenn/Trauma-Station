@@ -1,0 +1,106 @@
+- type: dungeonLayers
+  id: MaintroomsCivillian
+  layers:
+  - !type:NestedDunGen
+    proto: MaintroomsLibrary
+  - !type:NestedDunGen
+    proto: MaintroomsDorms
+  - !type:NestedDunGen
+    proto: MaintroomsOffice
+  - !type:FeatureDunGen
+    feature:
+      id: OfficeDecoration
+    rolls: 1, 4
+    position: !type:RoomSidePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+      - TopLeft
+      - TopRight
+      - BottomLeft
+      - BottomRight
+
+- type: dungeonLayers
+  id: MaintroomsLibrary
+  layers:
+  - !type:FeatureDunGen
+    feature:
+      id: BookshelvesLine
+    rolls: 1, 2
+    position: !type:RoomRandomPosition
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceLibrary
+  - !type:FeatureDunGen
+    feature:
+      id: ReadingTable
+    position: !type:RoomRandomPosition
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceLibrary
+
+# Dorms for living
+- type: dungeonLayers
+  id: MaintroomsDorms
+  layers:
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceDormClosets
+    position: !type:RoomSidePosition
+      availableSides:
+      - TopRight
+      - BottomRight
+      - Right
+    requireAll: false
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceDorm
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceOffice
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceDormBed
+    position: !type:RoomSidePosition
+      availableSides:
+      - Center
+      - TopLeft
+      - Left
+      - BottomLeft
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceDorm
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceDormLight
+    position: !type:RoomSidePosition
+      availableSides:
+      - Center
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceDorm
+
+# Office rooms with consoles, papers, faxes and stuff
+- type: dungeonLayers
+  id: MaintroomsOffice
+  layers:
+  - !type:FeatureDunGen
+    feature:
+      id: TableLine
+    position: !type:RoomSidePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceOffice
+  - !type:FeatureDunGen
+    feature:
+      id: ComputerLine
+    position: !type:RoomRandomPosition
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceOffice
