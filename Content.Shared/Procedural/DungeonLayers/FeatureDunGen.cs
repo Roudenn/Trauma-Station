@@ -31,6 +31,17 @@ public sealed partial class FeatureDunGen : IDunGenLayer
     public NumberSelector Rolls = new ConstantNumberSelector(1);
 
     /// <summary>
+    /// If enabled, causes the <see cref="Rolls"/> amount to be scaled by the
+    /// <see cref="RoomScale"/> value and the total amount of tiles in the target room.
+    /// Floored to the nearest integer after the number selector had run.
+    /// </summary>
+    [DataField]
+    public bool RoomScaleEnabled;
+
+    [DataField]
+    public float RoomScale = 0.1f;
+
+    /// <summary>
     /// Check if the condition for this selector are met.
     /// </summary>
     public bool CheckConditions(IEntityManager entMan, IPrototypeManager proto, DungeonRoom room)

@@ -2,15 +2,21 @@
   id: MaintroomsSalvageLoot
   layers:
   - !type:FeatureDunGen
+    roomScaleEnabled: true
+    roomScale: 0.1
     position: !type:RoomRandomPosition
     rolls: !type:BinomialNumberSelector
       trials: 10
+      chance: 0.33
     feature:
       table: SalvageScrapSpawnerCommon
   - !type:FeatureDunGen
+    roomScaleEnabled: true
+    roomScale: 0.06
     position: !type:RoomRandomPosition
     rolls: !type:BinomialNumberSelector
-      trials: 5
+      trials: 8
+      chance: 0.33
     feature:
       table: SalvageScrapSpawnerValuable
 
@@ -18,9 +24,12 @@
   id: MaintroomsTrash
   layers:
   - !type:FeatureDunGen
+    roomScaleEnabled: true
+    roomScale: 0.03
     position: !type:RoomRandomPosition
     rolls: !type:BinomialNumberSelector
-      trials: 10
+      trials: 8
+      chance: 0.33
     feature:
       table: GenericTrashItems
 
@@ -28,30 +37,38 @@
   id: MaintroomsStructures
   layers:
   - !type:FeatureDunGen
+    roomScaleEnabled: true
+    roomScale: 0.03
     position: !type:RoomRandomPosition
     rolls: !type:BinomialNumberSelector
-      trials: 4
+      trials: 3
       chance: 0.33
     feature:
       ent: Girder
   - !type:FeatureDunGen
+    roomScaleEnabled: true
+    roomScale: 0.03
     position: !type:RoomRandomPosition
     rolls: !type:BinomialNumberSelector
-      trials: 4
+      trials: 3
       chance: 0.25
     feature:
       ent: ReinforcedGirder
   - !type:FeatureDunGen
+    roomScaleEnabled: true
+    roomScale: 0.03
     position: !type:RoomRandomPosition
     rolls: !type:BinomialNumberSelector
-      trials: 4
+      trials: 3
       chance: 0.33
     feature:
       ent: Window
   - !type:FeatureDunGen
+    roomScaleEnabled: true
+    roomScale: 0.03
     position: !type:RoomRandomPosition
     rolls: !type:BinomialNumberSelector
-      trials: 4
+      trials: 3
       chance: 0.25
     feature:
       ent: ReinforcedWindow

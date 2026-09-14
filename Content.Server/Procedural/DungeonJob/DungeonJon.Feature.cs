@@ -22,6 +22,9 @@ public sealed partial class DungeonJob
         foreach (var room in dungeon.Rooms)
         {
             var rolls = gen.Rolls.Get(random);
+            if (gen.RoomScaleEnabled)
+                rolls = (int) MathF.Floor(rolls * gen.RoomScale * room.Tiles.Count);
+
             for (int i = 0; i < rolls; i++)
             {
                 if (!gen.CheckConditions(_entManager, _prototype, room))
