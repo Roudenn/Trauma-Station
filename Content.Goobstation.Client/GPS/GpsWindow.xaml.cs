@@ -5,7 +5,9 @@ using System.Linq;
 using Robust.Client.ResourceManagement;
 using Content.Client.Resources;
 using Content.Goobstation.Shared.GPS.Components;
+using Content.Trauma.Common.GPS;
 using Robust.Client.UserInterface.CustomControls;
+using Robust.Shared.Map;
 using Robust.Shared.Timing;
 
 namespace Content.Goobstation.Client.GPS;
@@ -32,6 +34,7 @@ public sealed partial class GpsWindow : BaseWindow
     private EntityUid _owner;
     private bool _inDistress;
     private bool _enabled;
+    private bool _suppressed;
 
     private string? _lastEnteredText;
     private List<GpsEntry> _previousEntry = new();
@@ -66,8 +69,11 @@ public sealed partial class GpsWindow : BaseWindow
         if (string.IsNullOrEmpty(_lastEnteredText))
             _lastEnteredText = gps.GpsName;
 
+        var parent = _entityManager.GetComponent<TransformComponent>(owner).MapUid;
+
         _inDistress = gps.InDistress;
         _enabled = gps.Enabled;
+        _suppressed = _entityManager.HasComponent<GPSSuppressionComponent>(parent);
         _owner = owner;
 
         EnabledButton.Text = gps.Enabled ? Loc.GetString("gps-window-visibility-on") : Loc.GetString("gps-window-visibility-off");
@@ -94,7 +100,7 @@ public sealed partial class GpsWindow : BaseWindow
         if (trackedEntity.HasValue)
         {
             var trackedEntry = gpsEntries.FirstOrDefault(e => e.NetEntity == trackedEntity.Value);
-            if (trackedEntry != null)
+            if (trackedEntry != null && !_suppressed)
             {
                 var coords = trackedEntry.Coordinates;
                 TrackedPositionLabel.Text = $"{coords.X:F0}, {coords.Y:F0}";
@@ -108,6 +114,13 @@ public sealed partial class GpsWindow : BaseWindow
 
     public void UpdateGpsEntries(List<GpsEntry> gpsEntries, NetEntity? trackedEntity)
     {
+        if (_suppressed)
+        {
+            GpsList.DisposeAllChildren();
+            UpdateSelectedEntry(trackedEntity);
+            return;
+        }
+
         var sortedEntries = gpsEntries
             .OrderByDescending(e => e.IsDistress)
             .ThenBy(e =>
@@ -172,6 +185,13 @@ public sealed partial class GpsWindow : BaseWindow
     protected override void FrameUpdate(FrameEventArgs args)
     {
         base.FrameUpdate(args);
+
+        if (_suppressed)
+        {
+            GpsPositionLabel.Text = "ERROR";
+            CompassContainer.UpdatePosition(MapCoordinates.Nullspace);
+            return;
+        }
 
         var mapCoords = _transform.GetMapCoordinates(_owner);
         GpsPositionLabel.Text = $"{mapCoords.Position.X:F0}, {mapCoords.Position.Y:F0}";
