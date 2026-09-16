@@ -30,7 +30,7 @@
     - !type:RoomRoleCondition
       role: RoomMaintenanceOffice
     - !type:RoomRoleCondition
-      role: RoomMaintenanceSurgery
+      role: RoomMaintenanceMedical
     - !type:RoomRoleCondition
       role: RoomMaintenanceKitchen
   - !type:FeatureFillDunGen

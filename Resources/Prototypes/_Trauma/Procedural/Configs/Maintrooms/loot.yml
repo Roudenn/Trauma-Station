@@ -9,6 +9,7 @@
       trials: 10
       chance: 0.33
     feature:
+      offset: -0.5,-0.5,0.5,0.5
       table: SalvageScrapSpawnerCommon
   - !type:FeatureDunGen
     roomScaleEnabled: true
@@ -18,6 +19,7 @@
       trials: 8
       chance: 0.33
     feature:
+      offset: -0.5,-0.5,0.5,0.5
       table: SalvageScrapSpawnerValuable
 
 - type: dungeonLayers
@@ -31,6 +33,7 @@
       trials: 8
       chance: 0.33
     feature:
+      offset: -0.5,-0.5,0.5,0.5
       table: GenericTrashItems
 
 - type: dungeonLayers
@@ -50,7 +53,7 @@
     roomScale: 0.03
     position: !type:RoomRandomPosition
     rolls: !type:BinomialNumberSelector
-      trials: 3
+      trials: 2
       chance: 0.25
     feature:
       ent: ReinforcedGirder
@@ -68,7 +71,7 @@
     roomScale: 0.03
     position: !type:RoomRandomPosition
     rolls: !type:BinomialNumberSelector
-      trials: 3
+      trials: 2
       chance: 0.25
     feature:
       ent: ReinforcedWindow

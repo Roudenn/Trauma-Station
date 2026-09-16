@@ -140,8 +140,10 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
     private static void SpawnEnt(EntProtoId entId, Feature feature, Args args)
     {
         var pos = args.CenterCoordinates
-            .Offset(feature.Offset.GetPosition(args.Rand))
-            .AlignWithClosestGridTile(entityManager: args.EntMan);
+            .Offset(feature.Offset.GetPosition(args.Rand));
+
+        if (feature.AlignTile)
+            pos = pos.AlignWithClosestGridTile(entityManager: args.EntMan);
 
         var ent = args.EntMan.PredictedSpawnAtPosition(entId, pos);
         var transformSys = args.EntMan.System<SharedTransformSystem>();
@@ -227,74 +229,75 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
         Visit(child, args);
     }
 
+    private static readonly Vector2i[] Axes = [new(1, 0), new(0, 1)];
+
     public void VisitLineFeature(LineFeature feature, Args args)
     {
-        var turf = args.EntMan.System<TurfSystem>();
-        var center = turf.GetTileRef(args.CenterCoordinates);
-        if (center == null || turf.IsTileBlocked(center.Value, CollisionGroup.MobMask))
+        var turfSystem = args.EntMan.System<TurfSystem>();
+        var mapSystem = args.EntMan.System<SharedMapSystem>();
+        var gridUid = args.CenterCoordinates.EntityId;
+        if (!args.EntMan.TryGetComponent(gridUid, out MapGridComponent? gridComp))
+            return;
+
+        var center = turfSystem.GetTileRef(args.CenterCoordinates);
+        if (center == null || turfSystem.IsTileBlocked(center.Value, CollisionGroup.MobMask))
             return;
 
         var maxSpawns = feature.MaxSpawns.Get(args.Rand);
-        var horizPos = new ValueList<EntityCoordinates>(maxSpawns + 1);
-        horizPos.Add(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices));
-        var leftEnd = false;
-        var rightEnd = false;
-        for (int i = 1; !leftEnd && !rightEnd; i++)
+        var centerTile = center.Value.GridIndices;
+
+        ValueList<Vector2i> bestPositions = default;
+
+        foreach (var axis in Axes)
         {
-            var left = turf.GetTileRef(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices + new Vector2i(-i, 0)));
-            var right = turf.GetTileRef(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices + new Vector2i(i, 0)));
-
-            if (left == null || turf.IsTileBlocked(left.Value, CollisionGroup.MobMask))
-                leftEnd = true;
-            else
-                horizPos.Add(new EntityCoordinates(left.Value.GridUid, left.Value.GridIndices));
-
-            if (right == null || turf.IsTileBlocked(right.Value, CollisionGroup.MobMask))
-                rightEnd = true;
-            else
-                horizPos.Add(new EntityCoordinates(right.Value.GridUid, right.Value.GridIndices));
-
-            if (horizPos.Count >= maxSpawns)
-                break;
+            var positions = GetAxisPositions(axis);
+            if (positions.Count > bestPositions.Count)
+                bestPositions = positions;
         }
 
-        var vertPos = new ValueList<EntityCoordinates>(maxSpawns + 1);
-        vertPos.Add(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices));
-        var topEnd = false;
-        var bottomEnd = false;
-        for (int i = 1; !topEnd || !bottomEnd; i++)
-        {
-            if (!bottomEnd)
-            {
-                var bottom = turf.GetTileRef(new EntityCoordinates(center.Value.GridUid, center.Value.GridIndices + new Vector2i(0, -i)));
-                if (bottom == null || turf.IsTileBlocked(bottom.Value, CollisionGroup.MobMask))
-                    bottomEnd = true;
-                else
-                    vertPos.Add(new EntityCoordinates(bottom.Value.GridUid, bottom.Value.GridIndices));
-            }
-
-            if (!topEnd)
-            {
-                var top = turf.GetTileRef(new EntityCoordinates(center.Value.GridUid,
-                    center.Value.GridIndices + new Vector2i(0, i)));
-                if (top == null || turf.IsTileBlocked(top.Value, CollisionGroup.MobMask))
-                    topEnd = true;
-                else
-                    vertPos.Add(new EntityCoordinates(top.Value.GridUid, top.Value.GridIndices));
-            }
-
-            if (vertPos.Count >= maxSpawns)
-                break;
-        }
-
-        SpawnFeatures(vertPos.Count > horizPos.Count ? vertPos : horizPos);
+        SpawnFeatures(bestPositions);
         return;
 
-        void SpawnFeatures(ValueList<EntityCoordinates> positions)
+        ValueList<Vector2i> GetAxisPositions(Vector2i axis)
+        {
+            var positions = new ValueList<Vector2i>(maxSpawns + 1) { centerTile };
+            var negEnd = false;
+            var posEnd = false;
+
+            for (int i = 1; (!negEnd || !posEnd) && positions.Count < maxSpawns; i++)
+            {
+                if (!negEnd)
+                {
+                    var negTile = centerTile - axis * i;
+                    var neg = turfSystem.GetTileRef(mapSystem.GridTileToLocal(gridUid, gridComp, negTile));
+                    if (neg == null || turfSystem.IsTileBlocked(neg.Value, CollisionGroup.MobMask))
+                        negEnd = true;
+                    else
+                        positions.Add(negTile);
+                }
+
+                if (!posEnd && positions.Count < maxSpawns)
+                {
+                    var posTile = centerTile + axis * i;
+                    var pos = turfSystem.GetTileRef(mapSystem.GridTileToLocal(gridUid, gridComp, posTile));
+                    if (pos == null || turfSystem.IsTileBlocked(pos.Value, CollisionGroup.MobMask))
+                        posEnd = true;
+                    else
+                        positions.Add(posTile);
+                }
+            }
+
+            return positions;
+        }
+
+        void SpawnFeatures(ValueList<Vector2i> positions)
         {
             foreach (var pos in positions)
             {
-                var newArgs = args with { CenterCoordinates = pos };
+                var newArgs = args with
+                {
+                    CenterCoordinates = mapSystem.GridTileToLocal(gridUid, gridComp, pos),
+                };
                 Visit(feature.Feature, newArgs);
             }
         }

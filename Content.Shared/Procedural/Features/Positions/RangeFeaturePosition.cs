@@ -15,4 +15,10 @@ public sealed partial class RangeFeaturePosition : FeaturePosition
     {
         return new Vector2(rand.NextFloat(MinPos.X, MaxPos.X), rand.NextFloat(MinPos.Y, MaxPos.Y));
     }
+
+    public RangeFeaturePosition(Vector2 minPos, Vector2 maxPos)
+    {
+        MinPos = minPos;
+        MaxPos = maxPos;
+    }
 }

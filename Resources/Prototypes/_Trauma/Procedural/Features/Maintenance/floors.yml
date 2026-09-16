@@ -13,8 +13,16 @@
         weight: 1
       - tile: FloorTechMaintDark
         weight: 1
-    - id: MaintenanceCatwalk # TODO remove this when Maintrooms have cables
-      prob: 0.1
+    - ent: Catwalk # TODO remove this when Maintrooms have cables
+      prob: 0.07
+    - !type:GroupFeature
+      prob: 0.3
+      children:
+      - ent: DecalSpawnerBloodSplattersTrauma
+      - ent: DecalSpawnerGraffiti
+      - ent: DecalSpawnerDirtWide
+      - ent: DecalSpawnerDirtMonospace
+      - ent: DecalSpawnerBurns
 
 # Spawns a catwalk on plating tiles with exposed cables in order to hide them
 # Currently unused since Maintrooms don't have cables yet

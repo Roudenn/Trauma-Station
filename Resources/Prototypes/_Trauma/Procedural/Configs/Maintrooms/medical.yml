@@ -2,11 +2,56 @@
   id: MaintroomsMedical
   layers:
   - !type:FeatureDunGen
-    feature:
-      id: MaintenanceSurgeryOperatingTable
+    feature: !type:GroupFeature
+      children:
+      - id: MaintenanceMedicalChemistry
+      - id: MaintenanceSurgeryOperatingTable
     position: !type:RoomSidePosition
       availableSides:
       - Center
     conditions:
     - !type:RoomRoleCondition
-      role: RoomMaintenanceSurgery
+      role: RoomMaintenanceMedical
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceMedicalLockers
+    position: !type:RoomSidePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceMedical
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceMedicalBeds
+    position: !type:RoomSidePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceMedical
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceMedicalLoot
+    position: !type:RoomSidePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceMedical
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceMedicalDrain
+    position: !type:RoomRandomPosition
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceMedical

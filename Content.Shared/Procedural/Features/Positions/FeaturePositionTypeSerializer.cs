@@ -22,6 +22,10 @@ public sealed class FeaturePositionTypeSerializer :
         if (VectorSerializerUtility.TryParseArgs(node.Value, 2, out _))
             return new ValidatedValueNode(node);
 
+        // RangeFeaturePosition validation
+        if (VectorSerializerUtility.TryParseArgs(node.Value, 4, out _))
+            return new ValidatedValueNode(node);
+
         return new ErrorNode(node, "Custom validation not supported! Please specify the type manually!");
     }
 
@@ -32,8 +36,6 @@ public sealed class FeaturePositionTypeSerializer :
         ISerializationContext? context = null,
         ISerializationManager.InstantiationDelegate<FeaturePosition>? instanceProvider = null)
     {
-        var type = typeof(FeaturePosition);
-
         if (VectorSerializerUtility.TryParseArgs(node.Value, 2, out var args))
         {
             var x = float.Parse(args[0], CultureInfo.InvariantCulture);
@@ -41,6 +43,15 @@ public sealed class FeaturePositionTypeSerializer :
             return new ConstantFeaturePosition(new Vector2(x, y));
         }
 
-        return (FeaturePosition) serializationManager.Read(type, node, context)!;
+        if (VectorSerializerUtility.TryParseArgs(node.Value, 4, out var argsRange))
+        {
+            var x1 = float.Parse(argsRange[0], CultureInfo.InvariantCulture);
+            var y1 = float.Parse(argsRange[1], CultureInfo.InvariantCulture);
+            var x2 = float.Parse(argsRange[2], CultureInfo.InvariantCulture);
+            var y2 = float.Parse(argsRange[3], CultureInfo.InvariantCulture);
+            return new RangeFeaturePosition(new Vector2(x1, y1), new Vector2(x2, y2));
+        }
+
+        return serializationManager.Read<FeaturePosition>(node, context, notNullableOverride: true);
     }
 }
