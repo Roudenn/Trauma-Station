@@ -1,31 +1,106 @@
+# An artifact analyzer in the center of the room
 - type: feature
-  id: ScienceArtifactAnalyzer
+  id: MaintenanceScienceArtifactAnalyzer
   feature: !type:AllFeature
     children:
     - ent: MachineArtifactAnalyzer
     - ent: RandomArtifactSpawner
       prob: 0.5
-    - ent: Poweredlight
-      offset: 1,0
-      rotation: 270
-    - ent: Poweredlight
-      offset: -1,0
+    - ent: PlasmaReinforcedWindowDirectional
+      rotation: 0
+      offset: 0,-1
+    - ent: PlasmaReinforcedWindowDirectional
       rotation: 90
-    - !type:ShapeFeature
-      feature:
-        tile: Plating
-      shape:
-        id: BoxFilled
-        size: 5
-    - !type:ShapeFeature
-      feature:
-        ent: WallReinforced
-      shape:
-        id: BoxHollow
-        size: 2
-    - !type:ShapeFeature
-      feature:
-        ent: CableApcExtension
-      shape:
-        id: BoxHollow
-        size: 2
+      offset: 1,0
+    - ent: PlasmaReinforcedWindowDirectional
+      rotation: 180
+      offset: 0,1
+    - ent: PlasmaReinforcedWindowDirectional
+      rotation: 270
+      offset: -1,0
+    - ent: NodeScanner
+      offset: -2,-2,2,2
+
+# Anomaly-related loot that requires a full tile
+- type: feature
+  id: MaintenanceScienceAnomalyLoot
+  feature: !type:LineFeature
+    maxSpawns: 3,5
+    feature: !type:GroupFeature
+      children:
+      - !type:AllFeature
+        weight: 3
+        children:
+        - ent: TableReinforced
+        - !type:GroupFeature
+          offset: -0.4,-0.4,0.4,0.4
+          rolls: 1,2
+          children:
+          - ent: NodeScanner
+          - ent: AnomalyScanner
+          - ent: WeaponPistolCHIMP
+            weight: 0.5
+          - ent: AnomalyLocator
+          - ent: AnomalyLocatorWide
+          - table: RandomAnomalyCoreTable
+            weight: 0.5
+          - table: RandomAnomalyCoreInertEnchantTable
+            weight: 0.05
+      - ent: MachineAPE
+      - ent: MachineAnomalyVessel
+      - ent: MachineAnomalyVesselExperimental
+        weight: 0.3
+      - ent: MachineFrame
+        weight: 0.5
+
+# Computer
+- type: feature
+  id: MaintenanceScienceConsole
+  feature: !type:LineFeature
+    maxSpawns: 1,3
+    feature: !type:GroupFeature
+      children:
+      - ent: ComputerAnalysisConsole
+      - ent: ComputerResearchAndDevelopment
+      - ent: ComputerRoboticsControl
+
+# Lathe
+- type: feature
+  id: MaintenanceScienceLathe
+  feature: !type:LineFeature
+    maxSpawns: 1,3
+    feature: !type:GroupFeature
+      children:
+      - ent: Autolathe
+      - ent: Protolathe
+      - ent: CircuitImprinter
+      - ent: ExosuitFabricator
+      - ent: ScienceTechFab
+        weight: 0.5
+
+# Crate/canister
+- type: feature
+  id: MaintenanceScienceResources
+  feature: !type:LineFeature
+    maxSpawns: 3,7
+    feature: !type:GroupFeature
+      children:
+      - !type:GroupFeature
+        children:
+        - ent: CarbonDioxideCanister
+        - ent: WaterVaporCanister
+        - ent: PlasmaCanister
+        - ent: NitrousOxideCanister
+        - ent: FrezonCanister
+          weight: 0.05
+        - ent: TritiumCanister
+          weight: 0.01
+      - !type:GroupFeature
+        children:
+        - ent: CrateMaterialSteel
+        - ent: CrateMaterialGlass
+        - ent: CrateMaterialPlastic
+        - ent: CrateMaterialPlasteel
+          weight: 0.1
+        - ent: CrateMaterialPlasma
+          weight: 0.5

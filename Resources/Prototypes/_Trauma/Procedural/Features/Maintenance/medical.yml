@@ -16,8 +16,6 @@
     conditionsApplySelf: false
     conditions:
     - !type:UnobstructedFeatureCondition
-      type:
-      - Entity
     feature: !type:GroupFeature
       children:
       - ent: LockerMedical # No loot for you mf!!!!!!!!!! (my friend)
@@ -32,8 +30,6 @@
     conditionsApplySelf: false
     conditions:
     - !type:UnobstructedFeatureCondition
-      type:
-      - Entity
     children:
     - ent: ChemMaster
     - ent: EnergyChemDispenser
@@ -56,8 +52,6 @@
     conditionsApplySelf: false
     conditions:
     - !type:UnobstructedFeatureCondition
-      type:
-      - Entity
     feature: !type:AllFeature
       children:
       - ent: BedsheetMedical
@@ -72,17 +66,13 @@
   id: MaintenanceMedicalLoot
   feature: !type:LineFeature
     maxSpawns: 3,5
-    conditionInheritance: true
-    conditionsApplySelf: false
-    conditions:
-    - !type:UnobstructedFeatureCondition
-      type:
-      - Entity
     feature: !type:AllFeature
+      conditions:
+      - !type:UnobstructedFeatureCondition
       children:
       - ent: TableReinforced
       - !type:GroupFeature
-        prob: 0.33
+        prob: 0.5
         children:
         - ent: MedkitBurnFilled
           weight: 1.5
@@ -98,5 +88,3 @@
     ent: FloorDrain
     conditions:
     - !type:UnobstructedFeatureCondition
-      type:
-      - Entity

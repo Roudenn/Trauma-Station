@@ -8,7 +8,7 @@
     - state: green
   - type: FeatureSpawner
     feature:
-      id: ScienceArtifactAnalyzer
+      id: MaintenanceScienceArtifactAnalyzer
 
 - type: entity
   parent: MarkerBase

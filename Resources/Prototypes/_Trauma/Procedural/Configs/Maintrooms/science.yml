@@ -1,3 +1,50 @@
 - type: dungeonLayers
   id: MaintroomsScience
-  # TODO
+  layers:
+  - !type:FeatureDunGen
+    feature: !type:GroupFeature
+      children:
+      - id: MaintenanceScienceAnomalyLoot
+      - id: MaintenanceScienceArtifactAnalyzer
+    position: !type:RoomSidePosition
+      availableSides:
+      - Center
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceScience
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceScienceConsole
+    position: !type:RoomSidePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceScience
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceScienceLathe
+    position: !type:RoomSidePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceScience
+  - !type:FeatureDunGen
+    feature:
+      id: MaintenanceScienceResources
+    position: !type:RoomSidePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+    conditions:
+    - !type:RoomRoleCondition
+      role: RoomMaintenanceScience
