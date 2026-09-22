@@ -26,7 +26,7 @@ public sealed class NumberSelectorTypeSerializer :
         ISerializationContext? context = null,
         ISerializationManager.InstantiationDelegate<NumberSelector>? instanceProvider = null)
     {
-        return (NumberSelector) ReadImpl(serializationManager, node, dependencies, hookCtx, context, instanceProvider);
+        return ReadImpl<NumberSelector>(serializationManager, node, dependencies, hookCtx, context, instanceProvider);
     }
 
     protected override IBaseValueSelector<int, float> GetConstantSelector(int constant)

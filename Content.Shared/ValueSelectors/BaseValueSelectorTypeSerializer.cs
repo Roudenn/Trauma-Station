@@ -17,6 +17,7 @@ public abstract class BaseValueSelectorTypeSerializer<TMain, TFrac>
 {
     // Abstract methods used for creation because IDynamicTypeFactory will be slower since it's not compile-time
     // And alternative solutions probably require using methods that are outside of sandbox.
+    // TODO there should probably be a more optimized way here
     protected abstract IBaseValueSelector<TMain, TFrac> GetConstantSelector(TMain constant);
 
     protected abstract IBaseValueSelector<TMain, TFrac> GetRangeSelector(TMain min, TMain max);
@@ -43,23 +44,23 @@ public abstract class BaseValueSelectorTypeSerializer<TMain, TFrac>
         return new ErrorNode(node, "Custom validation not supported! Please specify the type manually!");
     }
 
-    protected IBaseValueSelector<TMain, TFrac> ReadImpl(ISerializationManager serializationManager,
+    protected T ReadImpl<T>(ISerializationManager serializationManager,
         ValueDataNode node,
         IDependencyCollection dependencies,
         SerializationHookContext hookCtx,
         ISerializationContext? context = null,
-        ISerializationManager.InstantiationDelegate<IBaseValueSelector<TMain, TFrac>>? instanceProvider = null)
+        ISerializationManager.InstantiationDelegate<IBaseValueSelector<TMain, TFrac>>? instanceProvider = null) where T : IBaseValueSelector<TMain, TFrac>
     {
         if (TMain.TryParse(node.Value, CultureInfo.InvariantCulture, out var result))
-            return GetConstantSelector(result);
+            return (T) GetConstantSelector(result);
 
         if (VectorSerializerUtility.TryParseArgs(node.Value, 2, out var args))
         {
             var x = TMain.Parse(args[0], CultureInfo.InvariantCulture);
             var y = TMain.Parse(args[1], CultureInfo.InvariantCulture);
-            return GetRangeSelector(x, y);
+            return (T) GetRangeSelector(x, y);
         }
 
-        return serializationManager.Read<IBaseValueSelector<TMain, TFrac>>(node, context, notNullableOverride: true);
+        return serializationManager.Read<T>(node, context, notNullableOverride: true);
     }
 }
