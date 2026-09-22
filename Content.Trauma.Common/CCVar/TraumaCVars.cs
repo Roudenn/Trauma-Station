@@ -72,42 +72,6 @@ public sealed partial class TraumaCVars
 
     #region Skills
 
-    /// <summary>
-    /// Enables gaining XP and skills during rounds.
-    /// Character starting skills are not affected by this.
-    /// </summary>
-    public static readonly CVarDef<bool> SkillGain =
-        CVarDef.Create("trauma.skill_gain", true, CVar.SERVER | CVar.REPLICATED);
-
-    /// <summary>
-    /// Client setting to hide all skill-related popups.
-    /// </summary>
-    public static readonly CVarDef<bool> SkillPopups =
-        CVarDef.Create("trauma.skill_popups", true, CVar.CLIENTONLY | CVar.ARCHIVE);
-
-    #endregion
-
-    #region Chat
-
-    /// <summary>
-    /// Whether to play a sound when a highlighted message is received.
-    /// </summary>
-    public static readonly CVarDef<bool> ChatHighlightSound =
-        CVarDef.Create("chat.highlight_sound", true, CVar.ARCHIVE | CVar.CLIENTONLY);
-
-    /// <summary>
-    /// Volume of the highlight sound when a highlighted message is received.
-    /// </summary>
-    public static readonly CVarDef<float> ChatHighlightVolume =
-        CVarDef.Create("chat.highlight_volume", 1f, CVar.ARCHIVE | CVar.CLIENTONLY);
-
-    /// <summary>
-    /// You get instantly banned if you say something matching this regex in any chat channel.
-    /// The regex is case insensitive.
-    /// </summary>
-    public static readonly CVarDef<string> GamerWordsRegex =
-        CVarDef.Create("chat.gamer_words_regex", string.Empty, CVar.SERVER);
-
     #endregion
 
     #region Webhooks

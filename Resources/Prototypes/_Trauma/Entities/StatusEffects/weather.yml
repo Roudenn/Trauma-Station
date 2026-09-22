@@ -19,14 +19,21 @@
   id: WeatherRadiationStorm
   components:
   - type: WeatherEffects
+    conditions:
+    - !type:WhitelistCondition
+      blacklist:
+        components:
+        - RadStormImmune
     effects:
     - !type:HealthChange
+      ignoreResistances: false
       splitDamage: None
       damage:
         types:
           Radiation: 0.25
     - !type:RandomNegativeMutation
       probability: 0.1 # average 10s of exposure per mutation
+      difficulty: 0.75 # less punishing + can be a boon for genetics
     safeIndoors: false # entire station is indoors...
     safeAreas:
     - AreaAiUpload
@@ -36,6 +43,7 @@
     - AreaRadstorm
     - AreaLootRoom
     - AreaPrisonShower # not quite toilet
+    - AreaToilet
     - AreaShuttleAbductor
     - AreaShuttleNukie
 

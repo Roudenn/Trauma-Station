@@ -17,8 +17,6 @@
   components:
   - type: Wound
     damageType: Blunt
-    woundType: External
-    woundVisibility: Always
     scarWound: BluntScar
     mangleSeverity: Severe
     textString: Blunt
@@ -63,8 +61,6 @@
   components:
   - type: Wound
     damageType: Piercing
-    woundType: External
-    woundVisibility: Always
     scarWound: PiercingScar
     mangleSeverity: Severe
     textString: Pierce
@@ -115,8 +111,6 @@
   components:
   - type: Wound
     damageType: Ballistic
-    woundType: External
-    woundVisibility: Always
     scarWound: PiercingScar
     mangleSeverity: Severe
     textString: Ballistic
@@ -142,42 +136,11 @@
     scalingSpeed: 0.5
 
 - type: entity
-  id: ArmorPiercing
-  parent: WoundBase
-  components:
-  - type: Wound
-    woundType: External
-    woundVisibility: Always
-    scarWound: PiercingScar
-    selfHealMultiplier: 0
-    textString: Pierce
-  - type: TraumaInflicter
-    severityThreshold: 6
-    allowArmourDeduction:
-    - OrganDamage
-    - BoneDamage
-    - VeinsDamage
-    allowedTraumas:
-    - OrganDamage
-    - BoneDamage
-    - VeinsDamage
-    traumasChances:
-      Dismemberment: -1.8 # Bullets go THROUGH people
-      OrganDamage: 0.24
-      BoneDamage: 0.24
-      VeinsDamage: -0.4
-  - type: BleedInflicter
-    scalingSpeed: 0.34
-    severityThreshold: 5
-
-- type: entity
   id: Slash
   parent: WoundBase
   components:
   - type: Wound
     damageType: Slash
-    woundType: External
-    woundVisibility: Always
     scarWound: SlashScar
     mangleSeverity: Severe
     textString: Slash
@@ -222,8 +185,6 @@
   components:
   - type: Wound
     damageType: Heat
-    woundType: External
-    woundVisibility: Always
     scarWound: BurnScar
     textString: Burn
   - type: TraumaInflicter
@@ -264,25 +225,15 @@
   components:
   - type: Wound
     damageType: Ion
-    woundType: External
-    woundVisibility: Always
     scarWound: BurnScar
   - type: TraumaInflicter
-    severityThreshold: 17
-    allowedTraumas:
-#    - OrganDamage
-#    - BoneDamage
-    - VeinsDamage
-    allowArmourDeduction:
-    - OrganDamage # No matter what ultrasuperduper cool armour you have, while getting fucking boiled alive - YOUR VEINS AND NERVES WILL HURT.
-    - BoneDamage
+    severityThreshold: 0
+    allowedTraumas: []
     traumasChances:
       Dismemberment: 0
-#      OrganDamage: -0.12
-#      BoneDamage: -0.21
-      VeinsDamage: 0.34
-    mangledMultipliers:
-      BoneDamage: 1
+      OrganDamage: 0
+      BoneDamage: 0
+      VeinsDamage: 0
 
 - type: entity
   id: Cold
@@ -290,8 +241,6 @@
   components:
   - type: Wound
     damageType: Cold
-    woundType: External
-    woundVisibility: Always
     scarWound: BurnScar
     textString: Cold
   - type: TraumaInflicter
@@ -310,8 +259,6 @@
   components:
   - type: Wound
     damageType: Holy
-    woundType: Internal
-    woundVisibility: AdvancedScanner
     textString: Holy
   - type: TraumaInflicter
     severityThreshold: 0
@@ -328,8 +275,6 @@
   components:
   - type: Wound
     damageType: Shock
-    woundType: Internal
-    woundVisibility: HandScanner
     scarWound: BurnScar
     textString: Shock
   - type: TraumaInflicter
@@ -349,10 +294,7 @@
   components:
   - type: Wound
     damageType: Cellular
-    woundType: Internal
-    woundVisibility: AdvancedScanner
     scarWound: BurnScar
-    selfHealMultiplier: 0
   - type: TraumaInflicter
     severityThreshold: 0
     allowedTraumas:
@@ -371,8 +313,6 @@
   components:
   - type: Wound
     damageType: Caustic
-    woundType: Internal
-    woundVisibility: AdvancedScanner
     scarWound: BurnScar
     textString: Caustic
   - type: TraumaInflicter
@@ -391,10 +331,7 @@
   components:
   - type: Wound
     damageType: Radiation
-    woundType: Internal
-    woundVisibility: HandScanner
     scarWound: RadiationScar
-    selfHealMultiplier: 0
   - type: TraumaInflicter
     severityThreshold: 11
     allowedTraumas:
@@ -414,8 +351,6 @@
   components:
   - type: Wound
     damageType: Poison
-    woundType: Internal
-    woundVisibility: HandScanner
   - type: TraumaInflicter
     severityThreshold: 7
     allowedTraumas:

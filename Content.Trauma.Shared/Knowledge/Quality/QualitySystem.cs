@@ -168,9 +168,9 @@ public sealed partial class QualitySystem : EntitySystem
             {
                 passive.Coefficients[key] = number * modifierMinus;
             }
-            foreach (var (key, number) in passive.FlatReduction)
+            foreach (var (key, number) in passive.FlatReductions)
             {
-                passive.FlatReduction[key] = number * modifierPlus;
+                passive.FlatReductions[key] = number * modifierPlus;
             }
         }
 
@@ -180,9 +180,9 @@ public sealed partial class QualitySystem : EntitySystem
             {
                 active.Coefficients[key] = number * modifierMinus;
             }
-            foreach (var (key, number) in active.FlatReduction)
+            foreach (var (key, number) in active.FlatReductions)
             {
-                active.FlatReduction[key] = number * modifierPlus;
+                active.FlatReductions[key] = number * modifierPlus;
             }
         }
         Dirty(ent);
@@ -285,13 +285,17 @@ public sealed partial class QualitySystem : EntitySystem
             return;
         }
 
-        var (knowledgeToUse, lowestId, lowestDelta, skillDelta) = FindLowestDelta(brain, ent.Comp.LevelDeltas);
+        var rand = SharedRandomExtensions.PredictedRandom(_timing, GetNetEntity(ent));
+        var roll = rand.Next(1, 100);
+        var modifier = 100 - roll * 2; // 99 to -100 if skills are disabled, purely random
+        if (_knowledge.SkillsEnabled)
+        {
+            var (knowledgeToUse, lowestId, lowestDelta, skillDelta) = FindLowestDelta(brain, ent.Comp.LevelDeltas);
+            var added = _knowledge.GetKnowledge(brain, knowledgeToUse)?.Comp.NetLevel ?? -1;
+            modifier = added + lowestDelta * 15 + ent.Comp.Quality + ent.Comp.QualityModifiers - roll;
+        }
 
-        var added = _knowledge.GetKnowledge(brain, knowledgeToUse)?.Comp.NetLevel ?? -1;
-
-        var roll = SharedRandomExtensions.PredictedRandom(_timing, GetNetEntity(ent)).Next(1, 100);
-
-        ent.Comp.Quality = (added + lowestDelta * 15 + ent.Comp.Quality + ent.Comp.QualityModifiers - roll) switch
+        ent.Comp.Quality = modifier switch
         {
             >= 88 => 5,
             >= 44 => 4,

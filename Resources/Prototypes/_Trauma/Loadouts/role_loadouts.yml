@@ -20,3 +20,35 @@
   - ScientistEnvirosuit
   - ScientistEnvirogloves
   - ExclusiveItems
+
+- type: roleLoadout
+  id: JobRancher
+  groups:
+  - GroupTankHarness
+  - Glasses
+  - Survival
+  - Trinkets
+  - GroupSpeciesBreathTool
+  - BotanistEnvirohelm
+  - BotanistEnvirosuit
+  - BotanistEnvirogloves
+  - ExclusiveItems
+
+- type: roleLoadout
+  id: JobDClass
+  groups:
+  - GroupTankHarness
+  - DClassJumpsuit
+  - DClassBackpacks
+  - DClassNeck
+  - DClassFace
+  - DClassGloves
+  - DClassOuterClothing
+  - DClassShoes
+  - Survival
+  - Trinkets
+  - GroupSpeciesBreathTool
+  - AssistantEnvirohelm
+  - AssistantEnvirosuit
+  - AssistantEnvirogloves
+  - ExclusiveItems

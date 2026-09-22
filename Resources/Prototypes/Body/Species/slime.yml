@@ -131,6 +131,7 @@
   - type: Damageable
     damageModifierSet: Slime
   - type: PassiveDamage # Around 8 damage a minute healed
+    intervalHaltOnDamageTaken: 5s
     allowedStates:
     - Alive
     damage:
@@ -225,8 +226,7 @@
   abstract: true
   components:
   # <Trauma>
-  - type: Woundable
-    boneEntity: null
+  - type: Boneless
   # </Trauma>
   - type: Sprite
     sprite: Mobs/Species/Slime/parts.rsi

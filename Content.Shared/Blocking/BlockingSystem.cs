@@ -1,4 +1,5 @@
 // <Trauma>
+using Content.Trauma.Common.Knowledge;
 using Robust.Shared.Timing;
 // </Trauma>
 using System.Linq;
@@ -360,6 +361,11 @@ public sealed partial class BlockingSystem : EntitySystem
             return;
 
         var fraction = entity.Comp.IsRaised ? entity.Comp.ActiveBlockFraction : entity.Comp.PassiveBlockFraction;
+        // <Trauma>
+        var fractionEv = new GetBlockFractionEvent(args.User, entity, fraction);
+        RaiseLocalEvent(args.User, ref fractionEv);
+        fraction = Math.Clamp(fractionEv.Fraction, 0f, 1f);
+        // </Trauma>
         var modifier = GetBlockingModifier(entity);
 
         var msg = new FormattedMessage();
@@ -387,7 +393,7 @@ public sealed partial class BlockingSystem : EntitySystem
             ));
         }
 
-        foreach (var flat in modifiers.FlatReduction)
+        foreach (var flat in modifiers.FlatReductions)
         {
             msg.PushNewline();
             msg.AddMarkupOrThrow(Robust.Shared.Localization.Loc.GetString("blocking-reduction-trauma", // Trauma - use custom examine

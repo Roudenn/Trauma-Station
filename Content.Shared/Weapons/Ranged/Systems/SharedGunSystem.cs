@@ -6,7 +6,6 @@ using Content.Shared.Mech.Components;
 using Content.Shared.Weapons.Hitscan.Events;
 using Content.Trauma.Common.Projectiles;
 // </Trauma>
-using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Actions;
@@ -24,7 +23,7 @@ using Content.Shared.Popups;
 using Content.Shared.Projectiles;
 using Content.Shared.Tag;
 using Content.Shared.Throwing;
-using Content.Shared.Timing;
+using Content.Shared.Timing.Systems;
 using Content.Shared.Verbs;
 using Content.Shared.Weapons.Hitscan.Components;
 using Content.Shared.Weapons.Melee;
@@ -710,18 +709,23 @@ public abstract partial class SharedGunSystem : EntitySystem
         // <Trauma>
         if (targetCoordinates is {} target)
             projectile.TargetCoordinates = target;
+        if (user != null)
+            projectile.IgnoredEntities.Add(user.Value);
 
         if (user is {} userUid)
         {
-            var ev = new PlayerShotProjectileEvent(uid, userUid);
-            RaiseLocalEvent(ref ev);
+            var userEv = new PlayerShotProjectileEvent(uid, userUid);
+            RaiseLocalEvent(ref userEv);
         }
         if (gunUid is {} gun)
         {
-            var shotEv = new ProjectileShotEvent(uid, user);
+            var shotEv = new GunShotProjectileEvent(uid, user);
             RaiseLocalEvent(gun, ref shotEv);
         }
         // </Trauma>
+
+        var ev = new ProjectileShotEvent();
+        RaiseLocalEvent(uid, ref ev);
     }
 
     /// <summary>
@@ -1069,6 +1073,7 @@ public enum AmmoVisuals : byte
     AmmoCount,
     AmmoMax,
     HasAmmo, // used for generic visualizers. c# stuff can just check ammocount != 0
+    IsFull, // used for generic visualizers. c# stuff can just check ammocount == ammomax
     MagLoaded,
     BoltClosed,
 }

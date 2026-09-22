@@ -1,34 +1,28 @@
 // <Trauma>
 using Content.Goobstation.Shared.ManifestListings;
-using Content.Goobstation.Shared.NTR;
-using Content.Goobstation.Shared.NTR.Events;
 using Content.Trauma.Common.Wizard;
-using Content.Shared.GameTicking;
-using Robust.Shared.Prototypes;
 // </Trauma>
 using System.Linq;
 using Content.Server.Actions;
 using Content.Server.Administration.Logs;
+using Content.Shared.Mindshield;
 using Content.Server.Stack;
 using Content.Server.Store.Components;
 using Content.Shared.Actions;
 using Content.Shared.Database;
 using Content.Shared.FixedPoint;
 using Content.Shared.Hands.EntitySystems;
-using Content.Shared.Mindshield.Components;
 using Content.Shared.NPC.Systems;
 using Content.Shared.Store;
 using Content.Shared.Store.Components;
 using Content.Shared.UserInterface;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server.Store.Systems;
 
 public sealed partial class StoreSystem
 {
-    // <Trauma>
-    [Dependency] private SharedGameTicker _ticker = default!;
-    // </Trauma>
     [Dependency] private IAdminLogManager _admin = default!;
     [Dependency] private ActionContainerSystem _actionContainer = default!;
     [Dependency] private ActionsSystem _actions = default!;
@@ -37,6 +31,7 @@ public sealed partial class StoreSystem
     [Dependency] private SharedAudioSystem _audio = default!;
     [Dependency] private SharedHandsSystem _hands = default!;
     [Dependency] private StackSystem _stack = default!;
+    [Dependency] private MindShieldSystem _mindShield = default!;
 
     private void InitializeUi()
     {
@@ -130,20 +125,20 @@ public sealed partial class StoreSystem
                 return;
             }
         }
-        if (HasComp<NtrClientAccountComponent>(uid))
-            RaiseLocalEvent(uid, new NtrListingPurchaseEvent(cost.First().Value));
-        OnPurchase(listing); // Goob edit - ntr shittery
 
-        // Goobstation start
+        // <Trauma>
+        OnPurchase(listing);
         if (Mind.TryGetMind(buyer, out var mindId, out _))
         {
             var ev = new ListingPurchasedEvent(buyer, uid, listing);
             RaiseLocalEvent(mindId, ref ev);
         }
-        // Goobstation end
+        // </Trauma>
 
-        // if (!IsOnStartingMap(uid, component)) // Goob edit
-        //    DisableRefund(uid, component);
+        /* Trauma
+        if (!IsOnStartingMap(uid, component))
+            DisableRefund(uid, component);
+        */
 
         //subtract the cash
         foreach (var (currency, amount) in cost)
@@ -154,6 +149,13 @@ public sealed partial class StoreSystem
             component.BalanceSpent.TryAdd(currency, FixedPoint2.Zero);
 
             component.BalanceSpent[currency] += amount;
+        }
+
+        //apply components
+        if (listing.ProductComponents != null)
+        {
+            if (ProtoMan.Resolve(listing.ProductComponents, out var productComponentsEntity))
+                EntityManager.AddComponents(buyer, productComponentsEntity.Components);
         }
 
         //spawn entity
@@ -279,7 +281,8 @@ public sealed partial class StoreSystem
             logImpact = LogImpact.High;
             logExtraInfo = ", but was not from an expected faction";
 
-            if (HasComp<MindShieldComponent>(buyer))
+            _mindShield.GetMindshieldStatus(buyer, out var isMindshielded, out _);
+            if (isMindshielded)
             {
                 logImpact = LogImpact.Extreme;
                 logExtraInfo += " while also possessing a mindshield";

@@ -4,7 +4,6 @@ using Content.Goobstation.Common.Religion;
 using Content.Medical.Common.Damage;
 using Content.Medical.Common.Targeting;
 using Content.Medical.Shared.Traumas;
-using Content.Medical.Shared.Wounds;
 using Content.Shared.Actions;
 using Content.Shared.Actions.Events;
 using Content.Shared.Body;
@@ -31,6 +30,7 @@ using Content.Shared.Mobs.Systems;
 using Content.Shared.Movement.Pulling.Systems;
 using Content.Shared.Popups;
 using Content.Shared.StatusEffect;
+using Content.Shared.Store;
 using Content.Shared.Stunnable;
 using Content.Shared.Tag;
 using Content.Shared.Throwing;
@@ -42,6 +42,7 @@ using Content.Trauma.Shared.Heretic.Components.StatusEffects;
 using Content.Trauma.Shared.Heretic.Events;
 using Content.Trauma.Shared.Heretic.Systems.PathSpecific.Cosmos;
 using Content.Trauma.Shared.Heretic.Systems.PathSpecific.Void;
+using Content.Trauma.Shared.Wizard.FadingTimedDespawn;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Physics.Systems;
@@ -60,12 +61,13 @@ public abstract partial class SharedHereticAbilitySystem : EntitySystem
     [Dependency] protected SharedDoAfterSystem DoAfter = default!;
     [Dependency] protected EntityLookupSystem Lookup = default!;
     [Dependency] protected StatusEffectsSystem Status = default!;
+    [Dependency] protected Content.Shared.StatusEffectNew.StatusEffectsSystem StatusNew = default!;
     [Dependency] protected SharedVoidCurseSystem Voidcurse = default!;
     [Dependency] protected SharedHereticSystem Heretic = default!;
-    [Dependency] protected Content.Shared.StatusEffectNew.StatusEffectsSystem StatusNew = default!;
     [Dependency] protected ExamineSystemShared Examine = default!;
     [Dependency] protected SharedPopupSystem Popup = default!;
 
+    [Dependency] private SharedStoreSystem _store = default!;
     [Dependency] private SharedMapSystem _map = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
     [Dependency] private ThrowingSystem _throw = default!;
@@ -80,7 +82,7 @@ public abstract partial class SharedHereticAbilitySystem : EntitySystem
     [Dependency] private DamageableSystem _dmg = default!;
     [Dependency] private MobThresholdSystem _mobThreshold = default!;
     [Dependency] private BodySystem _body = default!;
-    [Dependency] private SharedBloodstreamSystem _blood = default!;
+    [Dependency] private BloodstreamSystem _blood = default!;
     [Dependency] private SharedSolutionContainerSystem _solution = default!;
     [Dependency] private SharedEmpSystem _emp = default!;
     [Dependency] private SharedMindSystem _mind = default!;
@@ -91,6 +93,7 @@ public abstract partial class SharedHereticAbilitySystem : EntitySystem
     [Dependency] private TouchSpellSystem _touchSpell = default!;
     [Dependency] private TraumaSystem _trauma = default!;
     [Dependency] private SharedGhoulSystem _ghoul = default!;
+    [Dependency] private SharedFadingTimedDespawnSystem _fadeDespawn = default!;
 
     [Dependency] private EntityQuery<GhoulComponent> _ghoulQuery = default!;
 
@@ -98,6 +101,7 @@ public abstract partial class SharedHereticAbilitySystem : EntitySystem
 
     public static readonly DamageSpecifier AllDamage = new();
 
+    private static EntProtoId JauntMutedEffect = "StatusEffectMutedJaunt";
     public static ProtoId<CollectiveMindPrototype> MansusLinkMind = "MansusLink";
 
     public override void Initialize()
@@ -109,6 +113,19 @@ public abstract partial class SharedHereticAbilitySystem : EntitySystem
         SubscribeBlade();
 
         CacheDamageTypes();
+    }
+
+    [SubscribeLocalEvent]
+    private void OnStore(EventHereticOpenStore args)
+    {
+        if (!TryUseAbility(args))
+            return;
+
+        if (!Heretic.TryGetHereticComponent(args.Performer, out _, out var ent) ||
+            Heretic.GetHereticStore(ent) is not { } store)
+            return;
+
+        _store.ToggleUi(args.Performer, store, store);
     }
 
     [SubscribeLocalEvent]
@@ -159,7 +176,7 @@ public abstract partial class SharedHereticAbilitySystem : EntitySystem
     [SubscribeLocalEvent]
     private void OnActionAttempt(Entity<HereticActionComponent> ent, ref ActionAttemptEvent args)
     {
-        if (StatusNew.HasEffectComp<BlockHereticActionsStatusEffectComponent>( args.User))
+        if (StatusNew.HasEffectComp<BlockHereticActionsStatusEffectComponent>(args.User))
             args.Cancelled = true;
     }
 
@@ -181,7 +198,7 @@ public abstract partial class SharedHereticAbilitySystem : EntitySystem
             if (checkNullRod)
             {
                 var ev = new BeforeCastTouchSpellEvent(look, false);
-                RaiseLocalEvent(look, ev, true);
+                RaiseLocalEvent(look, ref ev, true);
                 if (ev.Cancelled)
                     continue;
             }
@@ -202,6 +219,12 @@ public abstract partial class SharedHereticAbilitySystem : EntitySystem
         if (result && handle)
             args.Handled = true;
         return result;
+    }
+
+    [SubscribeLocalEvent]
+    private void OnJauntInit(Entity<JauntComponent> ent, ref ComponentInit args)
+    {
+        StatusNew.TryAddStatusEffect(ent.Owner, JauntMutedEffect, out _, null);
     }
 
     [SubscribeLocalEvent]
@@ -312,17 +335,14 @@ public abstract partial class SharedHereticAbilitySystem : EntitySystem
 
         if (boneHeal == null || boneHeal != FixedPoint2.Zero && Resolve(uid, ref uid.Comp2, false))
         {
-            var parts = _body.GetOrgans<WoundableComponent>((uid, uid.Comp2));
+            var bones = _body.GetOrgans<BoneComponent>((uid, uid.Comp2));
 
-            foreach (var part in parts)
+            foreach (var bone in bones)
             {
-                if (_trauma.GetBone(part.AsNullable()) is not {} bone)
-                    continue;
-
                 if (boneHeal is { } heal)
-                    _trauma.ApplyDamageToBone(bone, heal, bone.Comp);
+                    _trauma.DamageBone(bone.AsNullable(), heal); // heal is negative
                 else
-                    _trauma.SetBoneIntegrity(bone, bone.Comp.BoneIntegrity, bone.Comp);
+                    _trauma.SetBoneIntegrity(bone.AsNullable(), bone.Comp.BoneIntegrity);
             }
         }
 

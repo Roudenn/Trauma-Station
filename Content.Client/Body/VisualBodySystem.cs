@@ -5,11 +5,13 @@ using System.Linq;
 using Content.Client.DisplacementMap;
 using Content.Shared.Body;
 using Content.Shared.CCVar;
+using Content.Shared.DisplacementMap;
 using Content.Shared.Humanoid.Markings;
 using Content.Shared.Humanoid;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Shared.Configuration;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
 namespace Content.Client.Body;
@@ -67,6 +69,7 @@ public sealed partial class VisualBodySystem : SharedVisualBodySystem
         if (Comp<OrganComponent>(ent).Body is not { } body)
             return;
 
+        RemoveVisual(ent, body);
         ApplyVisual(ent, body);
     }
 
@@ -86,12 +89,17 @@ public sealed partial class VisualBodySystem : SharedVisualBodySystem
                 ent.Comp.Layer,
                 out _);
         }
+
+        if (displacement == null)
+        {
+            _displacement.EnsureDisplacementIsNotOnSprite((target, Comp<SpriteComponent>(target)), ent.Comp.Layer);
+        }
     }
 
     private void RemoveVisual(Entity<VisualOrganComponent> ent, EntityUid target)
     {
         // <Trauma> - removed parts have their body's skin colour. not enabled for eyes yet until it supports an iris layer
-        if (ent.Comp.Data.Color is {} color && !HasComp<InternalOrganComponent>(ent))
+        if (ent.Comp.Data.Color is {} color && !HasComp<InternalChildOrganComponent>(ent))
             _sprite.SetColor(ent.Owner, color);
         // </Trauma>
         if (!_sprite.LayerMapTryGet(target, ent.Comp.Layer, out var index, false)) // Trauma - don't log for missing layers
@@ -131,9 +139,10 @@ public sealed partial class VisualBodySystem : SharedVisualBodySystem
         ApplyVisual(ent, body);
     }
 
-    public override void SetOrganMarkings(Entity<VisualOrganMarkingsComponent> ent, Dictionary<HumanoidVisualLayers, List<Marking>> markings) // Trauma - made public
+    // Trauma - made public
+    public override void SetOrganMarkings(Entity<VisualOrganMarkingsComponent> ent, Dictionary<HumanoidVisualLayers, List<Marking>> markings, Dictionary<HumanoidVisualLayers, DisplacementData> displacement)
     {
-        base.SetOrganMarkings(ent, markings);
+        base.SetOrganMarkings(ent, markings, displacement);
 
         if (Comp<OrganComponent>(ent).Body is not { } body)
             return;
@@ -142,9 +151,9 @@ public sealed partial class VisualBodySystem : SharedVisualBodySystem
         ApplyMarkings(ent, body);
     }
 
-    protected override void SetOrganAppearance(Entity<VisualOrganComponent> ent, PrototypeLayerData data)
+    protected override void SetOrganAppearance(Entity<VisualOrganComponent> ent, PrototypeLayerData data, ProtoId<DisplacementDataPrototype>? displacement)
     {
-        base.SetOrganAppearance(ent, data);
+        base.SetOrganAppearance(ent, data, displacement);
 
         if (Comp<OrganComponent>(ent).Body is not { } body)
             return;
@@ -197,7 +206,8 @@ public sealed partial class VisualBodySystem : SharedVisualBodySystem
             if (!_marking.TryGetMarking(marking, out var proto))
                 continue;
 
-            if (!_sprite.LayerMapTryGet(target, proto.BodyPart, out var index, true))
+            if (!_sprite.LayerMapTryGet(target, proto.BodyPart, out var index, true)
+                || !_sprite.TryGetLayer(target, index, out var bodypartLayer, true))
                 continue;
 
             ent.Comp.MarkingsDisplacement.TryGetValue(proto.BodyPart, out var displacement);
@@ -213,7 +223,7 @@ public sealed partial class VisualBodySystem : SharedVisualBodySystem
 
                 var layerId = $"{proto.ID}-{rsi.RsiState}";
 
-                if (!_sprite.LayerMapTryGet(target, layerId, out _, false))
+                if (!_sprite.LayerMapTryGet(target, layerId, out var spriteLayer, false))
                 {
                     // Having three separate indices and a magic +1 is cursed, but:
                     // - index refers to the index of the organ the marking is applied to
@@ -222,15 +232,16 @@ public sealed partial class VisualBodySystem : SharedVisualBodySystem
                     //   an additional offset to ensure that the order of the base sprites is correct
                     //   after inserting a displacement layer
                     // - The +1 ensures that markings render on top of the base organ
-                    var spriteLayer = _sprite.AddLayer(target, sprite, index + i + numDisplacements + 1);
+                    spriteLayer = _sprite.AddLayer(target, sprite, index + i + numDisplacements + 1);
                     _sprite.LayerMapSet(target, layerId, spriteLayer);
-                    _sprite.LayerSetSprite(target, layerId, rsi);
+                    _sprite.LayerSetSprite(target, spriteLayer, rsi);
+                    _sprite.LayerSetVisible(target, spriteLayer, bodypartLayer.Visible);
                 }
 
                 if (marking.MarkingColors is not null && i < marking.MarkingColors.Count)
-                    _sprite.LayerSetColor(target, layerId, marking.MarkingColors[i]);
+                    _sprite.LayerSetColor(target, spriteLayer, marking.MarkingColors[i]);
                 else
-                    _sprite.LayerSetColor(target, layerId, Color.White);
+                    _sprite.LayerSetColor(target, spriteLayer, Color.White);
 
                 if (displacement != null && proto.CanBeDisplaced)
                 {
@@ -298,6 +309,9 @@ public sealed partial class VisualBodySystem : SharedVisualBodySystem
         if (!ent.Comp.HideableLayers.Contains(args.Args.Layer))
             return;
 
+        // This hurts.
+        args.Args = args.Args with { ShouldHide = true };
+
         foreach (var markings in ent.Comp.Markings.Values)
         {
             foreach (var marking in markings)
@@ -316,7 +330,8 @@ public sealed partial class VisualBodySystem : SharedVisualBodySystem
 
                     var layerId = $"{proto.ID}-{rsi.RsiState}";
 
-                    if (!_sprite.LayerMapTryGet(args.Body.Owner, layerId, out var index, true))
+                    // Not logging, can be called on initialization before the body's sprites are setup!
+                    if (!_sprite.LayerMapTryGet(args.Body.Owner, layerId, out var index, logMissing: false))
                         continue;
 
                     _sprite.LayerSetVisible(args.Body.Owner, index, args.Args.Visible);

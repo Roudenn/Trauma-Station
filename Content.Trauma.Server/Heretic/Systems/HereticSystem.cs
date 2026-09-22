@@ -17,7 +17,6 @@ using Content.Shared.Actions.Events;
 using Content.Shared.Chat;
 using Content.Shared.Eye;
 using Content.Shared.FixedPoint;
-using Content.Shared.GameTicking;
 using Content.Shared.Humanoid;
 using Content.Shared.Jaunt;
 using Content.Shared.Mind;
@@ -31,7 +30,6 @@ using Content.Shared.Roles.Jobs;
 using Content.Shared.Store;
 using Content.Shared.Store.Components;
 using Content.Shared.Tag;
-using Content.Trauma.Server.Abductor;
 using Content.Trauma.Server.Heretic.Components;
 using Content.Trauma.Server.Objectives.Components;
 using Content.Trauma.Shared.Heretic.Components;
@@ -39,6 +37,7 @@ using Content.Trauma.Shared.Heretic.Components.Ghoul;
 using Content.Trauma.Shared.Heretic.Events;
 using Content.Trauma.Shared.Heretic.Rituals;
 using Content.Trauma.Shared.Heretic.Systems;
+using Robust.Server.GameStates;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Player;
@@ -48,6 +47,7 @@ namespace Content.Trauma.Server.Heretic.Systems;
 
 public sealed partial class HereticSystem : SharedHereticSystem
 {
+    [Dependency] private IRobustRandom _rand = default!;
     [Dependency] private SharedAudioSystem _audio = default!;
     [Dependency] private SharedMindSystem _mind = default!;
     [Dependency] private StoreSystem _store = default!;
@@ -60,19 +60,25 @@ public sealed partial class HereticSystem : SharedHereticSystem
     [Dependency] private NpcFactionSystem _npcFaction = default!;
     [Dependency] private HandsSystem _hands = default!;
     [Dependency] private HereticRuleSystem _rule = default!;
-    [Dependency] private HumanoidProfileSystem _profile = default!;
-    [Dependency] private AbductorVestDisguiseSystem _disguise = default!;
     [Dependency] private SharedHereticRitualSystem _ritual = default!;
-    [Dependency] private IRobustRandom _rand = default!;
+    [Dependency] private PvsOverrideSystem _pvs = default!;
 
     [Dependency] private EntityQuery<HereticMinionComponent> _minionQuery = default!;
     [Dependency] private EntityQuery<HereticActionComponent> _hereticActionQuery = default!;
     [Dependency] private EntityQuery<ChangeUseDelayOnAscensionComponent> _changeUseDelayQuery = default!;
-
-    private float _timer;
-    private const float PassivePointCooldown = 20f * 60f;
+    [Dependency] private EntityQuery<HumanoidProfileComponent> _humanoidQuery = default!;
+    [Dependency] private EntityQuery<HereticSacrificeTargetComponent> _targetQuery = default!;
 
     private const int HereticVisFlags = (int) VisibilityFlags.EldritchInfluence;
+
+    private static readonly Dictionary<SacrificeTargetType, Type> SacrificeTypes = new()
+    {
+        { SacrificeTargetType.Command, typeof(CommandStaffComponent) },
+        { SacrificeTargetType.Security, typeof(SecurityStaffComponent) },
+    };
+
+    private List<SacrificeTargetData> _toRemove = new();
+    private List<SacrificeTargetData> _toAdd = new();
 
     public static readonly ProtoId<NpcFactionPrototype> HereticFactionId = "Heretic";
     public static readonly ProtoId<NpcFactionPrototype> NanotrasenFactionId = "NanoTrasen";
@@ -192,9 +198,15 @@ public sealed partial class HereticSystem : SharedHereticSystem
     public override void RaiseKnowledgeEvent(EntityUid uid, HereticKnowledgeEvent ev, bool negative)
     {
         if (negative)
+        {
             EntityManager.RemoveComponents(uid, ev.AddedComponents);
+            Status.RemoveEffects(uid, ev.StatusEffects);
+        }
         else
+        {
             EntityManager.AddComponents(uid, ev.AddedComponents);
+            Status.AddEffects(uid, ev.StatusEffects);
+        }
         ev.Negative = negative;
         ev.Heretic = uid;
         RaiseLocalEvent(uid, (object) ev, true);
@@ -240,49 +252,31 @@ public sealed partial class HereticSystem : SharedHereticSystem
         _eye.SetVisibilityMask(ev.Heretic, mask, eye);
     }
 
-    [SubscribeLocalEvent]
-    private void OnRestart(RoundRestartCleanupEvent ev)
-    {
-        _timer = 0f;
-    }
-
-    public override void Update(float frameTime)
-    {
-        base.Update(frameTime);
-
-        _timer += frameTime;
-
-        if (_timer < PassivePointCooldown)
-            return;
-
-        _timer = 0f;
-
-        var query = EntityQueryEnumerator<HereticComponent, StoreComponent, MindComponent>();
-        while (query.MoveNext(out var uid, out var heretic, out var store, out var mind))
-        {
-            // passive point gain every 20 minutes
-            UpdateMindKnowledge((uid, heretic, store, mind), null, OneKnowledgePoint);
-        }
-    }
-
-    public override void UpdateMindKnowledge(Entity<HereticComponent, StoreComponent, MindComponent> ent,
+    public override void UpdateMindKnowledge(Entity<HereticComponent?, MindComponent?> ent,
         EntityUid? user,
-        Dictionary<string, FixedPoint2> knowledge,
+        Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2> knowledge,
         bool showText = true,
         bool playSound = true)
     {
         base.UpdateMindKnowledge(ent, user, knowledge, showText, playSound);
 
-        var (mindId, heretic, store, mind) = ent;
+        var (mindId, heretic, mind) = ent;
+
+        if (!Resolve(mindId, ref heretic, ref mind))
+            return;
+
         var uid = user ?? mind.OwnedEntity;
 
-        _store.TryAddCurrency(knowledge, mindId, store);
-        _store.UpdateUserInterface(uid, mindId, store);
+        if (GetHereticStore(ent) is not { } store)
+            return;
+
+        _store.TryAddCurrency(knowledge, store, store);
+        _store.UpdateUserInterface(uid, store, store);
 
         if (_mind.TryGetObjectiveComp<HereticKnowledgeConditionComponent>(mindId, out var objective, mind))
             objective.Researched += knowledge.Values.Sum().Float();
 
-        UpdateObjectiveProgress((ent, ent.Comp1, ent.Comp3));
+        UpdateObjectiveProgress((mindId, heretic, mind));
 
         if (!showText && !playSound)
             return;
@@ -338,7 +332,10 @@ public sealed partial class HereticSystem : SharedHereticSystem
         }
 
         RaiseLocalEvent(ent, new EventHereticRerollTargets());
-        UpdateHereticCostModifiers(ent.AsNullable());
+        // Check for mind comp to prevent test fail
+        // Otherwise, heretic depends on entity having mind comp too
+        if (HasComp<MindComponent>(ent))
+            UpdateHereticCostModifiers(ent.AsNullable());
     }
 
     [SubscribeLocalEvent]
@@ -385,41 +382,148 @@ public sealed partial class HereticSystem : SharedHereticSystem
         ev.WeakToHoly = true;
     }
 
-    [SubscribeLocalEvent]
-    private void OnUpdateTargets(Entity<HereticComponent> ent, ref EventHereticUpdateTargets args)
+    public void UpdateHereticTargets(Entity<HereticComponent, MindComponent?> ent)
     {
-        ent.Comp.SacrificeTargets = ent.Comp.SacrificeTargets
-            .Where(target => TryGetEntity(target.Entity, out var tent) && Exists(tent) &&
-                             !EntityManager.IsQueuedForDeletion(tent.Value))
+        List<EntityUid>? targets = null;
+        _toRemove.Clear();
+        _toAdd.Clear();
+        foreach (var target in ent.Comp1.SacrificeTargets)
+        {
+            if (TryGetEntity(target.Entity, out var tent) &&
+                !TerminatingOrDeleted(tent.Value) && !Paused(tent.Value))
+                continue;
+
+            targets ??= GetHereticTargets(ent);
+
+            if (RerollIndividualTarget(ent, target, targets) is { } newTarget)
+                _toAdd.Add(newTarget);
+            _toRemove.Add(target);
+        }
+
+        foreach (var target in _toRemove)
+        {
+            ent.Comp1.SacrificeTargets.Remove(target);
+        }
+
+        foreach (var target in _toAdd)
+        {
+            ent.Comp1.SacrificeTargets.Add(target);
+        }
+
+        HereticTargetsUpdated(ent);
+        Dirty(ent, ent.Comp1);
+    }
+
+    private List<EntityUid> GetHereticTargets(Entity<HereticComponent> ent)
+    {
+        return _antag.GetAliveConnectedPlayers(PlayerMan.Sessions)
+            .Where(IsSessionValid)
+            .Select(x => x.AttachedEntity!.Value)
             .ToList();
-        Dirty(ent); // update client
+
+        bool IsSessionValid(ICommonSession session)
+        {
+            if (session.AttachedEntity is not { } uid)
+                return false;
+
+            if (!_humanoidQuery.HasComp(uid))
+                return false;
+
+            if (IsHereticOrGhoul(uid))
+                return false;
+
+            if (_targetQuery.TryComp(uid, out var target) &&
+                target.HereticMinds.Contains(ent))
+                return false;
+
+            if (!_mind.TryGetMind(uid, out var mind, out _) ||
+                mind == ent.Owner || !_job.MindTryGetJobId(mind, out _))
+                return false;
+
+            return true;
+        }
+    }
+
+    private void HereticTargetsUpdated(Entity<HereticComponent, MindComponent?> ent)
+    {
+        if (!Resolve(ent, ref ent.Comp2) || !PlayerMan.TryGetSessionById(ent.Comp2.UserId, out var session))
+            return;
+
+        foreach (var target in ent.Comp1.SacrificeTargets)
+        {
+            var uid = GetEntity(target.Entity);
+            EnsureComp<HereticSacrificeTargetComponent>(uid).HereticMinds.Add(ent);
+            _pvs.AddSessionOverride(uid, session);
+        }
+    }
+
+    private void RemoveSacrificeTarget(Entity<HereticComponent, MindComponent?> ent, SacrificeTargetData data)
+    {
+        if (!TryGetEntity(data.Entity, out var uid))
+            return;
+
+        if (TryComp(uid, out HereticSacrificeTargetComponent? target))
+        {
+            target.HereticMinds.Remove(ent);
+            if (target.HereticMinds.Count == 0)
+                RemComp(uid.Value, target);
+        }
+
+        if (!Resolve(ent, ref ent.Comp2) || !PlayerMan.TryGetSessionById(ent.Comp2.UserId, out var session))
+            return;
+
+        _pvs.RemoveSessionOverride(uid.Value, session);
+    }
+
+    private SacrificeTargetData? RerollIndividualTarget(Entity<HereticComponent> ent, SacrificeTargetData data, List<EntityUid>? targets = null)
+    {
+        RemoveSacrificeTarget(ent, data);
+
+        targets ??= GetHereticTargets(ent);
+
+        if (targets.Count == 0)
+            return null;
+
+        var dataType = data.Type;
+
+        EntityUid picked;
+        if (SacrificeTypes.TryGetValue(dataType, out var type))
+        {
+            var list = targets.Where(x => HasComp(x, type)).ToList();
+            if (list.Count == 0)
+            {
+                picked = _rand.Pick(targets);
+                dataType = SacrificeTargetType.None;
+            }
+            else
+                picked = _rand.Pick(list);
+        }
+        else
+            picked = _rand.Pick(targets);
+
+        targets.Remove(picked);
+        return GetData(picked, dataType);
     }
 
     [SubscribeLocalEvent]
     private void OnRerollTargets(Entity<HereticComponent> ent, ref EventHereticRerollTargets args)
     {
-        // welcome to my linq smorgasbord of doom
-        // have fun figuring that out
-
-        var targets = _antag.GetAliveConnectedPlayers(PlayerMan.Sessions)
-            .Where(IsSessionValid)
-            .Select(x => x.AttachedEntity!.Value)
-            .ToList();
-
-        var pickedTargets = new List<EntityUid>();
-
-        var predicates = new List<Func<EntityUid, bool>>();
-
-        // pick one command staff
-        predicates.Add(HasComp<CommandStaffComponent>);
-        // pick one security staff
-        predicates.Add(HasComp<SecurityStaffComponent>);
-
-        // add more predicates here
-
-        foreach (var predicate in predicates)
+        foreach (var target in ent.Comp.SacrificeTargets)
         {
-            var list = targets.Where(predicate).ToList();
+            RemoveSacrificeTarget(ent, target);
+        }
+
+        ent.Comp.SacrificeTargets.Clear();
+
+        var targets = GetHereticTargets(ent);
+        if (targets.Count == 0)
+            return;
+
+        var pickedTargets = new List<SacrificeTargetData>();
+
+        foreach (var (type, compType) in SacrificeTypes)
+        {
+            var list = targets.Where(x => HasComp(x, compType)).ToList();
 
             if (list.Count == 0)
                 continue;
@@ -427,54 +531,29 @@ public sealed partial class HereticSystem : SharedHereticSystem
             // pick and take
             var picked = _rand.Pick(list);
             targets.Remove(picked);
-            pickedTargets.Add(picked);
+            pickedTargets.Add(GetData(picked, type));
         }
 
         // add whatever more until satisfied
         for (var i = 0; i <= ent.Comp.MaxTargets - pickedTargets.Count; i++)
         {
-            if (targets.Count > 0)
-                pickedTargets.Add(_rand.PickAndTake(targets));
+            if (targets.Count == 0)
+                break;
+
+            var picked = _rand.PickAndTake(targets);
+            pickedTargets.Add(GetData(picked));
         }
 
-        // leave only unique entityuids
-        pickedTargets = pickedTargets.Distinct().ToList();
-
-        ent.Comp.SacrificeTargets = pickedTargets.Select(GetData).OfType<SacrificeTargetData>().ToList();
-        Dirty(ent); // update client
-
-        return;
-
-        bool IsSessionValid(ICommonSession session)
-        {
-            if (!HasComp<HumanoidProfileComponent>(session.AttachedEntity))
-                return false;
-
-            if (HasComp<GhoulComponent>(session.AttachedEntity.Value))
-                return false;
-
-            if (!_mind.TryGetMind(session.AttachedEntity.Value, out var mind, out _) ||
-                mind == ent.Owner || !_job.MindTryGetJobId(mind, out _))
-                return false;
-
-            return !HasComp<HereticComponent>(mind);
-        }
+        ent.Comp.SacrificeTargets = pickedTargets;
+        Dirty(ent);
+        HereticTargetsUpdated(ent);
     }
 
-    private SacrificeTargetData? GetData(EntityUid uid)
+    private SacrificeTargetData GetData(EntityUid uid, SacrificeTargetType type = SacrificeTargetType.None)
     {
-        if (!TryComp(uid, out HumanoidProfileComponent? humanoid))
-            return null;
-
-        if (!_mind.TryGetMind(uid, out var mind, out _) || !_job.MindTryGetJobId(mind, out var jobId) || jobId == null)
-            return null;
-
-        if (_profile.CreateProfile((uid, humanoid)) is not { } profile)
-            return null;
-
         var netEntity = GetNetEntity(uid);
 
-        return new SacrificeTargetData { Entity = netEntity, Profile = profile, Job = jobId.Value };
+        return new SacrificeTargetData { Entity = netEntity, Name = Name(uid), Type = type };
     }
 
     // notify the crew of how good the person is and play the cool sound :godo:
@@ -522,9 +601,6 @@ public sealed partial class HereticSystem : SharedHereticSystem
             }
         }
 
-        // Restore appearance if it was changed by envy knife
-        _disguise.RestoreAppearance(uid, false);
-
         var pathLoc = path.ToString().ToLower();
         var ascendSound =
             new SoundPathSpecifier($"/Audio/_Goobstation/Heretic/Ambience/Antag/Heretic/ascend_{pathLoc}.ogg");
@@ -533,6 +609,8 @@ public sealed partial class HereticSystem : SharedHereticSystem
             true,
             ascendSound,
             Color.Pink);
+
+        _rule.SpawnERTOnAscension();
     }
 
     [SubscribeLocalEvent]
@@ -544,7 +622,10 @@ public sealed partial class HereticSystem : SharedHereticSystem
         if (!ent.Comp.SideKnowledgeDrafts.TryGetValue(cat, out var amount))
             return;
 
-        var listings = _store.GetAvailableListings(args.User, ent, Comp<StoreComponent>(ent));
+        if (GetHereticStore(ent) is not { } store)
+            return;
+
+        var listings = _store.GetAvailableListings(args.User, store, store);
         foreach (var listing in listings)
         {
             if (listing == args.Data ||
@@ -558,21 +639,25 @@ public sealed partial class HereticSystem : SharedHereticSystem
         var newAmount = Math.Max(amount - 1, 0);
         ent.Comp.SideKnowledgeDrafts[cat] = newAmount;
         if (newAmount > 0)
-            UpdateHereticCostModifiers(ent.AsNullable(), cat, args.Data);
+            UpdateHereticCostModifiers(ent.AsNullable(), store, cat, args.Data);
     }
 
     public override void UpdateHereticCostModifiers(Entity<HereticComponent?> ent,
+        Entity<StoreComponent>? store = null,
         ProtoId<StoreCategoryPrototype>? category = null,
         ListingDataWithCostModifiers? except = null)
     {
-        base.UpdateHereticCostModifiers(ent, category, except);
+        base.UpdateHereticCostModifiers(ent, store, category, except);
 
         if (!Resolve(ent, ref ent.Comp))
             return;
 
-        var store = CompOrNull<StoreComponent>(ent) ?? _rule.InitializeStore(ent);
+        store ??= GetHereticStore(ent);
 
-        var allListings = _store.GetAvailableListings(ent, ent, store).ToList();
+        if (store == null)
+            return;
+
+        var allListings = _store.GetAvailableListings(ent, store.Value, store.Value).ToList();
 
         if (except is { } e)
             allListings.Remove(e);

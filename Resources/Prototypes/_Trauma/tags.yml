@@ -12,7 +12,16 @@
   id: AirlockAssembly # Used for airlock assemblies so that heretic void conduit can damage them
 
 - type: Tag
+  id: AnomalyCoreBluespace # Construction: teleport reactive armor
+
+- type: Tag
+  id: AnomalyCoreElectricity # Construction: tesla reactive armor
+
+- type: Tag
   id: AnvilTop # Construction: Anvil, added to AnvilTop after cooling it down
+
+- type: Tag
+  id: AnyGlassShard # Heretic rituals whitelist
 
 # Area whitelist tags for ambient music
 - type: Tag
@@ -33,10 +42,16 @@
 - type: Tag
   id: AreaMorgue
 
+- type: Tag
+  id: Apple
+
 ## B ##
 
 - type: Tag
   id: BloodVial
+
+- type: Tag
+  id: Bonfire # Heretic: ashen ritual ingredient
 
 - type: Tag
   id: BowImprovised # Construction: AltarConvertOrange, given to improvised shortbow, used to get Iradomini nullrod's altar
@@ -47,10 +62,10 @@
 - type: Tag
   id: Bracing # given to WeaponBracing, used to repair durability on a lot of weapons
 
-- type: Tag
-  id: Butt # Construction: MobButtBot
-
 ## C ##
+
+- type: Tag
+  id: BalloonMelon
 
 - type: Tag
   id: CartridgeGaussgun # Ammo whitelist: BaseMagazineGaussgun
@@ -68,13 +83,16 @@
   id: Cement # Construction: WetBrick
 
 - type: Tag
+  id: Chili
+
+- type: Tag
+  id: Chilly
+
+- type: Tag
   id: CircularSaw # Heretic: KnowledgeRitualHard
 
 - type: Tag
   id: CookedEgg # Construction: FoodMealFriedegg, FoodEggToast
-
-- type: Tag
-  id: CyberButt # Construction: MobButtBotCyber (currently unused)
 
 - type: Tag
   id: DataChip # Blueprint whitelist: RevMicroelectronicsAssembler
@@ -82,10 +100,16 @@
 ## D ##
 
 - type: Tag
+  id: ClearCorn
+
+- type: Tag
   id: DemonEssense
 
 - type: Tag
   id: DrillHead # for drills durability repair whitelist
+
+- type: Tag
+  id: DeliciousLookingApple
 
 - type: Tag
   id: Directional # for directional walls and windows, checked by experimental syndicate teleporter and heretic arena
@@ -114,12 +138,18 @@
   id: Ed209WeaponsControl
 
 - type: Tag
+  id: EggPlant
+
+- type: Tag
   id: EnchantingScroll # Enchanting ink's EnchantAdder whitelist
 
 - type: Tag
   id: EncryptionRevolutionary # Construction: RevTelesphere
 
 ## F ##
+
+- type: Tag
+  id: Fish # Ranching: SeaEgg
 
 - type: Tag
   id: Firebomb
@@ -148,6 +178,9 @@
 ## G ##
 
 - type: Tag
+  id: GrenadeIgnoreCosmicField # Heretic: cosmic fields will not defuse this grenade
+
+- type: Tag
   id: Gunpowder # Storage whitelist: GunpowderBottle
 
 - type: Tag
@@ -172,24 +205,29 @@
   id: MagazineTurret # Ammo whitelist: WeaponTurretRevolutionarySMG
 
 - type: Tag
+  id: MansusGraspAction # Heretic: whitelist for ritual rune to recharge mansus grasp when standing on it
+
+- type: Tag
+  id: LizardTail
+
+- type: Tag
   id: MetalContainer # Construction: MagazineGaussgunImprov
 
 ## M ##
 
 - type: Tag
-  id: MimeMask # Heretic: RitualEnvyKnife
-
-- type: Tag
   id: MimicToolbox # Emote: Tweak
 
-## O ##
-
-# :o nothing
+- type: Tag
+  id: MagicMushroom
 
 ## P ##
 
 - type: Tag
   id: PartCapacitor # Construction: WeaponGaussgunImprov
+
+- type: Tag
+  id: MethApple
 
 - type: Tag
   id: Pipebomb
@@ -206,6 +244,18 @@
   id: QMBoard # Construction: RevTechAnalyzer
 
 ## R ##
+
+- type: Tag
+  id: Peas
+
+- type: Tag
+  id: Peanut
+
+- type: Tag
+  id: Rag # Heretic: ritual ingredients
+
+- type: Tag
+  id: Raptor
 
 - type: Tag
   id: RCD # Construction: RevPrinter, not given to RPD so RCDComponent cant be used
@@ -236,6 +286,9 @@
 
 - type: Tag
   id: RitualBladeBlade # Heretic: infuses blades with mansus grasp
+
+- type: Tag
+  id: Rice
 
 - type: Tag
   id: RitualFeastOfOwls # Heretic: ritual that gets removed once you ascend or use feast of owls (TODO: just rename/use RitualAscension)
@@ -272,10 +325,22 @@
   id: T45ArmR # Construction: T45Armor
 
 - type: Tag
+  id: Sugar
+
+- type: Tag
+  id: SynthMeat
+
+- type: Tag
   id: T45ArmL
 
 - type: Tag
+  id: SteelWheat
+
+- type: Tag
   id: T45Chest
+
+- type: Tag
+  id: Tomato
 
 - type: Tag
   id: T45Helmet

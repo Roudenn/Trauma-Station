@@ -5,10 +5,10 @@ using Content.Trauma.Common.Language;
 // </Trauma>
 using System.Linq;
 using System.Text;
-using Content.Server.Speech.Prototypes;
 using Content.Shared.Chat;
-using Content.Shared.Ghost;
+using Content.Shared.Ghost.Components;
 using Content.Shared.Players;
+using Content.Shared.Speech.Prototypes;
 using Robust.Shared.Console;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
@@ -81,11 +81,10 @@ public sealed partial class ChatSystem
                 continue;
             var entHideChat = entRange == MessageRangeCheckResult.HideChat;
             // <Trauma> - completely different send logic and LOS check
-            if (session.AttachedEntity is not { Valid: true } playerEntity)
+            if (session.AttachedEntity is not { } listener)
                 continue;
             if (checkLOS && !data.Observer && !data.InLOS)
                 continue; // Some things don't go through walls, but they can go through windows!
-            EntityUid listener = session.AttachedEntity.Value;
 
             // Raises a event for the deaf component
             var ev = new ChatMessageOverrideInVoiceRangeEvent(source, name, language.ID, speech, colorOverride, obfuscated, obfuscatedWrappedMessage);
@@ -284,25 +283,7 @@ public sealed partial class ChatSystem
     {
     }
 
-    public string ObfuscateMessageReadability(string message, float chance = DefaultObfuscationFactor) // Trauma - made public, added default chance
-    {
-        var modifiedMessage = new StringBuilder(message);
-
-        for (var i = 0; i < message.Length; i++)
-        {
-            if (char.IsWhiteSpace((modifiedMessage[i])))
-            {
-                continue;
-            }
-
-            if (_random.Prob(1 - chance))
-            {
-                modifiedMessage[i] = '~';
-            }
-        }
-
-        return modifiedMessage.ToString();
-    }
+    // Trauma - moved ObfuscateMessageReadability to shared
 
     public string BuildGibberishString(IReadOnlyList<char> charOptions, int length)
     {

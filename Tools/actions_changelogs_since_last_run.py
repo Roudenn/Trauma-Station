@@ -1,12 +1,4 @@
 #!/usr/bin/env python3
-# SPDX-FileCopyrightText: 2023 Pieter-Jan Briers <pieterjan.briers+git@gmail.com>
-# SPDX-FileCopyrightText: 2023 SlamBamActionman <83650252+SlamBamActionman@users.noreply.github.com>
-# SPDX-FileCopyrightText: 2024 Aiden <aiden@djkraz.com>
-# SPDX-FileCopyrightText: 2024 Myra <vasilis@pikachu.systems>
-# SPDX-FileCopyrightText: 2024 metalgearsloth <31366439+metalgearsloth@users.noreply.github.com>
-# SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
-#
-# SPDX-License-Identifier: AGPL-3.0-or-later
 
 """
 Sends updates to a Discord webhook for new changelog entries since the last GitHub Actions publish run.
@@ -76,11 +68,11 @@ def get_most_recent_workflow(
     sess: requests.Session, github_repository: str, github_run: str
 ) -> Any:
     workflow_run = get_current_run(sess, github_repository, github_run)
-    past_runs = get_past_runs(sess, workflow_run)
-    for run in past_runs:
-        return run
-
-    raise RuntimeError("Could not find a previous successful workflow run")
+    # <Trauma> - sort it to fix dogshit github api change
+    past_runs = list(get_past_runs(sess, workflow_run))
+    past_runs.sort(key=lambda r: r["created_at"], reverse=True)
+    return past_runs[0]
+    # </Trauma>
 
 
 def get_current_run(
@@ -235,7 +227,8 @@ def changelog_entries_to_message_lines(entries: Iterable[ChangelogEntry]) -> lis
                 emoji = TYPES_TO_EMOJI.get(change["type"], "❓")
                 message = change["message"]
 
-                if "labels" in entry and EXPERIMENTAL_LABEL in entry["labels"]:
+                labels = entry.get("labels") or []
+                if EXPERIMENTAL_LABEL in labels:
                     emoji = f"{emoji}{EXPERIMENTAL_EMOJI}"
 
                 message_lines.append(create_change_line(emoji, message, url))

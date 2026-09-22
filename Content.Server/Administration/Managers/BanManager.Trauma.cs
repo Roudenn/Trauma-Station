@@ -114,9 +114,9 @@ public sealed partial class BanManager
         {
             desc.Append(_random.Pick(PermaBanNames));
         }
-        desc.Append("\n\n> Reason: *");
-        desc.Append(ban.Reason);
-        desc.Append("*\n");
+        desc.Append("\n\n> Reason: ");
+        var reason = ban.WebhookReason ?? ban.Reason;
+        desc.Append(reason.Trim().Replace("\n", "\n> "));
 
         var payload = new WebhookPayload
         {
@@ -141,7 +141,7 @@ public sealed partial class BanManager
     private string GetRoleNames(BanDef ban)
     {
         var names = new List<string>();
-        var jobs = new HashSet<string>();
+        var jobs = new List<string>();
         foreach (var role in ban.Roles!)
         {
             if (role.RoleType == DbTypeAntag)
@@ -153,11 +153,12 @@ public sealed partial class BanManager
             else
                 names.Add(role.RoleId); // who knows what it is
         }
+        var jobsPresent = new HashSet<string>(jobs); // want to keep it for e.g. command + sec department bans but not display them
 
         // coalesce jobs that make up a whole department to make it less spammy
         foreach (var department in _prototypeManager.EnumeratePrototypes<DepartmentPrototype>())
         {
-            if (!department.Roles.All(id => jobs.Contains(id)))
+            if (!department.Roles.All(id => jobsPresent.Contains(id)))
                 continue;
 
             foreach (var id in department.Roles)
@@ -182,18 +183,18 @@ public sealed partial class BanManager
     {
         string Format(string name, double n)
         {
-            var i = (int) Math.Floor(n);
+            var i = (int) Math.Round(n);
             var suffix = i != 1 ? "s" : "";
             return $"{i} {name}{suffix}";
         }
 
-        if (time.TotalDays >= 1)
+        if (time.TotalDays >= 0.5)
             return Format("day", time.TotalDays);
-        if (time.TotalHours >= 1)
+        if (time.TotalHours >= 0.5)
             return Format("hour", time.TotalHours);
-        if (time.TotalMinutes >= 1)
+        if (time.TotalMinutes >= 0.5)
             return Format("minute", time.TotalMinutes);
-        if (time.TotalSeconds >= 1)
+        if (time.TotalSeconds >= 0.5)
             return Format("second", time.TotalSeconds);
 
         // troll admin

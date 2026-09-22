@@ -15,8 +15,9 @@
   configuration:
     entity: PolymorphAshJaunt
     forced: true
-    duration: 7
+    duration: 6
     attachToGridOrMap: true
+    showPopup: false
     allowRepeatedMorphs: true
 
 - type: polymorph
@@ -409,6 +410,21 @@
   id: ShapeshiftFireSharkLock
   configuration:
     entity: MobGhoulFireSharkLock
+    transferName: true
+    transferDamage: true
+    revertOnCrit: true
+    revertOnDeath: true
+    revertConfirmationPopup: false
+    allowRepeatedMorphs: true
+    componentsToTransfer:
+    - component: LanguageKnowledge
+    - component: LanguageSpeaker
+    - component: Grammar
+
+- type: polymorph
+  id: ShapeshiftAshSpiritLock
+  configuration:
+    entity: MobGhoulAshSpiritLock
     transferName: true
     transferDamage: true
     revertOnCrit: true

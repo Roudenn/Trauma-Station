@@ -4,12 +4,11 @@ using Content.Server.Antag;
 using Content.Server.Chat.Systems;
 using Content.Server.Jittering;
 using Content.Server.Popups;
-using Content.Server.Speech.EntitySystems;
-using Content.Server.Stunnable;
 using Content.Shared.FixedPoint;
 using Content.Shared.Mind.Components;
 using Content.Shared.Popups;
 using Content.Shared.Speech.Components;
+using Content.Shared.Speech.EntitySystems;
 using Content.Shared.StatusEffectNew;
 using Content.Shared.Stunnable;
 using Content.Shared.Tag;
@@ -29,7 +28,7 @@ public sealed partial class FeastOfOwlsSystem : EntitySystem
     [Dependency] private AntagSelectionSystem _antag = default!;
     [Dependency] private JitteringSystem _jitter = default!;
     [Dependency] private StutteringSystem _stutter = default!;
-    [Dependency] private StunSystem _stun = default!;
+    [Dependency] private SharedStunSystem _stun = default!;
     [Dependency] private ChatSystem _chat = default!;
     [Dependency] private SharedAudioSystem _audio = default!;
     [Dependency] private HereticSystem _heretic = default!;
@@ -106,11 +105,7 @@ public sealed partial class FeastOfOwlsSystem : EntitySystem
 
             if (comp.CurrentStep + 1 < comp.Reward && !_stun.TryUpdateParalyzeDuration(uid, comp.ParalyzeTime))
             {
-                var dict = new Dictionary<string, FixedPoint2>()
-                {
-                    {SharedHereticSystem.Currency, comp.Reward - comp.CurrentStep}
-                };
-                _heretic.UpdateKnowledge(uid, dict, false, false, mindContainer);
+                _heretic.UpdateKnowledge(uid, new() { { SharedHereticSystem.Currency, comp.Reward - comp.CurrentStep } }, false, false, mindContainer);
                 RemCompDeferred(uid, comp);
                 continue;
             }

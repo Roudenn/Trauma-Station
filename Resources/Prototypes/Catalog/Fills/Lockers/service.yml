@@ -94,7 +94,7 @@
     children:
     - id: WetFloorSign
       amount: 3
-    - id: LightReplacer
+    - id: LightReplacerFilled
     - id: BoxLightMixed
     - id: Holoprojector
     - id: WireBrush
@@ -180,7 +180,7 @@
     - id: ClothingUniformOveralls
     - id: ClothingHeadHatTrucker
       prob: 0.3
-    # - id: GatfruitSeeds # Scammer
+    # - id: GatfruitSeeds # Trauma
     #   prob: 0.1
     # - id: FlyAmanitaSeeds
     #   prob: 0.5

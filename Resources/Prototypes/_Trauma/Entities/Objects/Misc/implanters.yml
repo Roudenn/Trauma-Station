@@ -1,18 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 - type: entity
-  parent: BaseImplantOnlyImplanterSyndi
-  id: HellRipImplanter
-  suffix: Hell Rip
-  components:
-  - type: Implanter
-    implant: HellRipImplant
-
-- type: entity
   parent: [ BaseFastDrawImplanter, BaseRevMajorContraband ]
   id: RevShieldRipper
   name: shield ripper
-  description: A device that quickly and painfully rips the mindshield out of someone, it can only be used one time.
+  description: A device that quickly and painfully rips the mindshield out of someone. It can only be used once.
   components:
   - type: Item
     sprite: _Trauma/Objects/Specific/Medical/shieldripper.rsi
@@ -43,7 +35,7 @@
       - Body
     currentMode: Draw
     drawTime: 1
-    implantTime: 999
+    extractOnly: true
     implanterSlot:
       name: Implant
       locked: True
@@ -84,13 +76,3 @@
         implantOnly:
           True: {state: broken}
           False: {state: implanter1}
-
-- type: entity
-  id: RadioImplanterRev
-  suffix: Revolutionary Radio
-  parent: [BaseImplantOnlyImplanter, BaseRevMajorContraband]
-  name: revolutionary radio implanter
-  description: This implanter grants access to the Revolutionary channel and the Head Revolutionary channel without a headset, use "j" to talk in head revolutionary.
-  components:
-  - type: Implanter
-    implant: RadioImplantRev

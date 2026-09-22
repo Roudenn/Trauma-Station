@@ -1,3 +1,6 @@
+// <Trauma>
+using Content.Shared.Eye.Blinding.Systems;
+// </Trauma>
 using Content.Shared.Administration.Logs;
 using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Reaction;
@@ -22,11 +25,26 @@ public sealed partial class SharedEntityEffectsSystem : EntitySystem, IEntityEff
     public override void Initialize()
     {
         SubscribeLocalEvent<ReactiveComponent, ReactionEntityEvent>(OnReactive);
+        SubscribeLocalEvent<EntityEffectOnMapInitComponent, MapInitEvent>(OnMapInit);
     }
 
     private void OnReactive(Entity<ReactiveComponent> entity, ref ReactionEntityEvent args)
     {
         var scale = entity.Comp.ScaleOverride ?? args.ReagentQuantity.Quantity.Float(); // Trauma - use ScaleOverride
+
+        // <Trauma> Prevent's reagent effects if proper eye protection.
+        if (args.Method == ReactionMethod.Eyes)
+        {
+            var ev = new GetEyeProtectionEvent()
+            {
+                Target = entity.Owner
+            };
+            RaiseLocalEvent(entity.Owner, ev);
+
+            if (ev.Protection > TimeSpan.Zero)
+                return;
+        }
+        // </Trauma>
 
         if (args.Reagent.ReactiveEffects != null && entity.Comp.ReactiveGroups != null
             && AllowedToReact(entity)) // Trauma
@@ -57,6 +75,11 @@ public sealed partial class SharedEntityEffectsSystem : EntitySystem, IEntityEff
                     ApplyEffects(entity, entry.Effects, scale);
             }
         }
+    }
+
+    private void OnMapInit(Entity<EntityEffectOnMapInitComponent> entity, ref MapInitEvent args)
+    {
+        ApplyEffects(entity, entity.Comp.Effects);
     }
 
     /// <inheritdoc cref="ApplyEffects(EntityUid,EntityEffect[],float,EntityUid?)"/>
