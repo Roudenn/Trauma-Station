@@ -60,6 +60,6 @@ public abstract class BaseValueSelectorTypeSerializer<TMain, TFrac>
             return GetRangeSelector(x, y);
         }
 
-        return (IBaseValueSelector<TMain, TFrac>) serializationManager.Read(typeof(IBaseValueSelector<TMain, TFrac>), node, context)!;
+        return serializationManager.Read<IBaseValueSelector<TMain, TFrac>>(node, context, notNullableOverride: true);
     }
 }
