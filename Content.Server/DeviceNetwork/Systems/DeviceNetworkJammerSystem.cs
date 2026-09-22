@@ -4,6 +4,7 @@ using Content.Trauma.Common.Heretic;
 using Content.Shared.DeviceNetwork.Components;
 using Content.Shared.DeviceNetwork.Events;
 using Content.Shared.DeviceNetwork.Systems;
+using Content.Trauma.Common.DeviceNetwork;
 using Robust.Server.GameObjects;
 
 namespace Content.Server.DeviceNetwork.Systems;
@@ -31,6 +32,14 @@ public sealed partial class DeviceNetworkJammerSystem : SharedDeviceNetworkJamme
         RaiseLocalEvent(xform.Comp.ParentUid, ref attemptEv);
         if (attemptEv.Cancelled)
             return;
+
+        if (xform.Comp.MapUid != null)
+        {
+            var mapEv = new MapPacketReceiveAttemptEvent();
+            RaiseLocalEvent(xform.Comp.MapUid.Value, ref mapEv);
+            if (mapEv.Cancelled)
+                return;
+        }
         // <Trauma>
 
         var query = EntityQueryEnumerator<DeviceNetworkJammerComponent, TransformComponent>();
