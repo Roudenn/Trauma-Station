@@ -27,7 +27,7 @@ public sealed class FloatSelectorTypeSerializer :
         ISerializationContext? context = null,
         ISerializationManager.InstantiationDelegate<FloatSelector>? instanceProvider = null)
     {
-        return (FloatSelector) ReadImpl(serializationManager, node, dependencies, hookCtx, context, instanceProvider);
+        return ReadImpl<FloatSelector>(serializationManager, node, dependencies, hookCtx, context, instanceProvider);
     }
 
     protected override IBaseValueSelector<float, float> GetConstantSelector(float constant)
