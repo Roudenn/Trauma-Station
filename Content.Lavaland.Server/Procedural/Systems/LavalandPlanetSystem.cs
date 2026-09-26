@@ -22,7 +22,7 @@ using Robust.Shared.Random;
 // ReSharper disable EnforceForeachStatementBraces
 namespace Content.Lavaland.Server.Procedural.Systems;
 
-public sealed partial class LavalandSystem : EntitySystem
+public sealed partial class LavalandPlanetSystem : EntitySystem
 {
     public bool LavalandEnabled = true;
 
@@ -41,25 +41,17 @@ public sealed partial class LavalandSystem : EntitySystem
     [Dependency] private SharedPhysicsSystem _physics = default!;
     [Dependency] private ShuttleSystem _shuttle = default!;
 
-    private EntityQuery<MapGridComponent> _gridQuery;
-    private EntityQuery<TransformComponent> _xformQuery;
-    private EntityQuery<FixturesComponent> _fixtureQuery;
+    [Dependency] private EntityQuery<MapGridComponent> _gridQuery = default!;
+    [Dependency] private EntityQuery<TransformComponent> _xformQuery = default!;
+    [Dependency] private EntityQuery<FixturesComponent> _fixtureQuery = default!;
 
     public override void Initialize()
     {
         base.Initialize();
-
-        SubscribeLocalEvent<LoadingMapsEvent>(OnLoadingMaps);
-        SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestart);
-        SubscribeLocalEvent<MobStateComponent, EntParentChangedMessage>(OnPlayerParentChange);
-
-        _gridQuery = GetEntityQuery<MapGridComponent>();
-        _xformQuery = GetEntityQuery<TransformComponent>();
-        _fixtureQuery = GetEntityQuery<FixturesComponent>();
-
         Subs.CVar(_config, LavalandCVars.LavalandEnabled, value => LavalandEnabled = value, true);
     }
 
+    [SubscribeLocalEvent]
     private void OnLoadingMaps(LoadingMapsEvent ev)
     {
         EnsurePreloaderMap();
@@ -72,6 +64,7 @@ public sealed partial class LavalandSystem : EntitySystem
         }
     }
 
+    [SubscribeLocalEvent]
     private void OnRoundRestart(RoundRestartCleanupEvent ev)
     {
         var ent = GetPreloaderEntity();
@@ -94,9 +87,7 @@ public sealed partial class LavalandSystem : EntitySystem
         _map.SetPaused(mapId, true);
     }
 
-    /// <summary>
-    /// Raised when an entity exits or enters a grid.
-    /// </summary>
+    [SubscribeLocalEvent]
     private void OnPlayerParentChange(Entity<MobStateComponent> ent, ref EntParentChangedMessage args)
     {
         if (TerminatingOrDeleted(ent.Owner))

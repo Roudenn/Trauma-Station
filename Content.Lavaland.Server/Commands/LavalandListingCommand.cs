@@ -20,7 +20,7 @@ public sealed partial class LavalandListingCommand : IConsoleCommand
 
     public void Execute(IConsoleShell shell, string argStr, string[] args)
     {
-        var lavalands = _ent.System<LavalandSystem>().GetLavalands();
+        var lavalands = _ent.System<LavalandPlanetSystem>().GetLavalands();
 
         foreach (var (owner, comp) in lavalands)
         {

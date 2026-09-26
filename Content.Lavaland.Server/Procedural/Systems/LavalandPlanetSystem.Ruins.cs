@@ -13,7 +13,7 @@ using Robust.Shared.Random;
 
 namespace Content.Lavaland.Server.Procedural.Systems;
 
-public sealed partial class LavalandSystem
+public sealed partial class LavalandPlanetSystem
 {
     private void SetupRuins(LavalandRuinPoolPrototype? pool, Entity<LavalandMapComponent> lavaland, Entity<LavalandPreloaderComponent> preloader)
     {

@@ -14,7 +14,7 @@ public sealed partial class LavalandMapComponent : Component
     public int Seed;
 
     [ViewVariables]
-    public ProtoId<LavalandMapPrototype>? PrototypeId;
+    public ProtoId<PlanetPrototype>? PrototypeId;
 
     /// <summary>
     /// Chunks in this area are always loaded
@@ -27,4 +27,10 @@ public sealed partial class LavalandMapComponent : Component
     /// </summary>
     [DataField("loadedChunks")]
     public HashSet<Vector2i> LoadedChunks = new();
+
+    [DataField]
+    public ProtoId<LavalandLayoutPrototype>? Layout;
+
+    [DataField]
+    public ProtoId<LavalandRuinPoolPrototype>? Ruins;
 }

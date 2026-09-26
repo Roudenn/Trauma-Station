@@ -1,0 +1,15 @@
+- type: planet
+  id: MaintRooms
+  name: lavaland-planet-name-maintrooms
+  mapLight: Black
+  biome: Empty
+  atmosphere:
+    volume: 2500
+    immutable: True
+    temperature: 293.15
+    moles:
+      Oxygen: 21.824879
+      Nitrogen: 82.10312
+  mapEffects:
+  - !type:MakeDunGen
+    dungeon: MaintRoomsDefault

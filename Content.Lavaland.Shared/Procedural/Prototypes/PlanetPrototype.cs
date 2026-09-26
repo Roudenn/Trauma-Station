@@ -9,15 +9,15 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Lavaland.Shared.Procedural.Prototypes;
 
 /// <summary>
-/// Contains information about Lavaland planet configuration.
+/// Contains information about a planet configuration.
 /// </summary>
 [Prototype]
-public sealed partial class LavalandPlanetPrototype : IPrototype, IInheritingPrototype
+public sealed partial class PlanetPrototype : IPrototype, IInheritingPrototype
 {
     [IdDataField]
     public string ID { get; private set; } = default!;
 
-    [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<LavalandPlanetPrototype>))]
+    [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<PlanetPrototype>))]
     public string[]? Parents { get; private set; }
 
     [NeverPushInheritance]
@@ -43,20 +43,13 @@ public sealed partial class LavalandPlanetPrototype : IPrototype, IInheritingPro
     public ProtoId<BiomeTemplatePrototype> BiomePrototype;
 
     [DataField("markers")]
-    public List<ProtoId<BiomeMarkerLayerPrototype>> OreLayers = new()
-    {
-        "OreIron",
-        "OreCoal",
-        "OreQuartz",
-        "OreGold",
-        "OreSilver",
-        "OrePlasma",
-        "OreUranium",
-        "BSCrystal",
-        "OreBananium",
-        "OreArtifactFragment",
-        "OreDiamond",
-    };
+    public List<ProtoId<BiomeMarkerLayerPrototype>> OreLayers = new();
+
+    /// <summary>
+    /// Effects to apply before the initialization stage.
+    /// </summary>
+    [DataField]
+    public EntityEffect[] StartupEffects = [];
 
     /// <summary>
     /// Entity effects to apply to the resulting map entity.

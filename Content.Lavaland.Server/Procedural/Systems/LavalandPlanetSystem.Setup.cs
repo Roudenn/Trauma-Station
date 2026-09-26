@@ -14,12 +14,12 @@ using Robust.Shared.Map;
 
 namespace Content.Lavaland.Server.Procedural.Systems;
 
-public sealed partial class LavalandSystem
+public sealed partial class LavalandPlanetSystem
 {
     [Dependency] private SharedEntityEffectsSystem _effects = default!;
 
     public bool SetupLavalandPlanet(
-        ProtoId<LavalandMapPrototype> mapProto,
+        ProtoId<PlanetPrototype> planetProto,
         out Entity<LavalandMapComponent>? lavaland,
         int? seed = null,
         Entity<LavalandPreloaderComponent>? preloader = null)
@@ -39,15 +39,18 @@ public sealed partial class LavalandSystem
             }
         }
 
-        var proto = ProtoMan.Index(mapProto);
-        var prototype = ProtoMan.Index(proto.Planet);
-        var layout = ProtoMan.Index(proto.Layout);
-        var pool = ProtoMan.Index(proto.Ruins);
+        var prototype = ProtoMan.Index(planetProto);
 
         // Basic setup.
         var lavalandMap = _map.CreateMap(out var lavalandMapId, runMapInit: false);
+
+        _effects.ApplyEffects(lavalandMap, prototype.StartupEffects);
+
         var mapComp = EnsureComp<LavalandMapComponent>(lavalandMap);
         lavaland = (lavalandMap, mapComp);
+
+        var layout = ProtoMan.Index(mapComp.Layout);
+        var pool = ProtoMan.Index(mapComp.Ruins);
 
         // If not specified already, create new seed
         seed ??= _random.Next();
@@ -93,7 +96,7 @@ public sealed partial class LavalandSystem
         return true;
     }
 
-    private void PlanetBasicSetup(EntityUid lavalandMap, LavalandPlanetPrototype prototype, int seed)
+    private void PlanetBasicSetup(EntityUid lavalandMap, PlanetPrototype prototype, int seed)
     {
         // Name
         _metaData.SetEntityName(lavalandMap, Loc.GetString(prototype.Name));

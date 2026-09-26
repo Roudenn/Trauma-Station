@@ -14,7 +14,7 @@ public sealed partial class GameMapPrototype
     /// Not protoid because its in lavaland.shared
     /// </summary>
     [DataField]
-    public List<string> Planets = new() { "Lavaland" };
+    public List<string> Planets = new() { "Lavaland", "MaintRooms" };
 
     /// <summary>
     /// The map pool's <c>RequiredEntities</c> that this map gets to leave out and still pass tests.

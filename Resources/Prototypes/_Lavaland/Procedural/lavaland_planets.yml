@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-- type: lavalandPlanet
-  id: LavalandPlanet
+- type: planet
+  id: Lavaland
   name: lavaland-planet-name-lavaland
   mapLight: "#f0a959"
   biome: LavaLand
@@ -28,6 +28,12 @@
   - OreDiamond
   - OreBSCrystal
   #- OreGibtonite # It's broken right now sadly because of how Gatherable works :(
+  startupEffects:
+  - !type:AddComponents
+    components:
+    - type: LavalandMap
+      layout: LavalandOutpost
+      ruins: LavalandRuins
   mapEffects:
   - !type:AddComponents
     components:

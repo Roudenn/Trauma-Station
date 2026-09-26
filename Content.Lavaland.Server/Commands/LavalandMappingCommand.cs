@@ -22,7 +22,7 @@ public sealed partial class LavalandMappingCommand : IConsoleCommand
 
     public void Execute(IConsoleShell shell, string argStr, string[] args)
     {
-        LavalandMapPrototype? lavalandProto;
+        PlanetPrototype? lavalandProto;
         int? lavalandSeed = null;
 
         switch (args.Length)
@@ -57,7 +57,7 @@ public sealed partial class LavalandMappingCommand : IConsoleCommand
                 shell.WriteLine(Help);
                 return;
         }
-        var lavalandSys = _entityManager.System<LavalandSystem>();
+        var lavalandSys = _entityManager.System<LavalandPlanetSystem>();
 
         if (lavalandSys.GetPreloaderEntity() == null)
             lavalandSys.EnsurePreloaderMap();
