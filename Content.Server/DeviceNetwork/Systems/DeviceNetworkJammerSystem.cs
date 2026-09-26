@@ -38,7 +38,10 @@ public sealed partial class DeviceNetworkJammerSystem : SharedDeviceNetworkJamme
             var mapEv = new MapPacketReceiveAttemptEvent();
             RaiseLocalEvent(xform.Comp.MapUid.Value, ref mapEv);
             if (mapEv.Cancelled)
+            {
+                ev.Cancelled = true;
                 return;
+            }
         }
         // <Trauma>
 

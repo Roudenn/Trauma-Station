@@ -13,3 +13,7 @@
   mapEffects:
   - !type:MakeDunGen
     dungeon: MaintRoomsDefault
+  - !type:AddComponents
+    components:
+    - type: DeviceNetworkSuppression
+    - type: GPSSuppression
