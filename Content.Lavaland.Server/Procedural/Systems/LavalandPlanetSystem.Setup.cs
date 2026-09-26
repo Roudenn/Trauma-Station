@@ -10,7 +10,6 @@ using Content.Shared.Gravity;
 using Content.Shared.Parallax.Biomes;
 using Content.Shared.Salvage;
 using Content.Shared.Shuttles.Components;
-using Robust.Shared.Map;
 
 namespace Content.Lavaland.Server.Procedural.Systems;
 
@@ -26,7 +25,7 @@ public sealed partial class LavalandPlanetSystem
     {
         lavaland = null;
 
-        if (!LavalandEnabled)
+        if (!PlanetsEnabled)
             return false;
 
         if (preloader == null)
@@ -49,30 +48,21 @@ public sealed partial class LavalandPlanetSystem
         var mapComp = EnsureComp<LavalandMapComponent>(lavalandMap);
         lavaland = (lavalandMap, mapComp);
 
-        var layout = ProtoMan.Index(mapComp.Layout);
-        var pool = ProtoMan.Index(mapComp.Ruins);
-
-        // If not specified already, create new seed
-        seed ??= _random.Next();
-
-        var lavalandPrototypeId = prototype.ID;
-
-        PlanetBasicSetup(lavalandMap, prototype, seed.Value);
-
-        // Ensure that it's paused
-        _map.SetPaused(lavalandMapId, true);
-
-        SetupLayout(lavalandMap, lavalandMapId, layout, out mapComp.SpawnedGrids);
-
         var loadBox = Box2.CentredAroundZero(new Vector2(prototype.RestrictedRange * 2, prototype.RestrictedRange * 2));
 
+        seed ??= _random.Next();
+
         mapComp.Seed = seed.Value;
-        mapComp.PrototypeId = lavalandPrototypeId;
+        mapComp.PrototypeId = planetProto;
         mapComp.LoadArea = loadBox;
 
         EnsureComp<BiomeOptimizeComponent>(lavalandMap).LoadArea = loadBox;
 
-        SetupRuins(pool, lavaland.Value, preloader.Value);
+        PlanetBasicSetup(lavalandMap, prototype, seed.Value);
+        _map.SetPaused(lavalandMapId, true);
+
+        var ev = new PlanetSetupEvent();
+        RaiseLocalEvent(lavalandMap, ref ev);
 
         // Hide all grids from the mass scanner.
         foreach (var grid in _map.GetAllGrids(lavalandMapId))
@@ -123,28 +113,5 @@ public sealed partial class LavalandPlanetSystem
         // Restricted Range
         var restricted = EnsureComp<RestrictedRangeComponent>(lavalandMap);
         restricted.Range = prototype.RestrictedRange;
-    }
-
-    private void SetupLayout(EntityUid lavaland, MapId lavalandMapId, LavalandLayoutPrototype? proto, out List<EntityUid> spawned)
-    {
-        spawned = new();
-
-        if (proto == null)
-            return; // nothing to spawn
-
-        foreach (var layout in proto.Layouts)
-        {
-            if (!_mapLoader.TryLoadGrid(lavalandMapId, layout.GridPath, out var result))
-            {
-                Log.Error($"Failed to load grid {layout.GridPath} on planet {ToPrettyString(lavaland)}!");
-                continue;
-            }
-
-            _transform.SetCoordinates(result.Value, new EntityCoordinates(lavaland, layout.Position));
-            _metaData.SetEntityName(result.Value, Loc.GetString(layout.Name));
-
-            Log.Debug($"Spawned {ToPrettyString(result.Value)} grid on planet {ToPrettyString(lavaland)}.");
-            spawned.Add(result.Value);
-        }
     }
 }

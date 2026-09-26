@@ -4,19 +4,12 @@ using Content.Lavaland.Server.Procedural.Components;
 using Content.Lavaland.Shared.CCVar;
 using Content.Lavaland.Shared.Procedural.Components;
 using Content.Server.Atmos.EntitySystems;
-using Content.Server.Decals;
 using Content.Server.GameTicking;
 using Content.Server.Parallax;
 using Content.Server.Shuttles.Systems;
 using Content.Shared.GameTicking;
 using Content.Shared.Mobs.Components;
-using Content.Shared.Maps;
 using Robust.Shared.Configuration;
-using Robust.Shared.EntitySerialization.Systems;
-using Robust.Shared.Map;
-using Robust.Shared.Map.Components;
-using Robust.Shared.Physics;
-using Robust.Shared.Physics.Systems;
 using Robust.Shared.Random;
 
 // ReSharper disable EnforceForeachStatementBraces
@@ -24,31 +17,20 @@ namespace Content.Lavaland.Server.Procedural.Systems;
 
 public sealed partial class LavalandPlanetSystem : EntitySystem
 {
-    public bool LavalandEnabled = true;
+    public bool PlanetsEnabled = true;
 
     [Dependency] private SharedMapSystem _map = default!;
-    [Dependency] private SharedTransformSystem _transform = default!;
-    [Dependency] private TileSystem _tile = default!;
-    [Dependency] private ITileDefinitionManager _tiledef = default!;
     [Dependency] private IRobustRandom _random = default!;
     [Dependency] private INetConfigurationManager _config = default!;
     [Dependency] private AtmosphereSystem _atmos = default!;
     [Dependency] private BiomeSystem _biome = default!;
-    [Dependency] private DecalSystem _decals = default!;
-    [Dependency] private EntityLookupSystem _lookup = default!;
     [Dependency] private MetaDataSystem _metaData = default!;
-    [Dependency] private MapLoaderSystem _mapLoader = default!;
-    [Dependency] private SharedPhysicsSystem _physics = default!;
     [Dependency] private ShuttleSystem _shuttle = default!;
-
-    [Dependency] private EntityQuery<MapGridComponent> _gridQuery = default!;
-    [Dependency] private EntityQuery<TransformComponent> _xformQuery = default!;
-    [Dependency] private EntityQuery<FixturesComponent> _fixtureQuery = default!;
 
     public override void Initialize()
     {
         base.Initialize();
-        Subs.CVar(_config, LavalandCVars.LavalandEnabled, value => LavalandEnabled = value, true);
+        Subs.CVar(_config, LavalandCVars.PlanetsEnabled, value => PlanetsEnabled = value, true);
     }
 
     [SubscribeLocalEvent]
@@ -78,7 +60,7 @@ public sealed partial class LavalandPlanetSystem : EntitySystem
     {
         // Already have a preloader?
         if (GetPreloaderEntity() != null
-            || !LavalandEnabled)
+            || !PlanetsEnabled)
             return;
 
         var mapUid = _map.CreateMap(out var mapId, false);

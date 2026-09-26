@@ -8,8 +8,8 @@ namespace Content.Lavaland.Shared.CCVar;
 public sealed partial class LavalandCVars
 {
     /// <summary>
-    ///     Should the Lavaland roundstart generation be enabled.
+    ///     Should planet roundstart generation be enabled.
     /// </summary>
-    public static readonly CVarDef<bool> LavalandEnabled =
+    public static readonly CVarDef<bool> PlanetsEnabled =
         CVarDef.Create("lavaland.enabled", true, CVar.SERVERONLY);
 }

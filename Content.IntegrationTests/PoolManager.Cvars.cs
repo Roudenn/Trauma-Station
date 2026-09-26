@@ -16,7 +16,7 @@ public static partial class PoolManager
     {
         // @formatter:off
         // <Trauma>
-        (LavalandCVars.LavalandEnabled.Name, "false"),
+        (LavalandCVars.PlanetsEnabled.Name, "false"),
         (TraumaCVars.DisablePathfinding.Name, "true"), // 5GB memory usage spike in some tests and potential deadlocking
         (TraumaCVars.DisableVisionEffects.Name, "true"), // they spawn entities a lot, similar to how audio entities which are ignored
         (TraumaCVars.StationTraitsEnabled.Name, "false"), // spawns game rules and tests dont like it

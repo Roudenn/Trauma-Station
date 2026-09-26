@@ -14,11 +14,11 @@ public sealed partial class LavalandMappingCommand : IConsoleCommand
     [Dependency] private IPrototypeManager _proto = default!;
     [Dependency] private IEntityManager _entityManager = default!;
 
-    public string Command => "mappinglavaland";
+    public string Command => "spawnplanet";
 
-    public string Description => "Loads lavaland world on a new map. Be careful, this can cause freezes on runtime!";
+    public string Description => $"Spawns a {nameof(PlanetPrototype)} with a specified ID. Be careful, this can cause freezes on runtime!";
 
-    public string Help => "mappinglavaland <prototype id> <seed (optional)>";
+    public string Help => "spawnplanet <prototype id> <seed (optional)>";
 
     public void Execute(IConsoleShell shell, string argStr, string[] args)
     {
@@ -28,20 +28,20 @@ public sealed partial class LavalandMappingCommand : IConsoleCommand
         switch (args.Length)
         {
             case 0:
-                shell.WriteLine(Loc.GetString("Enter Lavaland prototype ID as a first argument"));
+                shell.WriteLine(Loc.GetString($"Enter {nameof(PlanetPrototype)} ID as a first argument"));
                 shell.WriteLine(Help);
                 return;
             case 1:
                 if (!_proto.TryIndex(args[0], out lavalandProto))
                 {
-                    shell.WriteLine(Loc.GetString("Wrong lavaland prototype!"));
+                    shell.WriteLine(Loc.GetString($"Invalid {nameof(PlanetPrototype)}!"));
                     return;
                 }
                 break;
             case 2:
                 if (!_proto.TryIndex(args[0], out lavalandProto))
                 {
-                    shell.WriteLine(Loc.GetString("Wrong lavaland prototype!"));
+                    shell.WriteLine(Loc.GetString($"Invalid {nameof(PlanetPrototype)}!"));
                     return;
                 }
 
