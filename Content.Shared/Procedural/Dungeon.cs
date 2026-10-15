@@ -1,5 +1,3 @@
-using Content.Shared.Procedural.Features;
-
 namespace Content.Shared.Procedural;
 
 /// <summary>
@@ -26,8 +24,6 @@ public sealed class Dungeon
     public readonly HashSet<Vector2i> CorridorExteriorTiles = new();
 
     public readonly HashSet<Vector2i> Entrances = new();
-
-    public readonly FeatureContext FeatureContext = new();
 
     public IReadOnlySet<Vector2i> AllTiles => _allTiles;
 

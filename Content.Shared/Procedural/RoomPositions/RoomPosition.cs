@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
 using Content.Shared.Procedural.DungeonLayers;
-using Content.Shared.Procedural.Features;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 

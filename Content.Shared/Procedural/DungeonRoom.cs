@@ -11,6 +11,4 @@ public sealed record DungeonRoom(HashSet<Vector2i> Tiles, Vector2 Center, Box2i 
     /// Nodes adjacent to tiles, including the corners.
     /// </summary>
     public readonly HashSet<Vector2i> Exterior = Exterior;
-
-    public readonly List<string> Roles = new();
 }

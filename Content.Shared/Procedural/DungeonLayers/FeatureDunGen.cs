@@ -1,5 +1,4 @@
-﻿using Content.Shared.Procedural.Features;
-using Content.Shared.Procedural.RoomConditions;
+﻿using Content.Shared.Procedural.RoomConditions;
 using Content.Shared.Procedural.RoomPositions;
 using Content.Shared.ValueSelectors.Numbers;
 using Robust.Shared.Prototypes;
