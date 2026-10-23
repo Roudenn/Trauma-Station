@@ -12,6 +12,7 @@ using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Random;
 
+// ReSharper disable StaticMemberInGenericType
 namespace Content.Trauma.Shared.Procedural.Systems;
 
 /// <summary>
@@ -48,23 +49,58 @@ public sealed partial class FeatureSystem : EntitySystem
 
         rand ??= _random;
         ctx ??= new FeatureContext();
-        SpawnFeatureVisitor.Instance.Visit(table, new SpawnFeatureVisitor.Args(EntityManager, ProtoMan, rand, ctx, centerCoords));
+        SpawnFeatureVisitor<NoneFeatureContext>.Instance.Visit(
+            table,
+            new SpawnFeatureVisitor<NoneFeatureContext>.Args(
+                EntityManager,
+                ProtoMan,
+                rand,
+                ctx,
+                new NoneFeatureContext(),
+                centerCoords));
+    }
+
+    public void SpawnFeature<T>(
+        Feature? table,
+        EntityCoordinates centerCoords,
+        T customCtx,
+        IRobustRandom? rand = null,
+        FeatureContext? ctx = null) where T : IFeatureContext
+    {
+        if (table == null)
+            return;
+
+        if (!centerCoords.IsValid(EntityManager))
+            return;
+
+        rand ??= _random;
+        ctx ??= new FeatureContext();
+        SpawnFeatureVisitor<T>.Instance.Visit(
+            table,
+            new SpawnFeatureVisitor<T>.Args(
+                EntityManager,
+                ProtoMan,
+                rand,
+                ctx,
+                customCtx,
+                centerCoords));
     }
 }
 
 /// <summary>
 /// The implementation of <see cref="FeatureSystem.SpawnFeature(Feature?, EntityCoordinates, IRobustRandom?, FeatureContext?)"/>.
 /// </summary>
-sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args>
+sealed file class SpawnFeatureVisitor<T> : IFeatureVisitor<SpawnFeatureVisitor<T>.Args> where T : IFeatureContext
 {
     private SpawnFeatureVisitor() { }
-    public static readonly SpawnFeatureVisitor Instance = new();
+    public static readonly SpawnFeatureVisitor<T> Instance = new();
 
     public record struct Args(
         EntityManager EntMan,
         IPrototypeManager ProtoMan,
         IRobustRandom Rand,
         FeatureContext Context,
+        T CustomContext,
         EntityCoordinates CenterCoordinates,
         Feature? LastFeature = null,
         Angle? OverrideRotation = null
@@ -139,7 +175,7 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
     private static void SpawnEnt(EntProtoId entId, Feature feature, Args args)
     {
         var pos = args.CenterCoordinates
-            .Offset(feature.Offset.GetPosition(args.Rand));
+            .Offset(feature.Offset.GetPosition(args.Rand, args.CustomContext));
 
         if (feature.AlignTile)
             pos = pos.AlignWithClosestGridTile(entityManager: args.EntMan);
@@ -162,7 +198,7 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
 
         var mapSystem = args.EntMan.System<SharedMapSystem>();
         var pos = args.CenterCoordinates
-            .Offset(feature.Offset.GetPosition(args.Rand))
+            .Offset(feature.Offset.GetPosition(args.Rand, args.CustomContext))
             .AlignWithClosestGridTile(entityManager: args.EntMan);
         var tile = new Tile(args.ProtoMan.Index(feature.Tile).TileId);
 
@@ -178,7 +214,7 @@ sealed file class SpawnFeatureVisitor : IFeatureVisitor<SpawnFeatureVisitor.Args
     {
         var decalSystem = args.EntMan.System<SharedDecalSystem>();
         var pos = args.CenterCoordinates
-            .Offset(feature.Offset.GetPosition(args.Rand))
+            .Offset(feature.Offset.GetPosition(args.Rand, args.CustomContext))
             .AlignWithClosestGridTile(entityManager: args.EntMan);
 
         decalSystem.TryAddDecal(

@@ -1,6 +1,6 @@
-﻿using Content.Shared.Procedural.Features.Positions;
-using Content.Shared.ValueSelectors.Numbers;
+﻿using Content.Shared.ValueSelectors.Numbers;
 using Content.Trauma.Shared.Procedural.Features.Conditions;
+using Content.Trauma.Shared.Procedural.Features.Positions;
 using Robust.Shared.Map;
 
 namespace Content.Trauma.Shared.Procedural.Features;

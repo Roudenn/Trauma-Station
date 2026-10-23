@@ -1,10 +1,12 @@
-﻿using System.Numerics;
-using Robust.Shared.Random;
+﻿using Robust.Shared.Random;
 
-namespace Content.Shared.Procedural.Features.Positions;
+namespace Content.Trauma.Shared.Procedural.Features.Positions;
 
 [ImplicitDataDefinitionForInheritors]
 public abstract partial class FeaturePosition
 {
-    public abstract Vector2 GetPosition(IRobustRandom rand);
+    [DataField]
+    public float Weight = 1f;
+
+    public abstract Vector2 GetPosition<T>(IRobustRandom rand, T customContext) where T : IFeatureContext;
 }

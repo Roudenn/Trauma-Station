@@ -16,7 +16,7 @@ public struct Chunk
     /// <summary>
     /// Relative position of this chunk inside a region.
     /// </summary>
-    public Vector2i Position;
+    public Vector2 Position;
 
     /// <summary>
     /// Bounds of the chunk.

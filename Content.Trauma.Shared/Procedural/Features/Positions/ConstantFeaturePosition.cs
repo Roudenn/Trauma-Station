@@ -1,7 +1,6 @@
-﻿using System.Numerics;
-using Robust.Shared.Random;
+﻿using Robust.Shared.Random;
 
-namespace Content.Shared.Procedural.Features.Positions;
+namespace Content.Trauma.Shared.Procedural.Features.Positions;
 
 public sealed partial class ConstantFeaturePosition : FeaturePosition
 {
@@ -16,7 +15,7 @@ public sealed partial class ConstantFeaturePosition : FeaturePosition
         Offset = value;
     }
 
-    public override Vector2 GetPosition(IRobustRandom rand)
+    public override Vector2 GetPosition<T>(IRobustRandom rand, T customContext)
     {
         return Offset;
     }

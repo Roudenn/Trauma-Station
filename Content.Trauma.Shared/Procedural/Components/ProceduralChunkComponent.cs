@@ -1,4 +1,5 @@
 ﻿using Content.Shared.EntityEffects;
+using Content.Trauma.Shared.Procedural.Regions;
 
 namespace Content.Trauma.Shared.Procedural.Components;
 
@@ -14,4 +15,10 @@ public sealed partial class ProceduralChunkComponent : Component
     /// </summary>
     [DataField]
     public List<EntityEffect> Effects = new();
+
+    [DataField]
+    public EntityUid GridOwner;
+
+    [DataField]
+    public Chunk ChunkData;
 }

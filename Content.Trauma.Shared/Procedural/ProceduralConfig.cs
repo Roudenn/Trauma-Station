@@ -37,4 +37,10 @@ public sealed partial class ProceduralConfig
     /// </summary>
     [DataField]
     public List<EntityEffect> ChunkEffects = new();
+
+    /// <summary>
+    /// If specified, sets a starting seed for the random function used by the dungeon.
+    /// </summary>
+    [DataField]
+    public ulong? Seed;
 }

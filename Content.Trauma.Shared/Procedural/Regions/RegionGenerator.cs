@@ -17,9 +17,9 @@ public abstract partial class RegionGenerator
     [DataField]
     public float LoadRadius = 128f;
 
-    public IEnumerable<Vector2i> GetPositions(Vector2i gridCenter, Vector2 startPoint)
+    public IEnumerable<Vector2i> GetPositions(Vector2i gridCenter, Vector2 loaderPos)
     {
-        return GetPositionsInternal(gridCenter, Box2.CenteredAround(startPoint, new Vector2(LoadRadius * 2f)));
+        return GetPositionsInternal(gridCenter, Box2.CenteredAround(loaderPos, new Vector2(LoadRadius * 2f)));
     }
 
     protected abstract IEnumerable<Vector2i> GetPositionsInternal(Vector2i gridCenter, Box2 loadingArea);

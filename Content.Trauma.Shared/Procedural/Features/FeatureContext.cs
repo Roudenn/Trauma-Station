@@ -1,8 +1,25 @@
 ﻿using Content.Shared.Decals;
+using Content.Trauma.Shared.Procedural.Effects;
+using Content.Trauma.Shared.Procedural.Regions;
 using Robust.Shared.Map;
-using Robust.Shared.Prototypes;
 
 namespace Content.Trauma.Shared.Procedural.Features;
+
+/// <summary>
+/// Marker interface for different contexts in which a <see cref="Feature"/> can be spawned.
+/// </summary>
+public interface IFeatureContext;
+
+/// <summary>
+/// Dummy feature context with no information.
+/// </summary>
+public record struct NoneFeatureContext : IFeatureContext;
+
+/// <summary>
+/// <see cref="IFeatureContext"/> for features spawned by <see cref="ChunkFeature"/>.
+/// Contains the information about the chunk itself and a grid its on.
+/// </summary>
+public record struct ChunkFeatureContext(Chunk ChunkData) : IFeatureContext;
 
 public sealed class FeatureContext
 {

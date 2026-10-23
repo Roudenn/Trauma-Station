@@ -311,30 +311,6 @@ public sealed partial class DungeonJob : Job<List<Dungeon>>
             case WormCorridorDunGen worm:
                 await PostGen(worm, dungeons[^1], reservedTiles, random);
                 break;
-            // <Trauma>
-            case FeatureDunGen feature:
-                await PostGen(feature, dungeons[^1], reservedTiles, random);
-                break;
-            case FeatureFillDunGen featureFill:
-                await PostGen(featureFill, dungeons[^1], reservedTiles, random);
-                break;
-            case RoomRoleDunGen sizeRole:
-                await PostGen(sizeRole, dungeons[^1], reservedTiles, random);
-                break;
-            case ShapeRoomDunGen shapeRoom:
-                dungeons.Add(await GenerateShapeDunGen(position, shapeRoom, reservedTiles, random));
-                break;
-            case RandomRoomDunGen randomRoom:
-                dungeons.Add(await GenerateRandomDunGen(position, randomRoom, reservedTiles, random));
-                break;
-            case NestedDunGen nestedDungeon:
-                var layers = _prototype.Index(nestedDungeon.Proto).Layers;
-                foreach (var nestedLayer in layers)
-                {
-                    await RunLayer(dungeons, position, nestedLayer, reservedTiles, seed, random);
-                }
-                break;
-            // </Trauma>
             default:
                 throw new NotImplementedException();
         }

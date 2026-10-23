@@ -1,9 +1,13 @@
-﻿using Content.Trauma.Shared.Procedural.Components;
-using Content.Trauma.Shared.Procedural.Prototypes;
+﻿using System.Collections.Concurrent;
+using System.Threading;
+using Content.Trauma.Common.Utilities;
+using Content.Trauma.Shared.Procedural.Components;
 using Content.Trauma.Shared.Procedural.Regions;
-using JetBrains.Annotations;
 using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
 using Robust.Shared.Player;
+using Robust.Shared.Random;
+using Robust.Shared.Threading;
 using Robust.Shared.Timing;
 
 namespace Content.Trauma.Shared.Procedural.Systems;
@@ -16,20 +20,24 @@ namespace Content.Trauma.Shared.Procedural.Systems;
 /// Useful both for infinite dimensions and for large in-world structures.
 /// </para>
 /// </summary>
-public sealed partial class ProceduralSystem : EntitySystem, IChunkGeneratorVisitor<ProceduralSystem.Args>
+public sealed partial class ProceduralSystem : EntitySystem
 {
     [Dependency] private IGameTiming _timing = default!;
+    [Dependency] private IRobustRandom _random = default!;
+    [Dependency] private IParallelManager _parallel = default!;
     [Dependency] private SharedTransformSystem _xform = default!;
+    [Dependency] private SharedMapSystem _map = default!;
+
+    [Dependency] private EntityQuery<ProceduralGridComponent> _proceduralGridQuery;
+
+    private GenerateRegionsJob _regionsJob;
 
     /// <summary>
     /// Dictionary cache for all loading areas on all maps.
     /// </summary>
     private readonly Dictionary<MapId, List<Box2>> _loadAreasCache = new();
 
-    /// <summary>
-    /// A priority queue for all chunks. Priority is the distance from the nearest player to the chunk.
-    /// </summary>
-    private readonly PriorityQueue<Chunk, float> _loadQueue = new();
+    private readonly HashSet<Vector2i> _regionPosCache = new();
 
     /// <summary>
     /// Maximum time that can be spent on procedural loading.
@@ -38,12 +46,36 @@ public sealed partial class ProceduralSystem : EntitySystem, IChunkGeneratorVisi
 
     private const float DefaultLoadingArea = 16f;
 
+    private ThreadLocal<ProceduralRegionVisitor> _regionVisitors = new();
+
+    public override void Initialize()
+    {
+        base.Initialize();
+        _regionVisitors = new ThreadLocal<ProceduralRegionVisitor>(() => new ProceduralRegionVisitor());
+        _regionsJob = new GenerateRegionsJob { Visitors = _regionVisitors };
+    }
+
+    public override void Shutdown()
+    {
+        base.Shutdown();
+        _regionVisitors.Dispose();
+    }
+
+    // TODO PROCEDURAL FUTURE:
+    // - Add support for chunk unloading
+    // - Reduce the real loading radius to somewhat bigger than the interaction range, and load the rest client-only
+    // (requires predicted spawning V2 or even a specific engine PR to allow that)
+    // - Optimizations for tile spawning
+    // Currently there are too many entities and tile changes made at once which are server-only,
+    // then networks everything one-by-one. Instead it's better to send the seed and generate everything on the client deterministically.
+    // This is a fundamental flaw that makes procedural generation very slow.
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
 
-        // TODO consider not recalculating the chunks that have to be loaded
-        // and instead somehow update an already existing queue instead
+        // TODO PROCEDURAL:
+        // Consider not recalculating the chunks that have to be loaded
+        // This requires a deep rethinking and reorganization of the code below
 
         // Find all players on all maps and get their center positions and loading areas.
         _loadAreasCache.Clear();
@@ -66,33 +98,79 @@ public sealed partial class ProceduralSystem : EntitySystem, IChunkGeneratorVisi
         }
 
         // Get all regions and chunks that have to be generated based on which areas are currently loaded.
-        var gridQuery = EntityQueryEnumerator<ProceduralGridComponent, TransformComponent>();
-        while (gridQuery.MoveNext(out var gridUid, out var gridComp, out var gridXform))
-        {
-            gridComp.Config.RegionGenerator.GetPositions(Vector2i.Zero, );
-        }
-
-        // First the region layouts are generated in parallel.
-        // They are necessary before we can get to generating actual chunks.
-
         var startTime = _timing.RealTime;
-        while (_loadQueue.Count > 0)
+        var gridQuery = EntityQueryEnumerator<ProceduralGridComponent, MapGridComponent, TransformComponent>();
+        while (gridQuery.MoveNext(out var gridUid, out var gridComp, out var mapGridComp, out var gridXform))
         {
-            // Drop loading chunks when out of time.
-            if (_timing.RealTime - startTime > _maxChunkProcessTime)
-                return;
+            if (!_loadAreasCache.TryGetValue(gridXform.MapID, out var loaders))
+                continue; // No active loaders on the map
+
+            // Generate the regions that must be available before chunks can be generated.
+            _regionPosCache.Clear();
+
+            foreach (var box in loaders)
+            {
+                _regionPosCache.UnionWith(gridComp.Config.RegionGenerator.GetPositions(Vector2i.Zero, box.Center));
+            }
+
+            if (_regionPosCache.Count == 0)
+                continue;
+
+            _regionsJob.Generator = gridComp.Config.ChunkGenerator;
+            _parallel.ProcessNow(_regionsJob, _regionPosCache.Count);
+
+            // TODO region effects
+
+            // Generate chunks
+            foreach (var (regionIndices, region) in gridComp.Regions)
+            {
+                foreach (var chunk in region.Chunks)
+                {
+                    // Drop the task when out of time.
+                    if (_timing.RealTime - startTime > _maxChunkProcessTime)
+                        return;
+
+                    var chunkBox = Box2.CenteredAround(
+                        _map.GridTileToWorldPos(gridUid, mapGridComp, regionIndices) + chunk.Position,
+                        chunk.Bounds.Size);
+                    bool doLoad = false;
+                    foreach (var loadBox in loaders)
+                    {
+                        if (loadBox.Intersects(chunkBox))
+                            doLoad = true;
+                    }
+
+                    if (!doLoad)
+                        continue;
+
+                    var pos = _map.GridTileToLocal(gridUid, mapGridComp, region.GridIndices).Offset(chunk.Position);
+                    var chunkEnt = Spawn(null, pos);
+                    var chunkComp = EnsureComp<ProceduralChunkComponent>(chunkEnt);
+                    chunkComp.GridOwner = gridUid;
+                    chunkComp.ChunkData = chunk;
+
+
+                }
+            }
         }
     }
 
-    [PublicAPI]
-    public void EnsureProceduralGrid(EntityUid grid, ProtoId<ProceduralConfigPrototype> config)
+    private record struct GenerateRegionsJob() : IParallelRobustJob
     {
-        EnsureProceduralGrid(grid, ProtoMan.Index(config).Config);
-    }
+        public ChunkGenerator Generator = default!;
+        public DeterministicRandom Random = default!;
+        public Vector2i[] Positions = default!;
+        public ConcurrentDictionary<Vector2i, Region> Result = default!;
+        public ThreadLocal<ProceduralRegionVisitor> Visitors = default!;
 
-    [PublicAPI]
-    public void EnsureProceduralGrid(EntityUid grid, ProceduralConfig config)
-    {
+        public int BatchSize => 1;
 
+        public void Execute(int index)
+        {
+            Visitors.Value ??= new ProceduralRegionVisitor();
+            var pos = Positions[index];
+            var region = Generator.Accept(Visitors.Value, new ProceduralRegionVisitor.Args(Random, pos));
+            Result.TryAdd(pos, region);
+        }
     }
 }

@@ -1,7 +1,6 @@
-﻿using System.Numerics;
-using Robust.Shared.Random;
+﻿using Robust.Shared.Random;
 
-namespace Content.Shared.Procedural.Features.Positions;
+namespace Content.Trauma.Shared.Procedural.Features.Positions;
 
 public sealed partial class RangeFeaturePosition : FeaturePosition
 {
@@ -11,7 +10,7 @@ public sealed partial class RangeFeaturePosition : FeaturePosition
     [DataField]
     public Vector2 MaxPos;
 
-    public override Vector2 GetPosition(IRobustRandom rand)
+    public override Vector2 GetPosition<T>(IRobustRandom rand, T customContext)
     {
         return new Vector2(rand.NextFloat(MinPos.X, MaxPos.X), rand.NextFloat(MinPos.Y, MaxPos.Y));
     }
