@@ -31,7 +31,21 @@ public sealed class ProceduralRegionVisitor : IChunkGeneratorVisitor<ProceduralR
             chunks[i] = new Chunk();
         }
 
-        return new Region(chunks, args.GridIndices);
+        return new Region(chunks, generator.AreaSize, args.GridIndices);
+    }
+
+    Region IChunkGeneratorVisitor<Args>.VisitBoxGenerator(BoxChunkGenerator generator, Args args)
+    {
+        var chunkCount = generator.RegionSize.X * generator.RegionSize.Y;
+        var chunks = new Chunk[chunkCount];
+        for (int i = 0; i < chunkCount; i++)
+        {
+            chunks[i] = new Chunk();
+        }
+
+        return new Region(chunks,
+            (generator.ChunkDimensions + new Vector2i(generator.Steps, generator.Steps)) * generator.RegionSize,
+            args.GridIndices);
     }
 
     /// <summary>

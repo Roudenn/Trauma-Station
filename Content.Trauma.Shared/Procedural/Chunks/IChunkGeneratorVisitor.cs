@@ -15,4 +15,10 @@ public interface IChunkGeneratorVisitor<in TArgs>
     /// </summary>
     [PublicAPI]
     Region VisitBSPGenerator(BSPChunkGenerator generator, TArgs args);
+
+    /// <summary>
+    /// Visit an <see cref="BoxChunkGenerator"/>.
+    /// </summary>
+    [PublicAPI]
+    Region VisitBoxGenerator(BoxChunkGenerator generator, TArgs args);
 }
