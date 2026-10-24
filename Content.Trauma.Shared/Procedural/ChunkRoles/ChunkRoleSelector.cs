@@ -7,6 +7,9 @@
 [ImplicitDataDefinitionForInheritors]
 public abstract partial class ChunkRoleSelector
 {
+    [DataField]
+    public float Weight;
+
     [Access(Other = AccessPermissions.Execute)]
     public abstract IEnumerable<ProtoId<ChunkRolePrototype>> Accept<TArgs>(IChunkRoleSelectorVisitor<TArgs> visitor, TArgs args);
 }

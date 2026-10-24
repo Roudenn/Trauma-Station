@@ -11,8 +11,12 @@ public sealed partial class SizeChunkRoleSelector : ChunkRoleSelector
     /// Dictionary of chunk sizes and corresponding chunk roles.
     /// If a chunk's dimensions are equal to or lower than an entry, it assigns the corresponding role.
     /// </summary>
+    /// <remarks>
+    /// The vectors are compared by their length.
+    /// This means that the vectors don't depend on X and Y ordering for each pair.
+    /// </remarks>
     [DataField(required: true)]
-    public Dictionary<Vector2i, ProtoId<ChunkRolePrototype>> SizeDict;
+    public Dictionary<Vector2i, ChunkRoleSelector> SizeDict;
 
     public override IEnumerable<ProtoId<ChunkRolePrototype>> Accept<TArgs>(IChunkRoleSelectorVisitor<TArgs> visitor, TArgs args)
         => visitor.VisitSizeSelector(this, args);
