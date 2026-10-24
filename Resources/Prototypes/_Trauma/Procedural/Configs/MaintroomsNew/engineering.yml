@@ -1,0 +1,18 @@
+- type: entityEffect
+  id: MaintroomsEngineering
+  layers:
+  - !type:ChunkFeature
+    feature:
+      id: MaintenanceEngineeringLootRow
+    rolls: 1, 2
+    position: !type:ChunkSideFeaturePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+      - Center
+    requireAll: false
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceEngineering

@@ -5,6 +5,8 @@
 /// </summary>
 public sealed partial class SingleChunkRoleSelector : ChunkRoleSelector
 {
+    public const string RoleFieldName = "role";
+
     [DataField(required: true)]
     public ProtoId<ChunkRolePrototype> Role;
 

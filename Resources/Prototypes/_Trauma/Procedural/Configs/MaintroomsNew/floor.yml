@@ -1,0 +1,61 @@
+- type: entityEffect
+  id: MaintroomsFloor
+  effects:
+  - !type:ChunkFeatureFill
+    feature:
+      id: MaintenanceFloor
+    requireAll: false
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenance
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceGenerator
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceBotany
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceOutpost
+  - !type:ChunkFeatureFill
+    feature:
+      id: MaintenanceBlackFloor
+    requireAll: false
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceEngineering
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceAtmos
+    - !type:ChunkRoleCondition
+      role: RoomMaintenancePrison
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceScience
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceOffice
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceMedical
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceKitchen
+  - !type:ChunkFeatureFill
+    feature:
+      id: MaintenanceWoodFloor
+    requireAll: false
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceLibrary
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceBar
+  - !type:ChunkFeatureFill
+    feature:
+      id: MaintenanceDormFloor
+    requireAll: false
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceDorm
+  - !type:ChunkFeature
+    feature:
+      id: MaintenanceDormCarpet
+    position: !type:ChunkSideFeaturePosition
+      availableSides:
+      - Center
+    requireAll: false
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceDorm

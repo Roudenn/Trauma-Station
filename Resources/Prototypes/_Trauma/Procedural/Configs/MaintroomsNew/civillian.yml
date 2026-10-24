@@ -1,0 +1,106 @@
+- type: entityEffect
+  id: MaintroomsCivillian
+  layers:
+  - !type:NestedDunGen
+    proto: MaintroomsLibrary
+  - !type:NestedDunGen
+    proto: MaintroomsDorms
+  - !type:NestedDunGen
+    proto: MaintroomsOffice
+  - !type:ChunkFeature
+    feature:
+      id: OfficeDecoration
+    rolls: 1, 4
+    position: !type:ChunkSideFeaturePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+      - TopLeft
+      - TopRight
+      - BottomLeft
+      - BottomRight
+
+- type: entityEffect
+  id: MaintroomsLibrary
+  layers:
+  - !type:ChunkFeature
+    feature:
+      id: BookshelvesLine
+    rolls: 1, 2
+    position: !type:RoomRandomPosition
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceLibrary
+  - !type:ChunkFeature
+    feature:
+      id: ReadingTable
+    position: !type:RoomRandomPosition
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceLibrary
+
+# Dorms for living
+- type: entityEffect
+  id: MaintroomsDorms
+  layers:
+  - !type:ChunkFeature
+    feature:
+      id: MaintenanceDormClosets
+    position: !type:ChunkSideFeaturePosition
+      availableSides:
+      - TopRight
+      - BottomRight
+      - Right
+    requireAll: false
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceDorm
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceOffice
+  - !type:ChunkFeature
+    feature:
+      id: MaintenanceDormBed
+    position: !type:ChunkSideFeaturePosition
+      availableSides:
+      - Center
+      - TopLeft
+      - Left
+      - BottomLeft
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceDorm
+  - !type:ChunkFeature
+    feature:
+      id: MaintenanceDormLight
+    position: !type:ChunkSideFeaturePosition
+      availableSides:
+      - Center
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceDorm
+
+# Office rooms with consoles, papers, faxes and stuff
+- type: entityEffect
+  id: MaintroomsOffice
+  layers:
+  - !type:ChunkFeature
+    feature:
+      id: TableLine
+    position: !type:ChunkSideFeaturePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceOffice
+  - !type:ChunkFeature
+    feature:
+      id: ComputerLine
+    position: !type:RoomRandomPosition
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceOffice

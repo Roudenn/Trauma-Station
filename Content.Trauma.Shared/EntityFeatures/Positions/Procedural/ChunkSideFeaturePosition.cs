@@ -1,9 +1,9 @@
 ﻿using Content.Trauma.Shared.EntityFeatures.Contexts;
 using Robust.Shared.Random;
 
-namespace Content.Trauma.Shared.EntityFeatures.Positions;
+namespace Content.Trauma.Shared.EntityFeatures.Positions.Procedural;
 
-public sealed partial class ChunkFeaturePosition : FeaturePosition
+public sealed partial class ChunkSideFeaturePosition : FeaturePosition
 {
     [DataField]
     public RoomSides? Side;
@@ -39,7 +39,7 @@ public sealed partial class ChunkFeaturePosition : FeaturePosition
             case RoomSides.BottomRight:
                 return room.BottomRight;
             case RoomSides.None:
-                DebugTools.Assert($"Tried to get coordinates of a {nameof(ChunkFeaturePosition)} when the side wasn't specified.");
+                DebugTools.Assert($"Tried to get coordinates of a {nameof(ChunkSideFeaturePosition)} when the side wasn't specified.");
                 return room.Center;
             default:
                 throw new ArgumentOutOfRangeException();

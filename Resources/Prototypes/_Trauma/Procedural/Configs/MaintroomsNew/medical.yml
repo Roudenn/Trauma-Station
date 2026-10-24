@@ -1,0 +1,57 @@
+- type: entityEffect
+  id: MaintroomsMedical
+  layers:
+  - !type:ChunkFeature
+    feature: !type:GroupFeature
+      children:
+      - id: MaintenanceMedicalChemistry
+      - id: MaintenanceSurgeryOperatingTable
+    position: !type:ChunkSideFeaturePosition
+      availableSides:
+      - Center
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceMedical
+  - !type:ChunkFeature
+    feature:
+      id: MaintenanceMedicalLockers
+    position: !type:ChunkSideFeaturePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceMedical
+  - !type:ChunkFeature
+    feature:
+      id: MaintenanceMedicalBeds
+    position: !type:ChunkSideFeaturePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceMedical
+  - !type:ChunkFeature
+    feature:
+      id: MaintenanceMedicalLoot
+    position: !type:ChunkSideFeaturePosition
+      availableSides:
+      - Top
+      - Bottom
+      - Left
+      - Right
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceMedical
+  - !type:ChunkFeature
+    feature:
+      id: MaintenanceMedicalDrain
+    position: !type:RoomRandomPosition
+    conditions:
+    - !type:ChunkRoleCondition
+      role: RoomMaintenanceMedical

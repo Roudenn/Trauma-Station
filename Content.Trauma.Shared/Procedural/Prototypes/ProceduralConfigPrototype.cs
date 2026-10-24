@@ -9,6 +9,6 @@ public sealed partial class ProceduralConfigPrototype : IPrototype
     [IdDataField]
     public string ID { get; private set; } = default!;
 
-    [DataField(required: true)]
+    [DataField, IncludeDataField]
     public ProceduralConfig Config;
 }

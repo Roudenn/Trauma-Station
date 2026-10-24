@@ -20,6 +20,12 @@ public sealed partial class ChunkBoundaryWalls : EntityEffectBase<ChunkBoundaryW
     public EntityTableSelector Table;
 
     /// <summary>
+    /// Entity table for corner walls.
+    /// </summary>
+    [DataField]
+    public EntityTableSelector? CornerTable;
+
+    /// <summary>
     /// How much to enlarge the original chunk boundaries.
     /// </summary>
     [DataField]

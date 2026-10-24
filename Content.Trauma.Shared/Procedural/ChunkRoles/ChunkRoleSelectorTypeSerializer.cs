@@ -14,10 +14,10 @@ public sealed class ChunkRoleSelectorTypeSerializer :
         IDependencyCollection dependencies,
         ISerializationContext? context = null)
     {
-        if (node.Has(nameof(NestedChunkRoleSelector.Id)))
+        if (node.Has(NestedChunkRoleSelector.IdFieldName))
             return serializationManager.ValidateNode<NestedChunkRoleSelector>(node, context);
 
-        if (node.Has(nameof(SingleChunkRoleSelector.Role)))
+        if (node.Has(SingleChunkRoleSelector.RoleFieldName))
             return serializationManager.ValidateNode<SingleChunkRoleSelector>(node, context);
 
         return new ErrorNode(node, "Custom validation not supported! Please specify the type manually!");
@@ -30,10 +30,10 @@ public sealed class ChunkRoleSelectorTypeSerializer :
         ISerializationContext? context = null,
         ISerializationManager.InstantiationDelegate<ChunkRoleSelector>? instanceProvider = null)
     {
-        if (node.Has(nameof(NestedChunkRoleSelector.Id)))
+        if (node.Has(NestedChunkRoleSelector.IdFieldName))
             return serializationManager.Read<NestedChunkRoleSelector>(node, context, notNullableOverride: true);
 
-        if (node.Has(nameof(SingleChunkRoleSelector.Role)))
+        if (node.Has(SingleChunkRoleSelector.RoleFieldName))
             return serializationManager.Read<SingleChunkRoleSelector>(node, context, notNullableOverride: true);
 
         return serializationManager.Read<ChunkRoleSelector>(node, context, notNullableOverride: true);

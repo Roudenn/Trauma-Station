@@ -30,13 +30,20 @@ public sealed partial class ProceduralConfig
     /// when the config is first applied.
     /// </summary>
     [DataField]
-    public List<EntityEffect> GridEffects = new();
+    public ProtoId<EntityEffectPrototype>? GridEffects;
+
+    /// <summary>
+    /// Effects applied to the region entity with a <see cref="ProceduralRegionComponent"/>
+    /// when the region is first generated.
+    /// </summary>
+    [DataField]
+    public ProtoId<EntityEffectPrototype>? RegionEffects;
 
     /// <summary>
     /// Effects applied to every chunk entity with a <see cref="ProceduralChunkComponent"/> when they are loaded.
     /// </summary>
     [DataField]
-    public List<EntityEffect> ChunkEffects = new();
+    public ProtoId<EntityEffectPrototype>? ChunkEffects;
 
     /// <summary>
     /// If specified, sets a starting seed for the random function used by the dungeon.

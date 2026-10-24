@@ -5,6 +5,8 @@
 /// </summary>
 public sealed partial class NestedChunkRoleSelector : ChunkRoleSelector
 {
+    public const string IdFieldName = "id";
+
     [DataField(required: true)]
     public ProtoId<ChunkRoleSelectorPrototype> Id;
 

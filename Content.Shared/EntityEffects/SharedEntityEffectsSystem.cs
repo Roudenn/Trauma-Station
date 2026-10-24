@@ -145,8 +145,18 @@ public sealed partial class SharedEntityEffectsSystem : EntitySystem, IEntityEff
                 return false;
 
         // See if conditions apply
-        if (!_condition.TryConditions(target, effect.Conditions, sourceEnt: user)) // Trauma - pass user
-            return false;
+        // <Trauma> - added RequireAll if statement
+        if (effect.RequireAll)
+        {
+            if (!_condition.TryConditions(target, effect.Conditions, sourceEnt: user)) // Trauma - pass user
+                return false;
+        }
+        else
+        {
+            if (!_condition.TryAnyCondition(target, effect.Conditions, sourceEnt: user))
+                return false;
+        }
+        // </Trauma>
 
         ApplyEffect(target, effect, scale, user,
             predicted: predicted); // Trauma

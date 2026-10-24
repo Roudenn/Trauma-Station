@@ -12,4 +12,11 @@ public abstract partial class EntityEffect
     /// </summary>
     [DataField]
     public bool ScaleProbability;
+
+    /// <summary>
+    /// If false, will apply the effect when at least one condition passes.
+    /// If the <see cref="Conditions"/> field is null, the effect will never be applied.
+    /// </summary>
+    [DataField]
+    public bool RequireAll = true;
 }
