@@ -15,6 +15,8 @@ public sealed class ProceduralRoleSelectorVisitor : IChunkRoleSelectorVisitor<Pr
 
     private Vector2i[] _sizeCache = [];
 
+    public IEnumerable<ProtoId<ChunkRolePrototype>> Visit(ChunkRoleSelector selector, Args args) => selector.Accept(this, args);
+
     public IEnumerable<ProtoId<ChunkRolePrototype>> VisitSizeSelector(SizeChunkRoleSelector selector, Args args)
     {
         var size = args.Chunk.Bounds.Size;
@@ -74,7 +76,10 @@ public sealed class ProceduralRoleSelectorVisitor : IChunkRoleSelectorVisitor<Pr
             _allCache.AddRange(child.Accept(this, args));
         }
 
-        return _allCache;
+        foreach (var role in _allCache)
+        {
+            yield return role;
+        }
     }
 
     public IEnumerable<ProtoId<ChunkRolePrototype>> VisitGroupSelector(GroupChunkRoleSelector selector, Args args)

@@ -1,6 +1,4 @@
-﻿using Content.Trauma.Shared.Procedural.Features;
-
-namespace Content.Trauma.Shared.Procedural.Regions;
+﻿namespace Content.Trauma.Shared.Procedural.Regions;
 
 /// <summary>
 /// Chunks are pre-calculated data about which <see cref="Feature"/>s to spawn in bounds of their area.
@@ -11,15 +9,4 @@ namespace Content.Trauma.Shared.Procedural.Regions;
 /// To prevent major lag spikes when going through a procedural grid keep your chunk size small.
 /// </para>
 /// </summary>
-public struct Chunk
-{
-    /// <summary>
-    /// Relative position of this chunk inside a region.
-    /// </summary>
-    public Vector2 Position;
-
-    /// <summary>
-    /// Bounds of the chunk.
-    /// </summary>
-    public Box2i Bounds;
-}
+public record struct Chunk(Vector2i Position, Box2i Bounds, EntityUid Owner);
