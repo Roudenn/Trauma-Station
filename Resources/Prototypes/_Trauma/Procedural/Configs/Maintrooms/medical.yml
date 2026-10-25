@@ -1,57 +1,57 @@
-- type: dungeonLayers
+- type: entityEffect
   id: MaintroomsMedical
-  layers:
-  - !type:FeatureDunGen
+  effects:
+  - !type:ChunkFeature
     feature: !type:GroupFeature
       children:
       - id: MaintenanceMedicalChemistry
       - id: MaintenanceSurgeryOperatingTable
-    position: !type:RoomSidePosition
+    position: !type:ChunkSideFeaturePosition
       availableSides:
       - Center
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceMedical
-  - !type:FeatureDunGen
+  - !type:ChunkFeature
     feature:
       id: MaintenanceMedicalLockers
-    position: !type:RoomSidePosition
+    position: !type:ChunkSideFeaturePosition
       availableSides:
       - Top
       - Bottom
       - Left
       - Right
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceMedical
-  - !type:FeatureDunGen
+  - !type:ChunkFeature
     feature:
       id: MaintenanceMedicalBeds
-    position: !type:RoomSidePosition
+    position: !type:ChunkSideFeaturePosition
       availableSides:
       - Top
       - Bottom
       - Left
       - Right
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceMedical
-  - !type:FeatureDunGen
+  - !type:ChunkFeature
     feature:
       id: MaintenanceMedicalLoot
-    position: !type:RoomSidePosition
+    position: !type:ChunkSideFeaturePosition
       availableSides:
       - Top
       - Bottom
       - Left
       - Right
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceMedical
-  - !type:FeatureDunGen
+  - !type:ChunkFeature
     feature:
       id: MaintenanceMedicalDrain
-    position: !type:RoomRandomPosition
+    position: !type:ChunkRandomFeaturePosition
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceMedical

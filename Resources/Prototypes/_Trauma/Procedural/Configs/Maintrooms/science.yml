@@ -1,50 +1,50 @@
-- type: dungeonLayers
+- type: entityEffect
   id: MaintroomsScience
-  layers:
-  - !type:FeatureDunGen
+  effects:
+  - !type:ChunkFeature
     feature: !type:GroupFeature
       children:
       - id: MaintenanceScienceAnomalyLoot
       - id: MaintenanceScienceArtifactAnalyzer
-    position: !type:RoomSidePosition
+    position: !type:ChunkSideFeaturePosition
       availableSides:
       - Center
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceScience
-  - !type:FeatureDunGen
+  - !type:ChunkFeature
     feature:
       id: MaintenanceScienceConsole
-    position: !type:RoomSidePosition
+    position: !type:ChunkSideFeaturePosition
       availableSides:
       - Top
       - Bottom
       - Left
       - Right
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceScience
-  - !type:FeatureDunGen
+  - !type:ChunkFeature
     feature:
       id: MaintenanceScienceLathe
-    position: !type:RoomSidePosition
+    position: !type:ChunkSideFeaturePosition
       availableSides:
       - Top
       - Bottom
       - Left
       - Right
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceScience
-  - !type:FeatureDunGen
+  - !type:ChunkFeature
     feature:
       id: MaintenanceScienceResources
-    position: !type:RoomSidePosition
+    position: !type:ChunkSideFeaturePosition
       availableSides:
       - Top
       - Bottom
       - Left
       - Right
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceScience

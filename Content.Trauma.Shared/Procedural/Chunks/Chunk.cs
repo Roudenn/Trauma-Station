@@ -9,4 +9,8 @@
 /// To prevent major lag spikes when going through a procedural grid keep your chunk size small.
 /// </para>
 /// </summary>
-public record struct Chunk(Vector2i Position, Box2i Bounds, EntityUid Owner);
+public record struct Chunk(
+    Vector2i Position,
+    Box2i Bounds,
+    Box2 GridBounds,
+    EntityUid Owner);

@@ -1,17 +1,17 @@
-- type: dungeonLayers
+- type: entityEffect
   id: MaintroomsCivillian
-  layers:
+  effects:
   - !type:NestedDunGen
     proto: MaintroomsLibrary
   - !type:NestedDunGen
     proto: MaintroomsDorms
   - !type:NestedDunGen
     proto: MaintroomsOffice
-  - !type:FeatureDunGen
+  - !type:ChunkFeature
     feature:
       id: OfficeDecoration
     rolls: 1, 4
-    position: !type:RoomSidePosition
+    position: !type:ChunkSideFeaturePosition
       availableSides:
       - Top
       - Bottom
@@ -22,85 +22,85 @@
       - BottomLeft
       - BottomRight
 
-- type: dungeonLayers
+- type: entityEffect
   id: MaintroomsLibrary
-  layers:
-  - !type:FeatureDunGen
+  effects:
+  - !type:ChunkFeature
     feature:
       id: BookshelvesLine
     rolls: 1, 2
-    position: !type:RoomRandomPosition
+    position: !type:ChunkRandomFeaturePosition
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceLibrary
-  - !type:FeatureDunGen
+  - !type:ChunkFeature
     feature:
       id: ReadingTable
-    position: !type:RoomRandomPosition
+    position: !type:ChunkRandomFeaturePosition
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceLibrary
 
 # Dorms for living
-- type: dungeonLayers
+- type: entityEffect
   id: MaintroomsDorms
-  layers:
-  - !type:FeatureDunGen
+  effects:
+  - !type:ChunkFeature
     feature:
       id: MaintenanceDormClosets
-    position: !type:RoomSidePosition
+    position: !type:ChunkSideFeaturePosition
       availableSides:
       - TopRight
       - BottomRight
       - Right
     requireAll: false
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceDorm
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceOffice
-  - !type:FeatureDunGen
+  - !type:ChunkFeature
     feature:
       id: MaintenanceDormBed
-    position: !type:RoomSidePosition
+    position: !type:ChunkSideFeaturePosition
       availableSides:
       - Center
       - TopLeft
       - Left
       - BottomLeft
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceDorm
-  - !type:FeatureDunGen
+  - !type:ChunkFeature
     feature:
       id: MaintenanceDormLight
-    position: !type:RoomSidePosition
+    position: !type:ChunkSideFeaturePosition
       availableSides:
       - Center
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceDorm
 
 # Office rooms with consoles, papers, faxes and stuff
-- type: dungeonLayers
+- type: entityEffect
   id: MaintroomsOffice
-  layers:
-  - !type:FeatureDunGen
+  effects:
+  - !type:ChunkFeature
     feature:
       id: TableLine
-    position: !type:RoomSidePosition
+    position: !type:ChunkSideFeaturePosition
       availableSides:
       - Top
       - Bottom
       - Left
       - Right
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceOffice
-  - !type:FeatureDunGen
+  - !type:ChunkFeature
     feature:
       id: ComputerLine
-    position: !type:RoomRandomPosition
+    position: !type:ChunkRandomFeaturePosition
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceOffice

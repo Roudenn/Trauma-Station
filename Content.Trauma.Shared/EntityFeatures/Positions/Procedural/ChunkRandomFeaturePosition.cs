@@ -13,7 +13,7 @@ public sealed partial class ChunkRandomFeaturePosition : FeaturePosition
         if (customContext is not ChunkFeatureContext chunkCtx)
             return Vector2.Zero;
 
-        var room = chunkCtx.ChunkData.Bounds;
-        return
+        var room = chunkCtx.ChunkData.GridBounds;
+        return rand.NextVector2Box(room.Left, room.Bottom, room.Right, room.Top);
     }
 }

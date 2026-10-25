@@ -1,18 +1,18 @@
-- type: dungeonLayers
+- type: entityEffect
   id: MaintroomsMaintenance
-  layers:
+  effects:
   # Lights are shared for all rooms
-  - !type:FeatureDunGen
+  - !type:ChunkFeature
     feature:
       id: MaintenanceLight
       obstruct: false
       prob: 0.8
-    position: !type:RoomRandomPosition
-  - !type:FeatureDunGen
+    position: !type:ChunkRandomFeaturePosition
+  - !type:ChunkFeature
     feature:
       id: MaintenanceClosetLootRow
     rolls: 1, 2
-    position: !type:RoomSidePosition
+    position: !type:ChunkSideFeaturePosition
       availableSides:
       - Top
       - Bottom
@@ -20,16 +20,16 @@
       - Right
     requireAll: false
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenance
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceGenerator
-  - !type:FeatureDunGen
+  - !type:ChunkFeature
     feature:
       id: MaintenanceGenerator
-    position: !type:RoomSidePosition
+    position: !type:ChunkSideFeaturePosition
       availableSides:
       - Center
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceGenerator

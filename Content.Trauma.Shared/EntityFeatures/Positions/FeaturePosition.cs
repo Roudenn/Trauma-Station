@@ -1,9 +1,10 @@
 ﻿using Content.Trauma.Shared.EntityFeatures.Contexts;
+using JetBrains.Annotations;
 using Robust.Shared.Random;
 
 namespace Content.Trauma.Shared.EntityFeatures.Positions;
 
-[ImplicitDataDefinitionForInheritors]
+[ImplicitDataDefinitionForInheritors, UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
 public abstract partial class FeaturePosition
 {
     [DataField]

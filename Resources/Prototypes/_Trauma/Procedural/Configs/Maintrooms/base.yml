@@ -1,82 +1,84 @@
-# The core config of the Maintrooms which combines other nested configs.
-- type: dungeonConfig
-  id: MaintRoomsDefault
-  layers:
-  - !type:ShapeRoomDunGen
+- type: proceduralConfig
+  id: Maintrooms
+  chunkGenerator:
+    !type:BSPChunkGenerator
     areaSize: 150,150
-    tile: Plating
     minRoomWidth: 5
     minRoomHeight: 5
-    cutProb: 0.1 # Prefer more tunnels to large rooms
-    outerWall: WallPlastitaniumIndestructible # there is no escape from the brig maintenance
-    entranceCount: 2, 4
-  # Assign roles to rooms based on their size
-  - !type:NestedDunGen
-    proto: MaintroomsRoles
-  # Walls, entrances and shared wallmounts
-  - !type:RoomEntranceDunGen
-    tile: FloorSteel
-    contents: MaintenanceAirlock
-  - !type:BoundaryWallDunGen
-    wall: WallSolid
-    cornerWall: WallReinforced
+    cutProb: 0.1
+  regionGenerator: !type:SingleRegionGenerator # TODO PROCEDURAL add support for infinite regions
+  regionEffects: MaintroomsRegionEffects
+  chunkEffects: MaintroomsChunkEffects
+
+- type: entityEffect
+  id: MaintroomsRegionEffects
+  effects:
+  - !type:RegionAssignRoles
+    selector: !type:GroupChunkRoleSelector
+      children:
+      - id: RoomMaintenance
+        weight: 0.9
+      - !type:SizeChunkRoleSelector
+        weight: 0.1
+        sizeDict:
+          3,3: !type:GroupChunkRoleSelector
+            children:
+            - id: RoomMaintenanceArcade
+            - id: RoomMaintenanceAtmos
+            - id: RoomMaintenanceBotany
+            - id: RoomMaintenanceDorm
+            - id: RoomMaintenanceEngineering
+            - id: RoomMaintenanceKitchen
+            - id: RoomMaintenanceMedical
+            - id: RoomMaintenancePrison
+            - id: RoomMaintenanceSecurity
+            - id: RoomMaintenanceGenerator
+            - id: RoomMaintenanceOutpost
+              weight: 0.2
+          5,5: !type:GroupChunkRoleSelector
+            children:
+            - id: RoomMaintenanceLibrary
+              weight: 2
+            - id: RoomMaintenanceOffice
+              weight: 2
+            - id: RoomMaintenanceScience
+            - id: RoomMaintenanceBar
+            - id: RoomMaintenanceFirelockAnomaly
+              weight: 0.1
+  - !type:RegionTileFill
     tile: Plating
-  - !type:WallMountDunGen
-    contents: MaintenanceWalls
-    tile: Plating
-  # Room contents, sorted by departments & their loot importance
-  - !type:NestedDunGen
+
+- type: entityEffect
+  id: MaintroomsChunkEffects
+  effects:
+  - !type:ChunkBoundaryWalls
+    table:
+      id: WallSolid
+  - !type:NestedEffect
     proto: MaintroomsMaintenance # Default maintenance halls
-  - !type:NestedDunGen
+  - !type:NestedEffect
     proto: MaintroomsAnomalies # Extremely rare room anomalies with weird stuff
-  - !type:NestedDunGen
+  - !type:NestedEffect
     proto: MaintroomsEngineering # Engineering storage rooms
-  - !type:NestedDunGen
+  - !type:NestedEffect
     proto: MaintroomsMedical # Surgery, chemistry, and storage rooms
-  - !type:NestedDunGen
+  - !type:NestedEffect
     proto: MaintroomsScience # Artifact rooms and anomaly research rooms
-  - !type:NestedDunGen
+  - !type:NestedEffect
     proto: MaintroomsSecurity # Prison cells & control points
-  - !type:NestedDunGen
+  - !type:NestedEffect
     proto: MaintroomsCargo # Cargo storage rooms
-  - !type:NestedDunGen
+  - !type:NestedEffect
     proto: MaintroomsService # Bars, kitchens, botanies
-  - !type:NestedDunGen
+  - !type:NestedEffect
     proto: MaintroomsCivillian # Public places like libraries, dorms, etc.
   # Additional loot added to some rooms
-  - !type:NestedDunGen
+  - !type:NestedEffect
     proto: MaintroomsSalvageLoot # Scrap and rare materials usually found on salvage wrecks
-  - !type:NestedDunGen
+  - !type:NestedEffect
     proto: MaintroomsTrash # Random trash that appears literally everywhere
-  - !type:NestedDunGen
+  - !type:NestedEffect
     proto: MaintroomsStructures # Random obstacles in the middle of maintenance rooms
   # Tiles & decals for every role type (added at the very end to not mess up generation algorithms)
-  - !type:NestedDunGen
+  - !type:NestedEffect
     proto: MaintroomsFloor
-  # TODO auto cabling is very bad for performance because of how node groups work
-  #- !type:AutoCablingDunGen
-  #  entity: CableApcExtension
-  #- !type:AutoCablingDunGen
-  #  entity: CableMV
-  #  nodeGroup: MVPower
-  #- !type:AutoCablingDunGen
-  #  entity: CableHV
-  #  nodeGroup: HVPower
-
-- type: entityTable
-  id: MaintenanceAirlock
-  table: !type:AllSelector
-    children:
-    - id: AirlockMaintAlwaysPowered
-    - id: Firelock
-      prob: 0.5
-
-- type: entityTable
-  id: MaintenanceWalls
-  table: !type:GroupSelector
-    children:
-    - id: RandomPosterAny
-    - id: ExtinguisherCabinetFilled
-      prob: 0.1
-    - id: RandomPainting
-      prob: 0.01

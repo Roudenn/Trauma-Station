@@ -1,61 +1,61 @@
-- type: dungeonLayers
+- type: entityEffect
   id: MaintroomsFloor
-  layers:
-  - !type:FeatureFillDunGen
+  effects:
+  - !type:ChunkFeatureFill
     feature:
       id: MaintenanceFloor
     requireAll: false
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenance
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceGenerator
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceBotany
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceOutpost
-  - !type:FeatureFillDunGen
+  - !type:ChunkFeatureFill
     feature:
       id: MaintenanceBlackFloor
     requireAll: false
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceEngineering
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceAtmos
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenancePrison
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceScience
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceOffice
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceMedical
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceKitchen
-  - !type:FeatureFillDunGen
+  - !type:ChunkFeatureFill
     feature:
       id: MaintenanceWoodFloor
     requireAll: false
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceLibrary
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceBar
-  - !type:FeatureFillDunGen
+  - !type:ChunkFeatureFill
     feature:
       id: MaintenanceDormFloor
     requireAll: false
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceDorm
-  - !type:FeatureDunGen
+  - !type:ChunkFeature
     feature:
       id: MaintenanceDormCarpet
-    position: !type:RoomSidePosition
+    position: !type:ChunkSideFeaturePosition
       availableSides:
       - Center
     requireAll: false
     conditions:
-    - !type:RoomRoleCondition
+    - !type:ChunkRoleCondition
       role: RoomMaintenanceDorm
