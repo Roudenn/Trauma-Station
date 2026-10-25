@@ -7,17 +7,17 @@
       id: MaintenanceLight
       obstruct: false
       prob: 0.8
-    position: !type:ChunkRandomFeaturePosition
+      offset: !type:ChunkRandomFeaturePosition
   - !type:ChunkFeature
     feature:
       id: MaintenanceClosetLootRow
-    rolls: 1, 2
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - Top
-      - Bottom
-      - Left
-      - Right
+      rolls: 1, 2
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - Top
+        - Bottom
+        - Left
+        - Right
     requireAll: false
     conditions:
     - !type:ChunkRoleCondition
@@ -27,9 +27,9 @@
   - !type:ChunkFeature
     feature:
       id: MaintenanceGenerator
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - Center
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - Center
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceGenerator

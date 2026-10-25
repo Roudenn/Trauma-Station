@@ -1,26 +1,26 @@
 - type: entityEffect
   id: MaintroomsCivillian
   effects:
-  - !type:NestedDunGen
+  - !type:NestedEffect
     proto: MaintroomsLibrary
-  - !type:NestedDunGen
+  - !type:NestedEffect
     proto: MaintroomsDorms
-  - !type:NestedDunGen
+  - !type:NestedEffect
     proto: MaintroomsOffice
   - !type:ChunkFeature
     feature:
       id: OfficeDecoration
-    rolls: 1, 4
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - Top
-      - Bottom
-      - Left
-      - Right
-      - TopLeft
-      - TopRight
-      - BottomLeft
-      - BottomRight
+      rolls: 1, 4
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - Top
+        - Bottom
+        - Left
+        - Right
+        - TopLeft
+        - TopRight
+        - BottomLeft
+        - BottomRight
 
 - type: entityEffect
   id: MaintroomsLibrary
@@ -28,15 +28,15 @@
   - !type:ChunkFeature
     feature:
       id: BookshelvesLine
-    rolls: 1, 2
-    position: !type:ChunkRandomFeaturePosition
+      rolls: 1, 2
+      offset: !type:ChunkRandomFeaturePosition
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceLibrary
   - !type:ChunkFeature
     feature:
       id: ReadingTable
-    position: !type:ChunkRandomFeaturePosition
+      offset: !type:ChunkRandomFeaturePosition
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceLibrary
@@ -48,11 +48,11 @@
   - !type:ChunkFeature
     feature:
       id: MaintenanceDormClosets
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - TopRight
-      - BottomRight
-      - Right
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - TopRight
+        - BottomRight
+        - Right
     requireAll: false
     conditions:
     - !type:ChunkRoleCondition
@@ -62,21 +62,21 @@
   - !type:ChunkFeature
     feature:
       id: MaintenanceDormBed
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - Center
-      - TopLeft
-      - Left
-      - BottomLeft
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - Center
+        - TopLeft
+        - Left
+        - BottomLeft
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceDorm
   - !type:ChunkFeature
     feature:
       id: MaintenanceDormLight
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - Center
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - Center
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceDorm
@@ -88,19 +88,19 @@
   - !type:ChunkFeature
     feature:
       id: TableLine
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - Top
-      - Bottom
-      - Left
-      - Right
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - Top
+        - Bottom
+        - Left
+        - Right
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceOffice
   - !type:ChunkFeature
     feature:
       id: ComputerLine
-    position: !type:ChunkRandomFeaturePosition
+      offset: !type:ChunkRandomFeaturePosition
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceOffice

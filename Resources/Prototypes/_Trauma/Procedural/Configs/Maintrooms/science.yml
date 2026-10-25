@@ -3,48 +3,48 @@
   effects:
   - !type:ChunkFeature
     feature: !type:GroupFeature
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - Center
       children:
       - id: MaintenanceScienceAnomalyLoot
       - id: MaintenanceScienceArtifactAnalyzer
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - Center
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceScience
   - !type:ChunkFeature
     feature:
       id: MaintenanceScienceConsole
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - Top
-      - Bottom
-      - Left
-      - Right
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - Top
+        - Bottom
+        - Left
+        - Right
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceScience
   - !type:ChunkFeature
     feature:
       id: MaintenanceScienceLathe
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - Top
-      - Bottom
-      - Left
-      - Right
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - Top
+        - Bottom
+        - Left
+        - Right
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceScience
   - !type:ChunkFeature
     feature:
       id: MaintenanceScienceResources
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - Top
-      - Bottom
-      - Left
-      - Right
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - Top
+        - Bottom
+        - Left
+        - Right
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceScience

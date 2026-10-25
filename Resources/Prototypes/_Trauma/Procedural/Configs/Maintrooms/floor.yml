@@ -52,9 +52,9 @@
   - !type:ChunkFeature
     feature:
       id: MaintenanceDormCarpet
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - Center
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - Center
     requireAll: false
     conditions:
     - !type:ChunkRoleCondition

@@ -9,7 +9,7 @@ namespace Content.Trauma.Shared.EntityFeatures.Conditions;
 public sealed partial class TileFeatureCondition : FeatureCondition
 {
     [DataField(required: true)]
-    public readonly HashSet<ProtoId<ContentTileDefinition>> Tiles = new();
+    public HashSet<ProtoId<ContentTileDefinition>> Tiles = new();
 
     protected override bool EvaluateImplementation(Feature root,
         EntityCoordinates position,

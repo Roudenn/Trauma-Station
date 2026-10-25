@@ -1,0 +1,50 @@
+- type: chunkRole
+  id: RoomMaintenance
+
+- type: chunkRole
+  id: RoomMaintenanceArcade
+
+- type: chunkRole
+  id: RoomMaintenanceAtmos
+
+- type: chunkRole
+  id: RoomMaintenanceBotany
+
+- type: chunkRole
+  id: RoomMaintenanceDorm
+
+- type: chunkRole
+  id: RoomMaintenanceEngineering
+
+- type: chunkRole
+  id: RoomMaintenanceKitchen
+
+- type: chunkRole
+  id: RoomMaintenanceMedical
+
+- type: chunkRole
+  id: RoomMaintenancePrison
+
+- type: chunkRole
+  id: RoomMaintenanceSecurity
+
+- type: chunkRole
+  id: RoomMaintenanceGenerator
+
+- type: chunkRole
+  id: RoomMaintenanceOutpost
+
+- type: chunkRole
+  id: RoomMaintenanceLibrary
+
+- type: chunkRole
+  id: RoomMaintenanceOffice
+
+- type: chunkRole
+  id: RoomMaintenanceScience
+
+- type: chunkRole
+  id: RoomMaintenanceBar
+
+- type: chunkRole
+  id: RoomMaintenanceFirelockAnomaly

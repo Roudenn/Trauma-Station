@@ -15,7 +15,7 @@ public abstract partial class FeatureCondition
     /// If true, inverts the result of the condition.
     /// </summary>
     [DataField]
-    public readonly bool Invert;
+    public bool Invert;
 
     /// <summary>
     /// Evaluates a condition for a given context.

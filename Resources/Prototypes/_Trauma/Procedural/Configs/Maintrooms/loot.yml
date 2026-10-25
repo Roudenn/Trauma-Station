@@ -2,74 +2,82 @@
   id: MaintroomsSalvageLoot
   effects:
   - !type:ChunkFeature
-    rolls: !type:ChunkScaleValueSelector
-      scale: 0.1
-      selector: !type:BinomialNumberSelector
-        trials: 10
-        chance: 0.33
     feature:
-      offset: -0.5,-0.5,0.5,0.5
       table: SalvageScrapSpawnerCommon
+      offset:
+        combine:
+        - -0.5,-0.5,0.5,0.5
+        - !type:ChunkRandomFeaturePosition
+      rolls: !type:ChunkScaleValueSelector
+        scale: 0.1
+        selector: !type:BinomialNumberSelector
+          trials: 10
+          chance: 0.33
   - !type:ChunkFeature
-    position: !type:ChunkRandomFeaturePosition
-    rolls: !type:ChunkScaleValueSelector
-      scale: 0.06
-      selector: !type:BinomialNumberSelector
-        trials: 8
-        chance: 0.33
     feature:
-      offset: -0.5,-0.5,0.5,0.5
       table: SalvageScrapSpawnerValuable
+      rolls: !type:ChunkScaleValueSelector
+        scale: 0.06
+        selector: !type:BinomialNumberSelector
+          trials: 8
+          chance: 0.33
+      offset:
+        combine:
+        - -0.5,-0.5,0.5,0.5
+        - !type:ChunkRandomFeaturePosition
 
 - type: entityEffect
   id: MaintroomsTrash
   effects:
   - !type:ChunkFeature
-    rolls: !type:ChunkScaleValueSelector
-      scale: 0.03
-      selector: !type:BinomialNumberSelector
-        trials: 8
-        chance: 0.33
     feature:
-      offset: -0.5,-0.5,0.5,0.5
       table: GenericTrashItems
+      offset:
+        combine:
+        - -0.5,-0.5,0.5,0.5
+        - !type:ChunkRandomFeaturePosition
+      rolls: !type:ChunkScaleValueSelector
+        scale: 0.03
+        selector: !type:BinomialNumberSelector
+          trials: 8
+          chance: 0.33
 
 - type: entityEffect
   id: MaintroomsStructures
   effects:
   - !type:ChunkFeature
-    position: !type:ChunkRandomFeaturePosition
-    rolls: !type:ChunkScaleValueSelector
-      scale: 0.03
-      selector: !type:BinomialNumberSelector
-        trials: 3
-        chance: 0.33
     feature:
       ent: Girder
+      offset: !type:ChunkRandomFeaturePosition
+      rolls: !type:ChunkScaleValueSelector
+        scale: 0.03
+        selector: !type:BinomialNumberSelector
+          trials: 3
+          chance: 0.33
   - !type:ChunkFeature
-    position: !type:ChunkRandomFeaturePosition
-    rolls: !type:ChunkScaleValueSelector
-      scale: 0.03
-      selector: !type:BinomialNumberSelector
-        trials: 2
-        chance: 0.25
     feature:
       ent: ReinforcedGirder
+      offset: !type:ChunkRandomFeaturePosition
+      rolls: !type:ChunkScaleValueSelector
+        scale: 0.03
+        selector: !type:BinomialNumberSelector
+          trials: 2
+          chance: 0.25
   - !type:ChunkFeature
-    position: !type:ChunkRandomFeaturePosition
-    rolls: !type:ChunkScaleValueSelector
-      scale: 0.03
-      selector: !type:BinomialNumberSelector
-        trials: 3
-        chance: 0.25
     feature:
       ent: Window
+      offset: !type:ChunkRandomFeaturePosition
+      rolls: !type:ChunkScaleValueSelector
+        scale: 0.03
+        selector: !type:BinomialNumberSelector
+          trials: 3
+          chance: 0.25
   - !type:ChunkFeature
-    position: !type:ChunkRandomFeaturePosition
-    rolls: !type:ChunkScaleValueSelector
-      scale: 0.03
-      selector: !type:BinomialNumberSelector
-        trials: 2
-        chance: 0.25
     feature:
       ent: ReinforcedWindow
+      offset: !type:ChunkRandomFeaturePosition
+      rolls: !type:ChunkScaleValueSelector
+        scale: 0.03
+        selector: !type:BinomialNumberSelector
+          trials: 2
+          chance: 0.25

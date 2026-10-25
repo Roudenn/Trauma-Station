@@ -16,34 +16,34 @@
   - !type:RegionAssignRoles
     selector: !type:GroupChunkRoleSelector
       children:
-      - id: RoomMaintenance
+      - role: RoomMaintenance
         weight: 0.9
       - !type:SizeChunkRoleSelector
         weight: 0.1
         sizeDict:
           3,3: !type:GroupChunkRoleSelector
             children:
-            - id: RoomMaintenanceArcade
-            - id: RoomMaintenanceAtmos
-            - id: RoomMaintenanceBotany
-            - id: RoomMaintenanceDorm
-            - id: RoomMaintenanceEngineering
-            - id: RoomMaintenanceKitchen
-            - id: RoomMaintenanceMedical
-            - id: RoomMaintenancePrison
-            - id: RoomMaintenanceSecurity
-            - id: RoomMaintenanceGenerator
-            - id: RoomMaintenanceOutpost
+            - role: RoomMaintenanceArcade
+            - role: RoomMaintenanceAtmos
+            - role: RoomMaintenanceBotany
+            - role: RoomMaintenanceDorm
+            - role: RoomMaintenanceEngineering
+            - role: RoomMaintenanceKitchen
+            - role: RoomMaintenanceMedical
+            - role: RoomMaintenancePrison
+            - role: RoomMaintenanceSecurity
+            - role: RoomMaintenanceGenerator
+            - role: RoomMaintenanceOutpost
               weight: 0.2
           5,5: !type:GroupChunkRoleSelector
             children:
-            - id: RoomMaintenanceLibrary
+            - role: RoomMaintenanceLibrary
               weight: 2
-            - id: RoomMaintenanceOffice
+            - role: RoomMaintenanceOffice
               weight: 2
-            - id: RoomMaintenanceScience
-            - id: RoomMaintenanceBar
-            - id: RoomMaintenanceFirelockAnomaly
+            - role: RoomMaintenanceScience
+            - role: RoomMaintenanceBar
+            - role: RoomMaintenanceFirelockAnomaly
               weight: 0.1
   - !type:RegionTileFill
     tile: Plating

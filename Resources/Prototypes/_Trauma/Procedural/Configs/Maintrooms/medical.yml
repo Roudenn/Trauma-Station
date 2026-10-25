@@ -3,55 +3,55 @@
   effects:
   - !type:ChunkFeature
     feature: !type:GroupFeature
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - Center
       children:
       - id: MaintenanceMedicalChemistry
       - id: MaintenanceSurgeryOperatingTable
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - Center
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceMedical
   - !type:ChunkFeature
     feature:
       id: MaintenanceMedicalLockers
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - Top
-      - Bottom
-      - Left
-      - Right
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - Top
+        - Bottom
+        - Left
+        - Right
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceMedical
   - !type:ChunkFeature
     feature:
       id: MaintenanceMedicalBeds
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - Top
-      - Bottom
-      - Left
-      - Right
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - Top
+        - Bottom
+        - Left
+        - Right
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceMedical
   - !type:ChunkFeature
     feature:
       id: MaintenanceMedicalLoot
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - Top
-      - Bottom
-      - Left
-      - Right
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - Top
+        - Bottom
+        - Left
+        - Right
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceMedical
   - !type:ChunkFeature
     feature:
       id: MaintenanceMedicalDrain
-    position: !type:ChunkRandomFeaturePosition
+      offset: !type:ChunkRandomFeaturePosition
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceMedical

@@ -1,18 +1,18 @@
 - type: entityEffect
   id: MaintroomsAnomalies
   effects:
-  - !type:NestedDunGen
+  - !type:NestedEffect
     proto: MaintroomsFirelockAnomaly
 
-- type: dungeonLayers
+- type: entityEffect
   id: MaintroomsFirelockAnomaly # A lot of firelocks with a plasma chamber in the center.
   effects:
   - !type:ChunkFeature
     feature:
       id: MaintenanceAnomalyFireChamber
-    position: !type:ChunkSideFeaturePosition
-      availableSides:
-      - Center
+      offset: !type:ChunkSideFeaturePosition
+        availableSides:
+        - Center
     conditions:
     - !type:ChunkRoleCondition
       role: RoomMaintenanceFirelockAnomaly

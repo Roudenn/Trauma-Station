@@ -1,5 +1,6 @@
 using System.Globalization;
 using Robust.Shared.Serialization.Manager;
+using Robust.Shared.Serialization.Markdown.Mapping;
 using Robust.Shared.Serialization.Markdown.Validation;
 using Robust.Shared.Serialization.Markdown.Value;
 using Robust.Shared.Serialization.TypeSerializers.Interfaces;
@@ -8,7 +9,8 @@ namespace Content.Trauma.Shared.EntityFeatures.Positions;
 
 [TypeSerializer]
 public sealed class FeaturePositionTypeSerializer :
-    ITypeReader<FeaturePosition, ValueDataNode>
+    ITypeReader<FeaturePosition, ValueDataNode>,
+    ITypeReader<FeaturePosition, MappingDataNode>
 {
     public ValidationNode Validate(ISerializationManager serializationManager,
         ValueDataNode node,
@@ -48,6 +50,30 @@ public sealed class FeaturePositionTypeSerializer :
             var y2 = float.Parse(argsRange[3], CultureInfo.InvariantCulture);
             return new RangeFeaturePosition(new Vector2(x1, y1), new Vector2(x2, y2));
         }
+
+        return serializationManager.Read<FeaturePosition>(node, context, notNullableOverride: true);
+    }
+
+    public ValidationNode Validate(ISerializationManager serializationManager,
+        MappingDataNode node,
+        IDependencyCollection dependencies,
+        ISerializationContext? context = null)
+    {
+        if (node.Has(CombineFeaturePosition.CombineFieldName))
+            return serializationManager.ValidateNode<CombineFeaturePosition>(node, context);
+
+        return new ErrorNode(node, "Custom validation not supported! Please specify the type manually!");
+    }
+
+    public FeaturePosition Read(ISerializationManager serializationManager,
+        MappingDataNode node,
+        IDependencyCollection dependencies,
+        SerializationHookContext hookCtx,
+        ISerializationContext? context = null,
+        ISerializationManager.InstantiationDelegate<FeaturePosition>? instanceProvider = null)
+    {
+        if (node.Has(CombineFeaturePosition.CombineFieldName))
+            return serializationManager.Read<CombineFeaturePosition>(node, context, notNullableOverride: true);
 
         return serializationManager.Read<FeaturePosition>(node, context, notNullableOverride: true);
     }
