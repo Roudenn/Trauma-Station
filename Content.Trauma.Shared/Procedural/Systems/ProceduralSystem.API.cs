@@ -9,13 +9,13 @@ namespace Content.Trauma.Shared.Procedural.Systems;
 public sealed partial class ProceduralSystem
 {
     [PublicAPI]
-    public void EnsureProceduralGrid(EntityUid grid, ProtoId<ProceduralConfigPrototype> config)
+    public void EnsureProcedural(EntityUid grid, ProtoId<ProceduralConfigPrototype> config)
     {
-        EnsureProceduralGrid(grid, ProtoMan.Index(config).Config);
+        EnsureProcedural(grid, ProtoMan.Index(config).Config);
     }
 
     [PublicAPI]
-    public void EnsureProceduralGrid(EntityUid grid, ProceduralConfig config)
+    public void EnsureProcedural(EntityUid grid, ProceduralConfig config)
     {
         var comp = EnsureComp<ProceduralGridComponent>(grid);
         comp.Config = config;

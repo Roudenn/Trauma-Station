@@ -1,0 +1,24 @@
+- type: proceduralConfig
+  id: Debug
+  chunkGenerator: !type:BoxChunkGenerator
+    regionSize: 16,16
+    chunkDimensions: 8,8
+  regionGenerator: !type:GridRegionGenerator
+  chunkEffects: DebugProceduralChunkEffects
+  regionEffects: DebugProceduralRegionEffects
+  seed: 65
+
+- type: entityEffect
+  id: DebugProceduralRegionEffects
+  effects:
+  - !type:RegionTileFill
+    tile: Plating
+
+- type: entityEffect
+  id: DebugProceduralChunkEffects
+  effects:
+  - !type:ChunkFeature
+    feature:
+      ent: WallSolid
+      offset: !type:ChunkSideFeaturePosition
+        side: Center

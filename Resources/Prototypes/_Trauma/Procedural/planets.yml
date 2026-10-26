@@ -11,8 +11,8 @@
       Oxygen: 21.824879
       Nitrogen: 82.10312
   mapEffects:
-  - !type:MakeDunGen
-    dungeon: MaintRoomsDefault
+  #- !type:MakeDunGen
+  #  dungeon: MaintRoomsDefault
   - !type:AddComponents
     components:
     - type: DeviceNetworkSuppression
