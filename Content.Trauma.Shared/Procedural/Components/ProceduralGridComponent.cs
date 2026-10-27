@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using Content.Trauma.Common.Utilities;
+﻿using Content.Trauma.Common.Utilities;
 using Content.Trauma.Shared.Procedural.Regions;
 
 namespace Content.Trauma.Shared.Procedural.Components;
@@ -14,7 +13,7 @@ public sealed partial class ProceduralGridComponent : Component
     public ProceduralConfig Config = default!;
 
     [DataField]
-    public ConcurrentDictionary<Vector2i, Region> Regions = new();
+    public Dictionary<Vector2i, Region> Regions = new();
 
     [DataField]
     public DeterministicRandom Random = new();

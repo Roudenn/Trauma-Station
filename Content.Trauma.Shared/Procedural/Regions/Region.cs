@@ -5,4 +5,7 @@
 /// This struct contains basic information about the Chunk layout on a large area,
 /// which allows to create large open spaces that feel logical.
 /// </summary>
-public sealed record Region(Chunk[] Chunks, Vector2i Bounds, Vector2i GridIndices);
+public sealed record Region(Chunk[] Chunks, Vector2i Bounds, Vector2i GridIndices)
+{
+    public EntityUid RegionEnt;
+}

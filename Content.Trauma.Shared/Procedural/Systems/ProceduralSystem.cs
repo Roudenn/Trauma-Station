@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Threading;
+﻿using System.Threading;
 using Content.Trauma.Common.Utilities;
 using Content.Trauma.Shared.Procedural.Components;
 using Content.Trauma.Shared.Procedural.Regions;
@@ -38,6 +37,10 @@ public sealed partial class ProceduralSystem : EntitySystem
     private readonly Dictionary<MapId, List<Box2>> _loadAreasCache = new();
 
     private readonly HashSet<Vector2i> _regionPosCache = new();
+
+    private Vector2i[] _regionPosArray = [];
+
+    private Region[] _regionCache = [];
 
     /// <summary>
     /// Maximum time that can be spent on procedural loading.
@@ -98,7 +101,6 @@ public sealed partial class ProceduralSystem : EntitySystem
         }
 
         // Get all regions and chunks that have to be generated based on which areas are currently loaded.
-        var startTime = _timing.RealTime;
         var gridQuery = EntityQueryEnumerator<ProceduralGridComponent, MapGridComponent, TransformComponent>();
         while (gridQuery.MoveNext(out var gridUid, out var gridComp, out var mapGridComp, out var gridXform))
         {
@@ -116,10 +118,35 @@ public sealed partial class ProceduralSystem : EntitySystem
             if (_regionPosCache.Count == 0)
                 continue;
 
+            _regionPosArray.AsSpan().Clear();
+            Extensions.EnsureLength(ref _regionPosArray, _regionPosCache.Count);
+
+            var i = 0;
+            foreach (var pos in _regionPosCache)
+            {
+                if (gridComp.Regions.ContainsKey(pos))
+                    continue;
+
+                _regionPosArray[i] = pos;
+                i++;
+            }
+
+            Extensions.EnsureLength(ref _regionCache, i + 1);
+
             _regionsJob.Generator = gridComp.Config.ChunkGenerator;
+            _regionsJob.Random = gridComp.Random;
+            _regionsJob.Positions = _regionPosArray;
+            _regionsJob.Result = _regionCache;
             _parallel.ProcessNow(_regionsJob, _regionPosCache.Count);
 
-            // TODO region effects
+            for (int j = 0; j < _regionPosArray.Length; j++)
+            {
+                var region = _regionCache[j];
+                gridComp.Regions.Add(_regionPosArray[j], region);
+                var pos = _map.ToCoordinates(gridUid, region.GridIndices, mapGridComp);
+                var ent = Spawn("", pos);
+                region.RegionEnt = ent;
+            }
 
             // Generate chunks
             foreach (var (regionIndices, region) in gridComp.Regions)
@@ -127,7 +154,7 @@ public sealed partial class ProceduralSystem : EntitySystem
                 foreach (var chunk in region.Chunks)
                 {
                     // Drop the task when out of time.
-                    if (_timing.RealTime - startTime > _maxChunkProcessTime)
+                    if (_timing.RealTime - _timing.LastTick > _maxChunkProcessTime)
                         return;
 
                     var chunkBox = Box2.CenteredAround(
@@ -160,7 +187,7 @@ public sealed partial class ProceduralSystem : EntitySystem
         public ChunkGenerator Generator = default!;
         public DeterministicRandom Random = default!;
         public Vector2i[] Positions = default!;
-        public ConcurrentDictionary<Vector2i, Region> Result = default!;
+        public Region[] Result = default!;
         public ThreadLocal<ProceduralRegionVisitor> Visitors = default!;
 
         public int BatchSize => 1;
@@ -170,7 +197,7 @@ public sealed partial class ProceduralSystem : EntitySystem
             Visitors.Value ??= new ProceduralRegionVisitor();
             var pos = Positions[index];
             var region = Generator.Accept(Visitors.Value, new ProceduralRegionVisitor.Args(Random, pos));
-            Result.TryAdd(pos, region);
+            Result[index] = region;
         }
     }
 }
