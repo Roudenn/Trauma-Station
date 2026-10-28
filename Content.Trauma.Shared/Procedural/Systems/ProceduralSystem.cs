@@ -1,5 +1,4 @@
 ﻿using System.Threading;
-using Content.Trauma.Common.Utilities;
 using Content.Trauma.Shared.Procedural.Components;
 using Content.Trauma.Shared.Procedural.Regions;
 using Robust.Shared.Map;
@@ -21,6 +20,7 @@ namespace Content.Trauma.Shared.Procedural.Systems;
 /// </summary>
 public sealed partial class ProceduralSystem : EntitySystem
 {
+    [Dependency] private INetManager _net = default!;
     [Dependency] private IGameTiming _timing = default!;
     [Dependency] private IRobustRandom _random = default!;
     [Dependency] private IParallelManager _parallel = default!;
@@ -76,6 +76,9 @@ public sealed partial class ProceduralSystem : EntitySystem
     {
         base.Update(frameTime);
 
+        if (_net.IsClient)
+            return;
+
         // TODO PROCEDURAL:
         // Consider not recalculating the chunks that have to be loaded
         // This requires a deep rethinking and reorganization of the code below
@@ -87,18 +90,7 @@ public sealed partial class ProceduralSystem : EntitySystem
             area.Clear();
         }
 
-        var playerQuery = EntityQueryEnumerator<ActorComponent, TransformComponent>();
-        while (playerQuery.MoveNext(out _, out _, out var playerXform))
-        {
-            if (!_loadAreasCache.ContainsKey(playerXform.MapID))
-                _loadAreasCache.TryAdd(playerXform.MapID, new List<Box2>());
-
-            _loadAreasCache[playerXform.MapID]
-                .Add(
-                Box2.CenteredAround(
-                _xform.GetWorldPosition(playerXform),
-                new Vector2(DefaultLoadingArea)));
-        }
+        CalculateLoadBoxes(_loadAreasCache);
 
         // Get all regions and chunks that have to be generated based on which areas are currently loaded.
         var gridQuery = EntityQueryEnumerator<ProceduralGridComponent, MapGridComponent, TransformComponent>();
@@ -107,97 +99,23 @@ public sealed partial class ProceduralSystem : EntitySystem
             if (!_loadAreasCache.TryGetValue(gridXform.MapID, out var loaders))
                 continue; // No active loaders on the map
 
-            // Generate the regions that must be available before chunks can be generated.
-            _regionPosCache.Clear();
-
-            foreach (var box in loaders)
-            {
-                _regionPosCache.UnionWith(gridComp.Config.RegionGenerator.GetPositions(Vector2i.Zero, box.Center));
-            }
-
-            if (_regionPosCache.Count == 0)
-                continue;
-
-            _regionPosArray.AsSpan().Clear();
-            Extensions.EnsureLength(ref _regionPosArray, _regionPosCache.Count);
-
-            var i = 0;
-            foreach (var pos in _regionPosCache)
-            {
-                if (gridComp.Regions.ContainsKey(pos))
-                    continue;
-
-                _regionPosArray[i] = pos;
-                i++;
-            }
-
-            Extensions.EnsureLength(ref _regionCache, i + 1);
-
-            _regionsJob.Generator = gridComp.Config.ChunkGenerator;
-            _regionsJob.Random = gridComp.Random;
-            _regionsJob.Positions = _regionPosArray;
-            _regionsJob.Result = _regionCache;
-            _parallel.ProcessNow(_regionsJob, _regionPosCache.Count);
-
-            for (int j = 0; j < _regionPosArray.Length; j++)
-            {
-                var region = _regionCache[j];
-                gridComp.Regions.Add(_regionPosArray[j], region);
-                var pos = _map.ToCoordinates(gridUid, region.GridIndices, mapGridComp);
-                var ent = Spawn("", pos);
-                region.RegionEnt = ent;
-            }
-
-            // Generate chunks
-            foreach (var (regionIndices, region) in gridComp.Regions)
-            {
-                foreach (var chunk in region.Chunks)
-                {
-                    // Drop the task when out of time.
-                    if (_timing.RealTime - _timing.LastTick > _maxChunkProcessTime)
-                        return;
-
-                    var chunkBox = Box2.CenteredAround(
-                        _map.GridTileToWorldPos(gridUid, mapGridComp, regionIndices) + chunk.Position,
-                        chunk.Bounds.Size);
-                    bool doLoad = false;
-                    foreach (var loadBox in loaders)
-                    {
-                        if (loadBox.Intersects(chunkBox))
-                            doLoad = true;
-                    }
-
-                    if (!doLoad)
-                        continue;
-
-                    var pos = _map.GridTileToLocal(gridUid, mapGridComp, region.GridIndices).Offset(chunk.Position);
-                    var chunkEnt = Spawn(null, pos);
-                    var chunkComp = EnsureComp<ProceduralChunkComponent>(chunkEnt);
-                    chunkComp.GridOwner = gridUid;
-                    chunkComp.ChunkData = chunk;
-
-
-                }
-            }
+            GenerateRegions((gridUid, gridComp, mapGridComp), loaders);
+            GenerateChunks((gridUid, gridComp, mapGridComp), loaders);
         }
     }
 
-    private record struct GenerateRegionsJob() : IParallelRobustJob
+    private void CalculateLoadBoxes(Dictionary<MapId, List<Box2>> loadAreas)
     {
-        public ChunkGenerator Generator = default!;
-        public DeterministicRandom Random = default!;
-        public Vector2i[] Positions = default!;
-        public Region[] Result = default!;
-        public ThreadLocal<ProceduralRegionVisitor> Visitors = default!;
-
-        public int BatchSize => 1;
-
-        public void Execute(int index)
+        var playerQuery = EntityQueryEnumerator<ActorComponent, TransformComponent>();
+        while (playerQuery.MoveNext(out _, out _, out var playerXform))
         {
-            Visitors.Value ??= new ProceduralRegionVisitor();
-            var pos = Positions[index];
-            var region = Generator.Accept(Visitors.Value, new ProceduralRegionVisitor.Args(Random, pos));
-            Result[index] = region;
+            if (!loadAreas.ContainsKey(playerXform.MapID))
+                loadAreas.TryAdd(playerXform.MapID, new List<Box2>());
+
+            loadAreas[playerXform.MapID]
+                .Add(Box2.CenteredAround(
+                        _xform.GetWorldPosition(playerXform),
+                        new Vector2(DefaultLoadingArea)));
         }
     }
 }
