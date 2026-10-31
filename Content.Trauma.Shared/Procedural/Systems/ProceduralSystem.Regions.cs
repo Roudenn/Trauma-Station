@@ -48,7 +48,7 @@ public sealed partial class ProceduralSystem
             var region = _regionCache[j];
             grid.Comp1.Regions.Add(_regionPosArray[j], region);
             var pos = _map.ToCoordinates(grid.Owner, region.GridIndices, grid.Comp2);
-            var ent = Spawn("", pos);
+            var ent = Spawn(null, pos);
             var comp = EnsureComp<ProceduralRegionComponent>(ent);
             comp.GridOwner = grid.Owner;
             comp.RegionData = region;

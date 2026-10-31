@@ -12,5 +12,7 @@
 public record struct Chunk(
     Vector2i Position,
     Box2i Bounds,
-    Box2 GridBounds,
-    EntityUid Owner);
+    Box2 GridBounds)
+{
+    public EntityUid Owner;
+}

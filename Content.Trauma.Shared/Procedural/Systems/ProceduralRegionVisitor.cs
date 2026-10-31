@@ -28,7 +28,7 @@ public sealed class ProceduralRegionVisitor : IChunkGeneratorVisitor<ProceduralR
         for (int i = 0; i < _bspCache.Count; i++)
         {
             var box = _bspCache[i];
-            chunks[i] = new Chunk();
+            chunks[i] = new Chunk(box.Center.Floored(), box, box);
         }
 
         return new Region(chunks, generator.AreaSize, args.GridIndices);
@@ -40,7 +40,9 @@ public sealed class ProceduralRegionVisitor : IChunkGeneratorVisitor<ProceduralR
         var chunks = new Chunk[chunkCount];
         for (int i = 0; i < chunkCount; i++)
         {
-            chunks[i] = new Chunk();
+            var pos = new Vector2i();
+            var box = Box2.CenteredAround(pos, generator.ChunkDimensions);
+            chunks[i] = new Chunk(pos, (Box2i) box.Rounded(0), box);
         }
 
         return new Region(chunks,

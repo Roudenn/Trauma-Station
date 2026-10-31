@@ -47,8 +47,6 @@ public sealed partial class ProceduralSystem : EntitySystem
     /// </summary>
     private TimeSpan _maxChunkProcessTime = TimeSpan.FromMilliseconds(30);
 
-    private const float DefaultLoadingArea = 16f;
-
     //private ThreadLocal<ProceduralRegionVisitor> _regionVisitors = new();
 
     public override void Initialize()
@@ -106,8 +104,8 @@ public sealed partial class ProceduralSystem : EntitySystem
 
     private void CalculateLoadBoxes(Dictionary<MapId, List<Box2>> loadAreas)
     {
-        var playerQuery = EntityQueryEnumerator<ActorComponent, TransformComponent>();
-        while (playerQuery.MoveNext(out _, out _, out var playerXform))
+        var playerQuery = EntityQueryEnumerator<ProceduralLoaderComponent, TransformComponent>();
+        while (playerQuery.MoveNext(out _, out var loaderComp, out var playerXform))
         {
             if (!loadAreas.ContainsKey(playerXform.MapID))
                 loadAreas.TryAdd(playerXform.MapID, new List<Box2>());
@@ -115,7 +113,7 @@ public sealed partial class ProceduralSystem : EntitySystem
             loadAreas[playerXform.MapID]
                 .Add(Box2.CenteredAround(
                         _xform.GetWorldPosition(playerXform),
-                        new Vector2(DefaultLoadingArea)));
+                        new Vector2(loaderComp.Range)));
         }
     }
 }

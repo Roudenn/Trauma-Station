@@ -4,6 +4,7 @@
     regionSize: 16,16
     chunkDimensions: 8,8
   regionGenerator: !type:GridRegionGenerator
+    regionInterval: 128,128
   chunkEffects: DebugProceduralChunkEffects
   regionEffects: DebugProceduralRegionEffects
   seed: 65
