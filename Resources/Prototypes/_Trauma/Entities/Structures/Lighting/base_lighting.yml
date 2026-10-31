@@ -39,3 +39,41 @@
       types:
         Heat: 2
     popupText: powered-light-component-burn-hand
+
+# Humming lights
+
+- type: entity
+  id: HummingSmallLight
+  suffix: Humming, Always Powered
+  parent: SmallLight
+  components:
+  - type: AmbientSound
+    enabled: true
+    volume: -12
+    range: 5
+    sound:
+      path: /Audio/_Trauma/Effects/hum.ogg
+
+- type: entity
+  id: DimHummingSmallLight
+  suffix: Dim, Humming, Always Powered
+  parent: DimSmallLight
+  components:
+  - type: AmbientSound
+    enabled: true
+    volume: -12
+    range: 5
+    sound:
+      path: /Audio/_Trauma/Effects/hum.ogg
+
+- type: entity
+  id: WarmHummingSmallLight
+  suffix: Warm, Humming, Always Powered
+  parent: WarmSmallLight
+  components:
+  - type: AmbientSound
+    enabled: true
+    volume: -12
+    range: 5
+    sound:
+      path: /Audio/_Trauma/Effects/hum.ogg
