@@ -62,15 +62,15 @@ public sealed partial class ProceduralSystem
         public DeterministicRandom Random = default!;
         public Vector2i[] Positions = default!;
         public Region[] Result = default!;
-        public ThreadLocal<ProceduralRegionVisitor> Visitors = default!;
+        //public ThreadLocal<ProceduralRegionVisitor> Visitors = default!;
 
         public int BatchSize => 1;
 
         public void Execute(int index)
         {
-            Visitors.Value ??= new ProceduralRegionVisitor();
+            //Visitors.Value ??= new ProceduralRegionVisitor();
             var pos = Positions[index];
-            var region = Generator.Accept(Visitors.Value, new ProceduralRegionVisitor.Args(Random, pos));
+            var region = Generator.Accept(new ProceduralRegionVisitor(), new ProceduralRegionVisitor.Args(Random, pos));
             Result[index] = region;
         }
     }

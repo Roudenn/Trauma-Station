@@ -251,8 +251,6 @@ public sealed partial class DeterministicRandom : IRobustRandom
     /// <inheritdoc/>
     public void NextBytes(byte[] buffer)
     {
-        ArgumentNullException.ThrowIfNull(buffer);
-
         NextBytes(buffer.AsSpan());
     }
 
@@ -264,8 +262,6 @@ public sealed partial class DeterministicRandom : IRobustRandom
         {
             var value = NextUInt32();
 
-            // Explicit little-endian byte order makes the output
-            // independent of the machine's endianness.
             for (int shift = 0; shift < 32 && i < buffer.Length; shift += 8)
             {
                 buffer[i++] = (byte) (value >> shift);

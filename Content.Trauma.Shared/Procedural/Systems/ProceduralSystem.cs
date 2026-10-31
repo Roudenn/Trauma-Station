@@ -49,19 +49,19 @@ public sealed partial class ProceduralSystem : EntitySystem
 
     private const float DefaultLoadingArea = 16f;
 
-    private ThreadLocal<ProceduralRegionVisitor> _regionVisitors = new();
+    //private ThreadLocal<ProceduralRegionVisitor> _regionVisitors = new();
 
     public override void Initialize()
     {
         base.Initialize();
-        _regionVisitors = new ThreadLocal<ProceduralRegionVisitor>(() => new ProceduralRegionVisitor());
-        _regionsJob = new GenerateRegionsJob { Visitors = _regionVisitors };
+        //_regionVisitors = new ThreadLocal<ProceduralRegionVisitor>(() => new ProceduralRegionVisitor());
+        _regionsJob = new GenerateRegionsJob(); //{ Visitors = _regionVisitors };
     }
 
     public override void Shutdown()
     {
         base.Shutdown();
-        _regionVisitors.Dispose();
+        //_regionVisitors.Dispose();
     }
 
     // TODO PROCEDURAL FUTURE:
