@@ -1,9 +1,8 @@
-﻿using System.Threading;
+﻿using Content.Shared.EntityEffects;
 using Content.Trauma.Shared.Procedural.Components;
 using Content.Trauma.Shared.Procedural.Regions;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
-using Robust.Shared.Player;
 using Robust.Shared.Random;
 using Robust.Shared.Threading;
 using Robust.Shared.Timing;
@@ -26,6 +25,7 @@ public sealed partial class ProceduralSystem : EntitySystem
     [Dependency] private IParallelManager _parallel = default!;
     [Dependency] private SharedTransformSystem _xform = default!;
     [Dependency] private SharedMapSystem _map = default!;
+    [Dependency] private SharedEntityEffectsSystem _effects = default!;
 
     [Dependency] private EntityQuery<ProceduralGridComponent> _proceduralGridQuery;
 

@@ -43,7 +43,7 @@ public sealed partial class ProceduralSystem
         _regionsJob.Result = _regionCache;
         _parallel.ProcessNow(_regionsJob, _regionPosCache.Count);
 
-        for (int j = 0; j < _regionPosArray.Length; j++)
+        for (int j = 0; j < i; j++)
         {
             var region = _regionCache[j];
             grid.Comp1.Regions.Add(_regionPosArray[j], region);
@@ -53,6 +53,9 @@ public sealed partial class ProceduralSystem
             comp.GridOwner = grid.Owner;
             comp.RegionData = region;
             region.RegionEnt = ent;
+
+            if (grid.Comp1.Config.RegionEffects != null)
+                _effects.TryApplyEffect(ent, grid.Comp1.Config.RegionEffects.Value);
         }
     }
 

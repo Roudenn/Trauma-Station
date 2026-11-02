@@ -34,7 +34,7 @@ public sealed partial class RegionTileFillEffectSystem : EntityEffectSystem<Proc
             {
                 for (int x = 0; x < chunk.Bounds.Height; x++)
                 {
-                    _cache.Add((new Vector2i(x, y), tile));
+                    _cache.Add((new Vector2i(x, y) + chunk.Position + ent.Comp.RegionData.GridIndices, tile));
                 }
             }
         }

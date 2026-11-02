@@ -1,8 +1,10 @@
 ﻿using Content.Server.Administration;
 using Content.Shared.Administration;
+using Content.Shared.Maps;
 using Content.Trauma.Shared.Procedural.Prototypes;
 using Content.Trauma.Shared.Procedural.Systems;
 using Robust.Shared.Console;
+using Robust.Shared.Map;
 
 namespace Content.Trauma.Server.Commands;
 
@@ -17,6 +19,8 @@ public sealed partial class ProceduralMapCommand : LocalizedCommands
 
     public override string Command => "proceduralmap";
 
+    private static readonly ProtoId<ContentTileDefinition> BaseTile = "Plating";
+
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         if (!_protoMan.TryIndex<ProceduralConfigPrototype>(args[0], out var proto))
@@ -25,7 +29,10 @@ public sealed partial class ProceduralMapCommand : LocalizedCommands
             return;
         }
 
-        var map = _entMan.System<SharedMapSystem>().CreateMap();
-        _entMan.System<ProceduralSystem>().EnsureProcedural(map, proto);
+        var mapSystem = _entMan.System<SharedMapSystem>();
+        var map = mapSystem.CreateMap();
+        var grid = mapSystem.CreateGridEntity(map);
+        mapSystem.SetTile(grid, new Vector2i(0, 0), new Tile(_protoMan.Index(BaseTile).TileId));
+        _entMan.System<ProceduralSystem>().EnsureProcedural(grid, proto);
     }
 }

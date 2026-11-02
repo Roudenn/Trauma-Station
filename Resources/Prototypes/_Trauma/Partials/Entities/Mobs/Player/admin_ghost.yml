@@ -14,3 +14,4 @@
     - Abductor
   - type: Emagged # so cargo orders aren't announced and can bypass alert levels
     emagType: All
+  - type: ProceduralLoader

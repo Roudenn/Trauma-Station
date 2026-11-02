@@ -40,7 +40,7 @@ public sealed class ProceduralRegionVisitor : IChunkGeneratorVisitor<ProceduralR
         var chunks = new Chunk[chunkCount];
         for (int i = 0; i < chunkCount; i++)
         {
-            var pos = new Vector2i();
+            var pos = new Vector2i(i % generator.RegionSize.X, i / generator.RegionSize.X) * generator.ChunkDimensions;
             var box = Box2.CenteredAround(pos, generator.ChunkDimensions);
             chunks[i] = new Chunk(pos, (Box2i) box.Rounded(0), box);
         }
