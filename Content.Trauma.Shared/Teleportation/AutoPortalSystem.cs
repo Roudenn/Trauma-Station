@@ -76,7 +76,7 @@ public sealed partial class AutoPortalSystem : EntitySystem
             return false;
 
         EnsureComp(ref ent);
-        return ent.Comp.LinkedMaps.Add(map.Comp.MapId);
+        return ent.Comp!.LinkedMaps.Add(map.Comp.MapId);
     }
 
     /// <summary>
@@ -86,7 +86,7 @@ public sealed partial class AutoPortalSystem : EntitySystem
     public bool LinkToGrid(Entity<AutoPortalComponent?> ent, EntityUid grid)
     {
         EnsureComp(ref ent);
-        return ent.Comp.LinkedGrids.Add(grid);
+        return ent.Comp!.LinkedGrids.Add(grid);
     }
 
     /// <summary>
