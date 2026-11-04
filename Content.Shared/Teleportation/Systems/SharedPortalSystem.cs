@@ -130,6 +130,28 @@ public abstract partial class SharedPortalSystem : EntitySystem
             return;
         }
 
+        // <Trauma>
+        // This probably should be refactored but that requires changing more code below
+        var overrideEv = new PortalOverrideTargetEvent();
+        RaiseLocalEvent(ent.Owner, ref overrideEv);
+        if (overrideEv.Target != null)
+        {
+            if (_netMan.IsClient)
+                return;
+
+            if (HasComp<PortalComponent>(overrideEv.Target))
+            {
+                // if target is a portal, signal that they shouldn't be immediately teleported back
+                var timeout = EnsureComp<PortalTimeoutComponent>(subject);
+                timeout.EnteredPortal = ent;
+                Dirty(subject, timeout);
+            }
+
+            TeleportEntity(ent, subject, Transform(overrideEv.Target.Value).Coordinates, overrideEv.Target);
+            return;
+        }
+        // </Trauma>
+
         if (TryComp<LinkedEntityComponent>(ent, out var link) && link.LinkedEntities.Count != 0)
         {
             // check prediction
