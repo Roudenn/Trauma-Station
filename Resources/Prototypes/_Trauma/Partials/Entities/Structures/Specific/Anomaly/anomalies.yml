@@ -33,3 +33,8 @@
     - Copium
     - Nostalgia
     - Profanol
+
+- type: entity
+  id: AnomalyBluespace
+  components:
+  - type: AnomalyRift

@@ -4,6 +4,7 @@
   id: CarpRift
   components:
   - type: WaypointerTrackable
+  - type: AnomalyRift
 
 - type: entity
   abstract: true

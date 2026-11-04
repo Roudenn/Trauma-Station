@@ -1,0 +1,47 @@
+- type: entity
+  id: RiftLocatorUnpowered
+  parent: AnomalyLocatorUnpowered
+  name: rift locator
+  description: Uses highly advanced developments in redspace to detect space-time rifts of anomalous nature.
+  suffix: Always Powered
+  components:
+  - type: Sprite
+    sprite: _Trauma/Objects/Specific/Research/rift_locator.rsi
+  - type: ProximityDetector
+    range: 25
+    components:
+    - type: AnomalyRift
+  - type: Beeper
+    isMuted: true
+    minBeepInterval: 0.15
+    maxBeepInterval: 1.00
+    beepSound:
+      path: "/Audio/Items/locator_beep.ogg"
+      params:
+        maxDistance: 1
+        volume: -8
+  - type: PhysicalComposition #Goobstation - Recycle update
+    materialComposition:
+      Steel: 100
+      Glass: 25
+      Plasma: 50
+
+- type: entity
+  id: RiftLocator
+  parent: [ RiftLocatorUnpowered, PowerCellSlotSmallItem ]
+  suffix: ""
+  components:
+  - type: PowerCellDraw
+    drawRate: 1
+    useCharge: 0
+  - type: ToggleCellDraw
+
+- type: entity
+  id: RiftLocatorEmpty
+  parent: RiftLocator
+  suffix: Empty
+  components:
+  - type: ItemSlots
+    slots:
+      cell_slot:
+        name: power-cell-slot-component-slot-name-default
