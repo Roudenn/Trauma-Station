@@ -12,7 +12,8 @@
 public record struct Chunk(
     Vector2i Position,
     Box2i Bounds,
-    Box2 GridBounds)
+    Box2 GridBounds,
+    bool Initialized = false)
 {
     public EntityUid Owner;
 }

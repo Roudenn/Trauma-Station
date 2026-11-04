@@ -9,11 +9,16 @@ public sealed partial class ProceduralSystem
     {
         foreach (var (regionIndices, region) in grid.Comp1.Regions)
         {
-            foreach (var chunk in region.Chunks)
+            for (int i = 0; i < region.Chunks.Length; i++)
             {
+                var chunk = region.Chunks[i];
+
                 // Drop the task when out of time.
                 if (_timing.RealTime - _timing.LastTick > _maxChunkProcessTime)
                     return;
+
+                if (chunk.Initialized)
+                    continue;
 
                 var chunkBox = Box2.CenteredAround(
                     _map.GridTileToWorldPos(grid.Owner, grid.Comp2, regionIndices) + chunk.Position,
@@ -28,13 +33,17 @@ public sealed partial class ProceduralSystem
                 if (!doLoad)
                     continue;
 
+                region.Chunks[i].Initialized = true;
+
                 var pos = _map.GridTileToLocal(grid.Owner, grid.Comp2, region.GridIndices).Offset(chunk.Position);
                 var chunkEnt = Spawn(null, pos);
                 var chunkComp = EnsureComp<ProceduralChunkComponent>(chunkEnt);
                 chunkComp.GridOwner = grid.Owner;
                 chunkComp.ChunkData = chunk;
+                chunkComp.RegionData = region;
 
-
+                if (grid.Comp1.Config.ChunkEffects != null)
+                    _effects.TryApplyEffect(chunkEnt, grid.Comp1.Config.ChunkEffects.Value);
             }
         }
     }

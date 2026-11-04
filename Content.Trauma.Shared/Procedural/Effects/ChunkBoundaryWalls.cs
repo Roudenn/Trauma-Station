@@ -51,7 +51,7 @@ public sealed partial class ChunkBoundaryWallsEffectSystem : EntityEffectSystem<
             return;
 
         var box = ent.Comp.ChunkData.Bounds.Enlarged(args.Effect.Enlargement);
-        var chunkGridCenter = ent.Comp.ChunkData.Position;
+        var chunkGridCenter = ent.Comp.ChunkData.Position + ent.Comp.RegionData.GridIndices;
 
         for (int x = 0; x < box.Right; x++)
         {

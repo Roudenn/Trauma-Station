@@ -21,4 +21,7 @@ public sealed partial class ProceduralChunkComponent : Component
 
     [DataField]
     public Chunk ChunkData;
+
+    [DataField]
+    public Region RegionData;
 }
