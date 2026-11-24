@@ -14,6 +14,7 @@ using Content.Trauma.Shared.Heretic.Components;
 using Content.Trauma.Shared.Heretic.Events;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
+using System.Linq;
 
 namespace Content.Trauma.Shared.Heretic.Systems;
 
@@ -67,7 +68,7 @@ public sealed partial class TouchSpellSystem : EntitySystem
 
         if (args.HitEntities.Count == 1)
         {
-            args.Handled = TryUseTouchSpell(ent, args.User, args.HitEntities[0]);
+            args.Handled = TryUseTouchSpell(ent, args.User, args.HitEntities.First());
             return;
         }
 
@@ -169,7 +170,7 @@ public sealed partial class TouchSpellSystem : EntitySystem
             predicted);
 
         if (ent.Comp.DeleteOnInvoke && cooldownOverride != TimeSpan.Zero)
-            PredictedQueueDel(ent);
+            QueueDel(ent);
     }
 
     public void InvokeTouchSpell(EntityUid user,
@@ -209,7 +210,7 @@ public sealed partial class TouchSpellSystem : EntitySystem
     {
         if (FindTouchSpell(ent, args.TouchSpellWhitelist) is { } spell)
         {
-            PredictedQueueDel(spell);
+            QueueDel(spell);
             return null;
         }
 
@@ -230,7 +231,7 @@ public sealed partial class TouchSpellSystem : EntitySystem
         if (_hands.TryPickup(ent, touch, emptyHand, animate: false))
             return touch;
 
-        PredictedQueueDel(touch);
+        QueueDel(touch);
         return null;
     }
 }

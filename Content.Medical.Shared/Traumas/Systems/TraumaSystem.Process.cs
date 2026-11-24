@@ -126,6 +126,7 @@ public partial class TraumaSystem
         bool showAll = true)
     {
         var boneBroken = showAll && _boneQuery.TryComp(part, out var bone) && bone.BoneSeverity == BoneSeverity.Broken;
+
         foreach (var trauma in GetAllWoundTraumas(wound))
         {
             if (traumaType != null && trauma.Comp.TraumaType != traumaType)
@@ -237,7 +238,7 @@ public partial class TraumaSystem
             return traumaList;
 
         // Trauma chance is higher based on part integrity damage delta
-        var multiplier = MathF.Log(MathHelper.E + 0.1f * severity.Float());
+        var multiplier = MathF.Log(MathF.E + 0.1f * severity.Float());
 
         var target = (part, part.Comp);
         if (wound.Comp.AllowedTraumas.Contains(TraumaType.BoneDamage) &&
@@ -500,7 +501,7 @@ public partial class TraumaSystem
         var ev = new TraumaBeingRemovedEvent(trauma);
         RaiseLocalEvent(trauma.Comp.Wound, ref ev);
 
-        PredictedDel(trauma.Owner);
+        Del(trauma.Owner);
     }
 
     #endregion
@@ -555,10 +556,13 @@ public partial class TraumaSystem
                 case TraumaType.OrganDamage:
                     var traumaEnt = AddTrauma(targetChosen.Value, target, inflicter, TraumaType.OrganDamage, severity);
 
+                    // Organs have small amount of integrity, compensate it by dividing by 3
+                    var organSeverity = severity / 3;
+
                     if (traumaEnt != EntityUid.Invalid
-                        && !TryChangeOrganDamageModifier(targetChosen.Value, severity, traumaEnt, "WoundableDamage"))
+                        && !TryChangeOrganDamageModifier(targetChosen.Value, organSeverity, traumaEnt, "WoundableDamage"))
                     {
-                        TryCreateOrganDamageModifier(targetChosen.Value, severity, traumaEnt, "WoundableDamage");
+                        TryCreateOrganDamageModifier(targetChosen.Value, organSeverity, traumaEnt, "WoundableDamage");
                     }
 
                     break;

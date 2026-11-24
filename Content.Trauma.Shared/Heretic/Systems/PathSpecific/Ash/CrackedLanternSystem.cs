@@ -63,7 +63,7 @@ public sealed partial class CrackedLanternSystem : EntitySystem
         if (!args.IsHit || args.HitEntities.Count == 0 || !_heretic.IsHereticOrGhoul(args.User))
             return;
 
-        var target = args.HitEntities[0];
+        var target = args.HitEntities.First();
         if (args.User == target || !_mob.IsAlive(target))
             return;
 
@@ -202,7 +202,7 @@ public sealed partial class CrackedLanternSystem : EntitySystem
                 return;
             }
 
-            PredictedQueueDel(ent.Comp.Summoned.Value);
+            QueueDel(ent.Comp.Summoned.Value);
             ent.Comp.Summoned = null;
         }
 

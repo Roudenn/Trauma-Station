@@ -27,6 +27,7 @@ public sealed partial class OrganChipSystem : EntitySystem
     [Dependency] private SharedHandsSystem _hands = default!;
     [Dependency] private SharedDoAfterSystem _doAfter = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
+    [Dependency] private SharedTransformSystem _transform = default!;
     [Dependency] private EntityQuery<BypassInteractionChecksComponent> _bypassQuery = default!;
     [Dependency] private EntityQuery<OrganChipComponent> _query = default!;
     [Dependency] private EntityQuery<OrganChipContainerComponent> _containerQuery = default!;
@@ -249,7 +250,8 @@ public sealed partial class OrganChipSystem : EntitySystem
 
         var user = args.User;
         _popup.PopupEntity($"You pulled a chip out of the {OrganName(ent)}.", user, user);
-        _hands.TryPickupAnyHand(user, chip);
+        if (!_hands.TryPickupAnyHand(user, chip))
+            _transform.AttachToGridOrMap(chip);
         _adminLog.Add(LogType.Verb, $"{user:user} removed organ chip {chip:chip} from {ent:target}");
     }
 
@@ -378,21 +380,21 @@ public sealed partial class OrganChipSystem : EntitySystem
             if (!_containerQuery.TryComp(organ, out var container))
             {
                 Log.Error($"Tried to add chip {id} to {ToPrettyString(mob)}'s {category} organ {ToPrettyString(organ)} which was missing OrganChipContainer!");
-                PredictedDel(chip);
+                Del(chip);
                 return;
             }
 
             if (!_container.Insert(chip, container.Container))
             {
                 Log.Error($"Failed to insert chip {id} to {ToPrettyString(mob)}'s {ToPrettyString(organ)} chip container!");
-                PredictedDel(chip);
+                Del(chip);
             }
             return; // inserted
         }
 
         var organs = string.Join(", ", comp.Parents);
         Log.Error($"Tried to add chip {id} to {ToPrettyString(mob)} but it had no organs from {organs}!");
-        PredictedDel(chip);
+        Del(chip);
     }
 }
 

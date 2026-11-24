@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Content.Server.Antag;
 using Content.Server.Chat.Managers;
 using Content.Server.RoundEnd;
 using Content.Server.StationEvents.Components;
-using Content.Shared.Actions;
 using Content.Shared.Antag;
 using Content.Shared.Antag.Components;
 using Content.Shared.Chat;
@@ -22,16 +21,15 @@ using Content.Shared.Mind.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Movement.Pulling.Components;
-using Content.Shared.Roles;
 using Content.Shared.Station.Systems;
-using Content.Trauma.Server.BloodCult.Objectives;
 using Content.Trauma.Shared.BloodCult;
 using Content.Trauma.Shared.BloodCult.Components;
+using Content.Trauma.Shared.BloodCult.Constructs;
+using Content.Trauma.Shared.BloodCult.Constructs.SoulShard;
 using Content.Trauma.Shared.BloodCult.Gamerule;
 using Content.Trauma.Shared.BloodCult.Items;
 using Content.Trauma.Shared.BloodCult.Runes.Offering;
 using Content.Trauma.Shared.BloodCult.Runes.Rending;
-using Content.Trauma.Shared.Roles;
 using Robust.Shared.Containers;
 using Robust.Shared.Player;
 using Robust.Shared.Random;
@@ -51,10 +49,8 @@ public sealed partial class BloodCultRuleSystem : GameRuleSystem<BloodCultRuleCo
     [Dependency] private IRobustRandom _random = default!;
     [Dependency] private MobStateSystem _mob = default!;
     [Dependency] private RoundEndSystem _roundEnd = default!;
-    [Dependency] private SharedActionsSystem _actions = default!;
     [Dependency] private SharedContainerSystem _container = default!;
     [Dependency] private SharedHandsSystem _hands = default!;
-    [Dependency] private SharedRoleSystem _role = default!;
     [Dependency] private SharedMindSystem _mind = default!;
     [Dependency] private StationSystem _station = default!;
     [Dependency] private EntityQuery<ActorComponent> _actorQuery = default!;
@@ -62,6 +58,8 @@ public sealed partial class BloodCultRuleSystem : GameRuleSystem<BloodCultRuleCo
     [Dependency] private EntityQuery<BloodCultLeaderComponent> _leaderQuery = default!;
     [Dependency] private EntityQuery<BloodCultRuleComponent> _query = default!;
     [Dependency] private EntityQuery<BloodCultTargetComponent> _targetQuery = default!;
+    [Dependency] private EntityQuery<ConstructComponent> _constructQuery = default!;
+    [Dependency] private EntityQuery<SoulShardComponent> _soulShardQuery = default!;
 
     private static readonly Color AnnounceColor = Color.FromHex("#dc143c");
 
@@ -145,7 +143,10 @@ public sealed partial class BloodCultRuleSystem : GameRuleSystem<BloodCultRuleCo
             return;
 
         rule.Comp.TargetSacrificed = true;
-        DirtyField(rule, rule.Comp, nameof(BloodCultRuleComponent.TargetSacrificed));
+        rule.Comp.OfferingTarget = null;
+        DirtyFields(rule.AsNullable(), null,
+            nameof(BloodCultRuleComponent.TargetSacrificed),
+            nameof(BloodCultRuleComponent.OfferingTarget));
         AnnounceToCult(rule, "Nar'Sie's target has been sacrificed! Summon her to your realm and elevate your cult to godhood!");
     }
 
@@ -164,7 +165,9 @@ public sealed partial class BloodCultRuleSystem : GameRuleSystem<BloodCultRuleCo
         rule.Comp.WinCondition = CultWinCondition.Win;
         _roundEnd.EndRound();
 
-        foreach (var ent in rule.Comp.Cultists)
+        var cultists = rule.Comp.Cultists;
+        rule.Comp.Cultists = new();
+        foreach (var ent in cultists)
         {
             if (Deleted(ent))
                 continue;
@@ -177,14 +180,17 @@ public sealed partial class BloodCultRuleSystem : GameRuleSystem<BloodCultRuleCo
         }
     }
 
-    [SubscribeLocalEvent]
+    [SubscribeLocalEvent(before: [typeof(AntagObjectivesSystem)])]
     private void OnAntagEntitySelected(Entity<BloodCultRuleComponent> rule, ref AfterAntagEntitySelectedEvent args)
     {
         var mob = args.EntityUid;
         _cult.SetCultRule(mob, rule);
-        rule.Comp.Cultists.Add(mob);
-        UpdateCultistAppearance(mob, rule.Comp.Stage, rule.Comp.EyeColor);
-        UpdateCultStage(rule.Comp);
+        if (!_constructQuery.HasComp(mob) && !_soulShardQuery.HasComp(mob))
+        {
+            rule.Comp.Cultists.Add(mob);
+            UpdateCultistAppearance(mob, rule.Comp.Stage, rule.Comp.EyeColor);
+            UpdateCultStage(rule.Comp);
+        }
 
         // W pvs
         var query = EntityQueryEnumerator<BloodCultMemberComponent>();
@@ -206,7 +212,7 @@ public sealed partial class BloodCultRuleSystem : GameRuleSystem<BloodCultRuleCo
     }
 
     [SubscribeLocalEvent]
-    private void OnCultistRemove(Entity<BloodCultistComponent> cultist, ref ComponentRemove args)
+    private void OnCultistRemove(Entity<BloodCultistComponent> cultist, ref ComponentShutdown args)
     {
         if (_cult.GetRule(cultist) is { } rule)
         {
@@ -272,8 +278,8 @@ public sealed partial class BloodCultRuleSystem : GameRuleSystem<BloodCultRuleCo
         if (!_actorQuery.TryComp(target, out var actor))
             return false;
 
-        var antagEnt = (rule, antag);
-        return _antag.TryMakeAntag(antagEnt, specifier, actor.PlayerSession, checkPref: false);
+        _antag.ForceMakeAntag(actor.PlayerSession, (rule, antag), ProtoMan.Index(specifier));
+        return true;
     }
 
     private void CheckRoundShouldEnd()

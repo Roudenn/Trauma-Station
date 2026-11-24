@@ -324,7 +324,7 @@ public sealed partial class HereticBladeSystem : EntitySystem
 
     private void ShatterBlade(Entity<HereticBladeComponent> ent, EntityUid user)
     {
-        PredictedQueueDel(ent);
+        QueueDel(ent);
         _audio.PlayPredicted(ent.Comp.ShatterSound, user, user);
     }
 
@@ -346,8 +346,9 @@ public sealed partial class HereticBladeSystem : EntitySystem
         if (!args.IsHit || !_heretic.TryGetHereticComponent(args.User, out var heretic, out _))
             return;
 
-        ApplyBladeHitEffects(ent, args.User, args.HitEntities, heretic);
-        ApplyBladeBonuses(ent, args.User, heretic, args.BaseDamage, args.BonusDamage, (List<EntityUid>) args.HitEntities);
+        var list = args.HitEntities.ToList(); // TODO: refactor to allow hashset
+        ApplyBladeHitEffects(ent, args.User, list, heretic);
+        ApplyBladeBonuses(ent, args.User, heretic, args.BaseDamage, args.BonusDamage, list);
     }
 
     private void OnBeforeThrowDamage(Entity<HereticBladeComponent> ent, ref BeforeDamageOtherOnHitEvent args)

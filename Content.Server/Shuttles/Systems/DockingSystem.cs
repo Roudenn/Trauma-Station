@@ -45,7 +45,7 @@ public sealed partial class DockingSystem : SharedDockingSystem
     }
 
     [SubscribeLocalEvent]
-    private void OnShutdown(EntityUid uid, DockingComponent component, ComponentShutdown args)
+    private void OnShutdown(EntityUid uid, DockingComponent component, ref ComponentShutdown args)
     {
         if (component.DockedWith == null ||
             MetaData(uid).EntityLifeStage > EntityLifeStage.MapInitialized)
@@ -98,12 +98,12 @@ public sealed partial class DockingSystem : SharedDockingSystem
     }
 
     [SubscribeLocalEvent]
-    private void OnDockingReAnchor(Entity<DockingComponent> entity, ref ReAnchorEvent args)
+    private void OnDockingMove(Entity<DockingComponent> entity, ref MoveEvent args)
     {
         var uid = entity.Owner;
         var component = entity.Comp;
 
-        if (!component.Docked)
+        if (!component.Docked || args.OnlyRotation)
             return;
 
         var otherDock = component.DockedWith;
